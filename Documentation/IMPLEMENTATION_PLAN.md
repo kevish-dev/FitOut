@@ -1,6 +1,6 @@
 # Implementation plan and repository audit
 
-Authoritative requirements: [PRD v1.0](PRD.md). Scope of this checkpoint: **Phase 0 only**. User requests a Git checkpoint after each small feature. Target device: standard iPhone 17, portrait.
+Authoritative requirements: [PRD v1.0](PRD.md). Scope: **all PRD phases**, authorized by the latest “complete this app end to end” request. User requests a Git checkpoint after each small feature. Target device: standard iPhone 17, portrait.
 
 ## Existing implementation, 2026-10-23
 
@@ -24,7 +24,7 @@ Authoritative requirements: [PRD v1.0](PRD.md). Scope of this checkpoint: **Phas
 1. Versioned local SwiftData store and repository interfaces; preserve existing onboarding through a one-time legacy import; add persistence, rollback, and migration tests.
 2. Injected runtime capability provider for HealthKit, on-device Foundation Models, and Image Playground. Availability checks only, no authorization, queries, generation or network traffic.
 3. Dependency container, recoverable startup, five-tab navigation and Settings entry. Keep all unfinished modules as honest empty states with working navigation, not fake data or inactive action buttons.
-4. Build and run tests on iPhone 17, navigate all tabs with integrations unavailable, test relaunch and record actual results. Stop and report before Phase 1.
+4. Build and run tests on iPhone 17, navigate all tabs with integrations unavailable, test relaunch and record actual results. Report actual results, then continue Phase 1.
 
 ## Roadmap after Phase 0
 

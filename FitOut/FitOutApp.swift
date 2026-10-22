@@ -2,12 +2,31 @@ import SwiftUI
 
 @main
 struct FitOutApp: App {
-    @State private var store = OnboardingStore()
     var body: some Scene {
-        WindowGroup {
-            OnboardingView(store: store)
-                .preferredColorScheme(.dark)
-                .tint(FitTheme.orange)
+        WindowGroup { AppRoot().tint(FitTheme.orange).preferredColorScheme(.dark) }
+    }
+}
+
+struct AppRoot: View {
+    @State private var container: AppContainer?
+    @State private var failure: String?
+    var body: some View {
+        Group {
+            if let container {
+                if container.onboarding.profile.completedAt != nil {
+                    AppShell(container: container)
+                } else { OnboardingView(store: container.onboarding) }
+            } else if let failure {
+                ContentUnavailableView {
+                    Label("Your data could not be opened", systemImage: "externaldrive.badge.exclamationmark")
+                } description: {
+                    Text("Your saved files are preserved. \(failure)")
+                } actions: { Button("Retry", action: open).buttonStyle(.borderedProminent) }
+            } else { ProgressView("Opening FitOut…").task { open() } }
         }
+    }
+    private func open() {
+        do { container = try AppContainer.live(); failure = nil }
+        catch { failure = error.localizedDescription }
     }
 }

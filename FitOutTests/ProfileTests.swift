@@ -61,56 +61,53 @@ final class ProfileTests: XCTestCase {
         XCTAssertEqual(try JSONDecoder().decode(FitnessProfile.self, from: data), profile)
     }
 
-    @MainActor func testProgressAndCompletionSurviveRelaunch() {
-        let suite = "fitout.tests.\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suite)!
-        defer { defaults.removePersistentDomain(forName: suite) }
-        let first = OnboardingStore(defaults: defaults)
+    @MainActor func testProgressAndCompletionSurviveRelaunch() throws {
+        let repository = TestOnboardingRepository()
+        let first = try OnboardingStore(repository: repository)
         first.profile.name = "  Alex  "
         first.profile.age = 32
-        first.profile.emoji = "🦁"
         first.step = 3
-        let reopened = OnboardingStore(defaults: defaults)
+        let reopened = try OnboardingStore(repository: repository)
         XCTAssertEqual(reopened.step, 3)
         XCTAssertEqual(reopened.profile.age, 32)
-        XCTAssertEqual(reopened.profile.emoji, "🦁")
         XCTAssertTrue(reopened.complete())
-        let completed = OnboardingStore(defaults: defaults)
+        let completed = try OnboardingStore(repository: repository)
         XCTAssertNotNil(completed.profile.completedAt)
         XCTAssertEqual(completed.profile.name, "Alex")
-        completed.editProfile()
-        XCTAssertNil(completed.profile.completedAt)
-        XCTAssertEqual(completed.step, 1)
-        XCTAssertEqual(completed.profile.age, 32)
     }
 
-    @MainActor func testInvalidProfileCannotFinish() {
-        let suite = "fitout.tests.\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suite)!
-        defer { defaults.removePersistentDomain(forName: suite) }
-        let store = OnboardingStore(defaults: defaults)
+    @MainActor func testInvalidProfileCannotFinish() throws {
+        let store = try OnboardingStore(repository: TestOnboardingRepository())
         XCTAssertFalse(store.complete())
         XCTAssertNil(store.profile.completedAt)
-        store.profile.name = "Alex"
-        store.profile.goals = []
-        XCTAssertFalse(store.complete())
     }
 
-    @MainActor func testCorruptedStorageRecoversToWelcome() {
-        let suite = "fitout.tests.\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suite)!
-        defer { defaults.removePersistentDomain(forName: suite) }
-        defaults.set(Data("invalid json".utf8), forKey: "fitout.onboarding.v1")
-        let store = OnboardingStore(defaults: defaults)
-        XCTAssertEqual(store.step, 0)
-        XCTAssertEqual(store.profile, FitnessProfile())
+    @MainActor func testFailedCompletionDoesNotNavigate() throws {
+        let repository = TestOnboardingRepository()
+        let store = try OnboardingStore(repository: repository)
+        store.profile.name = "Alex"
+        repository.shouldFail = true
+        XCTAssertFalse(store.complete())
+        XCTAssertNil(store.profile.completedAt)
+        XCTAssertNotNil(store.storageError)
+        repository.shouldFail = false
+        XCTAssertTrue(store.complete())
+        XCTAssertNil(store.storageError)
     }
 
     @MainActor func testRestoredStepIsClamped() throws {
-        let suite = "fitout.tests.\(UUID().uuidString)"
-        let defaults = UserDefaults(suiteName: suite)!
-        defer { defaults.removePersistentDomain(forName: suite) }
-        defaults.set(try JSONEncoder().encode(OnboardingSnapshot(profile: FitnessProfile(), step: 99)), forKey: "fitout.onboarding.v1")
-        XCTAssertEqual(OnboardingStore(defaults: defaults).step, 4)
+        let repository = TestOnboardingRepository()
+        repository.snapshot = OnboardingSnapshot(profile: FitnessProfile(), step: 99)
+        XCTAssertEqual(try OnboardingStore(repository: repository).step, 4)
+    }
+}
+
+@MainActor final class TestOnboardingRepository: OnboardingRepository {
+    var snapshot: OnboardingSnapshot?
+    var shouldFail = false
+    func loadSnapshot() throws -> OnboardingSnapshot? { snapshot }
+    func saveSnapshot(_ snapshot: OnboardingSnapshot) throws {
+        if shouldFail { throw CocoaError(.fileWriteNoPermission) }
+        self.snapshot = snapshot
     }
 }

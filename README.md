@@ -1,35 +1,11 @@
 # FitOut
 
-Native SwiftUI onboarding for **iPhone 17**, built from the five supplied black-and-orange references. Portrait, dark appearance, bundled Orbitron/Rajdhani fonts, and an offline hero photograph. No web view or third-party runtime dependencies.
+Native, local-first SwiftUI fitness app for iPhone 17. Swift 6, iOS 18+, no third-party runtime dependencies or backend. On-device Apple Intelligence requires iOS 26 and runtime availability.
 
-## Run
+Open `FitOut.xcodeproj`, choose the **FitOut** scheme and **iPhone 17**, then Run or Test. With XcodeGen installed, `xcodegen generate` regenerates the project from `project.yml`.
 
-Open `FitOut.xcodeproj`, select the **FitOut** scheme and **iPhone 17** destination, then press **⌘R**. To run on a physical iPhone, select your development team in Signing & Capabilities. The checked-in Xcode project is ready to use; XcodeGen is only needed if editing `project.yml`.
+The approved orange/charcoal visual theme lives in `Views/DesignSystem.swift`. Functional implementation follows [the PRD](Documentation/PRD.md) and [phase plan](Documentation/IMPLEMENTATION_PLAN.md). See [actual verification results](Documentation/VERIFICATION.md) for completed checks and limitations.
 
-## Implemented
+Data stays on this device in a versioned SwiftData database. Existing onboarding drafts import once from the original UserDefaults format without deleting the backup. Failed stores are preserved and show Retry. HealthKit and Apple-native AI are optional capabilities, never prerequisites for manual tracking.
 
-- Welcome screen with a real, accessible Get Started button.
-- Name validation, 60 emoji avatars across four pages, and native Photos picker with square image resizing.
-- Gender selection and snapping age wheel (13–100).
-- Independent current/target weights, scrolling ruler, and kg/lb units. Canonical values stay in kilograms to avoid conversion drift.
-- Eight fitness goals with multiple selections, empty-selection validation, and a draggable finish control with a VoiceOver action.
-- Saved profile summary, edit flow, and native sharing.
-- Draft and completed profiles persist locally with UserDefaults; no account or network connection is needed.
-
-The screenshots cover onboarding. Completion opens the saved profile summary; workout logging, cloud sync, and a training dashboard are outside this implementation.
-
-## Tests
-
-Press **⌘U** with iPhone 17 selected. `FitOutTests` covers required fields, age and weight bounds, independent weight values, unit conversion, profile serialization, relaunch persistence, completion, editing, corrupt storage recovery, and step bounds.
-
-The same tests can run on macOS with `swift test` through the included `Package.swift`.
-
-## Source map
-
-- `FitOut/Views/`: five onboarding screens, shared controls, and completion summary.
-- `FitOut/Models/`: profile types and persistent state.
-- `FitOut/Resources/`: bundled image, app icon, fonts, and font licenses.
-- `project.yml`: XcodeGen project source.
-- `Tools/GenerateIcon.swift`: native vector wordmark icon generator.
-
-The hero photo was prepared with image generation using the supplied welcome image to remove baked-in interface text. The other screens are native SwiftUI components. The app uses the actual iPhone status bar and home indicator, rather than drawing mock device chrome. Orbitron and Rajdhani are distributed under their bundled SIL Open Font Licenses.
+This repository is under active implementation; unfinished modules display honest empty states. No demo workouts, meals, health readings, or progress statistics are seeded into production data.

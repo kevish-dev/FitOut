@@ -7,7 +7,7 @@ let package = Package(
     platforms: [.macOS(.v14)],
     products: [.library(name: "FitOutCore", targets: ["FitOutCore"])],
     targets: [
-        .target(name: "FitOutCore", path: "FitOut/Models"),
+        .target(name: "FitOutCore", path: "FitOut", sources: ["Models", "Core/Storage"]),
         .testTarget(name: "FitOutCoreTests", dependencies: ["FitOutCore"], path: "FitOutTests", sources: ["ProfileTests.swift"])
     ]
 )

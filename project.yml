@@ -45,6 +45,16 @@ targets:
       base:
         GENERATE_INFOPLIST_FILE: YES
         TARGETED_DEVICE_FAMILY: "1"
+  FitOutUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [FitOutUITests]
+    dependencies:
+      - target: FitOut
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1"
 schemes:
   FitOut:
     build:
@@ -52,6 +62,6 @@ schemes:
         FitOut: all
     test:
       debugEnabled: false
-      targets: [FitOutTests]
+      targets: [FitOutTests, FitOutUITests]
     run:
       debugEnabled: false

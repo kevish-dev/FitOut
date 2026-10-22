@@ -50,6 +50,17 @@
                ReferencedContainer = "container:FitOut.xcodeproj">
             </BuildableReference>
          </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "9561B3C23D9BBE9E8F9C3BFC"
+               BuildableName = "FitOutUITests.xctest"
+               BlueprintName = "FitOutUITests"
+               ReferencedContainer = "container:FitOut.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <CommandLineArguments>
       </CommandLineArguments>
@@ -74,6 +85,8 @@
             ReferencedContainer = "container:FitOut.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <CommandLineArguments>
+      </CommandLineArguments>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"

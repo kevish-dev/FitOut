@@ -3,16 +3,15 @@ import Observation
 
 @MainActor @Observable
 final class OnboardingStore {
-    var profile: FitnessProfile { didSet { persist() } }
-    var step: Int { didSet { persist() } }
+    var profile: FitnessProfile { didSet { if !applying { persist() } } }
+    var step: Int { didSet { if !applying { persist() } } }
     var storageError: String?
-    private let defaults: UserDefaults
-    private static let key = "fitout.onboarding.v1"
+    private let repository: any OnboardingRepository
+    private var applying = false
 
-    init(defaults: UserDefaults = .standard) {
-        self.defaults = defaults
-        let saved = defaults.data(forKey: Self.key)
-            .flatMap { try? JSONDecoder().decode(OnboardingSnapshot.self, from: $0) }
+    init(repository: any OnboardingRepository) throws {
+        self.repository = repository
+        let saved = try repository.loadSnapshot()
         profile = saved?.profile ?? FitnessProfile()
         step = min(max(saved?.step ?? 0, 0), 4)
         if profile.completedAt != nil && !profile.canComplete {
@@ -23,21 +22,24 @@ final class OnboardingStore {
 
     @discardableResult func complete() -> Bool {
         guard profile.canComplete else { return false }
-        profile.name = profile.trimmedName
-        profile.completedAt = Date()
-        return true
-    }
-
-    func editProfile() {
-        profile.completedAt = nil
-        step = 1
-    }
-
-    private func persist() {
+        var candidate = profile
+        candidate.name = candidate.trimmedName
+        candidate.completedAt = Date()
         do {
-            defaults.set(try JSONEncoder().encode(OnboardingSnapshot(profile: profile, step: step)), forKey: Self.key)
-        } catch {
-            storageError = "Your changes could not be saved. Please try again."
-        }
+            try repository.saveSnapshot(OnboardingSnapshot(profile: candidate, step: step))
+            applying = true
+            profile = candidate
+            applying = false
+            storageError = nil
+            return true
+        } catch { storageError = error.localizedDescription; return false }
+    }
+
+    func editProfile() { profile.completedAt = nil; step = 1 }
+    func persist() {
+        do {
+            try repository.saveSnapshot(OnboardingSnapshot(profile: profile, step: step))
+            storageError = nil
+        } catch { storageError = error.localizedDescription }
     }
 }

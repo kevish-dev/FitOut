@@ -141,4 +141,3 @@ struct WelcomeScreen: View {
     }
 }
 
-#Preview { OnboardingView(store: OnboardingStore(defaults: UserDefaults(suiteName: "fitout.preview")!)) }
