@@ -15,6 +15,7 @@
 		3D0FCDDFDDD2FAFEE04DB5D7 /* FitOutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */; };
 		400EA581DAF184E2BB8CADEE /* SwiftDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D8E4F8336E4F1028340F5B /* SwiftDataRepository.swift */; };
 		480D8ECEDE1F6EA2DDBD14DE /* orbitron-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */; };
+		5B942A6F130D212AA769CB19 /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E06E72006F94C883E88ADE79 /* CapabilityTests.swift */; };
 		62BE1CCC9FEE0BA00560D2E3 /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A058FE4B0C32CA6DE72AE792 /* PersistenceTests.swift */; };
 		658BB85E1C3604F63C39C81F /* rajdhani-500.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A2F37F01FD300A00EF4835A9 /* rajdhani-500.ttf */; };
 		6CBD24737E9791E340618F8C /* orbitron-700.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7B7F21158E5B770C62F60AEA /* orbitron-700.ttf */; };
@@ -22,6 +23,7 @@
 		8AD820F05EE6D3FD992320E7 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A26CE3AA6A76836F4D85A5 /* DesignSystem.swift */; };
 		9C036E9CEDA55B18D3D1E99A /* OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8521FB8F40CDC52DC0E729F9 /* OnboardingStore.swift */; };
 		9D144F2A7794EE4800D52D36 /* FitOutSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = A258C80F9DA85FC523368FD7 /* FitOutSchema.swift */; };
+		A27BE7051006DE096036BF4B /* CapabilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE158ECDB43A8891AB07FC /* CapabilityService.swift */; };
 		A7E156778D3E4B51FA4CAF2F /* GoalsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD588983899ED41104F7B633 /* GoalsScreen.swift */; };
 		BC19655BC5CEB954886742C5 /* rajdhani-600.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 89FD33D70129134AC4DC66B7 /* rajdhani-600.ttf */; };
 		BE0A9D2A52CF99228401F17C /* orbitron-800.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 79A505A2868DBC24CC79D1F9 /* orbitron-800.ttf */; };
@@ -50,6 +52,7 @@
 		27D8E4F8336E4F1028340F5B /* SwiftDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataRepository.swift; sourceTree = "<group>"; };
 		29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessProfile.swift; sourceTree = "<group>"; };
 		309FF4CAB360D8D7F7C65114 /* CompletionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionScreen.swift; sourceTree = "<group>"; };
+		57BE158ECDB43A8891AB07FC /* CapabilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityService.swift; sourceTree = "<group>"; };
 		5B34B8171F92F92C919FA673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		70527C9CBB10BD40886D6C27 /* GenderAgeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenderAgeScreen.swift; sourceTree = "<group>"; };
 		79A505A2868DBC24CC79D1F9 /* orbitron-800.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "orbitron-800.ttf"; sourceTree = "<group>"; };
@@ -69,12 +72,14 @@
 		CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		D02EE5C7D0EC131F25C78957 /* FitOut.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FitOut.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5AD094E75EDCD00D742446D /* FitOutTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FitOutTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E06E72006F94C883E88ADE79 /* CapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
 		3EC67EAD137BE1CFEDEA8F7E /* FitOutTests */ = {
 			isa = PBXGroup;
 			children = (
+				E06E72006F94C883E88ADE79 /* CapabilityTests.swift */,
 				A058FE4B0C32CA6DE72AE792 /* PersistenceTests.swift */,
 				0A679CD19EA0DF1595351C3D /* ProfileTests.swift */,
 			);
@@ -91,6 +96,14 @@
 				B6DADE99E6B30E0A1D76405F /* Views */,
 			);
 			path = FitOut;
+			sourceTree = "<group>";
+		};
+		525064689C99CE3910D225F1 /* Capabilities */ = {
+			isa = PBXGroup;
+			children = (
+				57BE158ECDB43A8891AB07FC /* CapabilityService.swift */,
+			);
+			path = Capabilities;
 			sourceTree = "<group>";
 		};
 		59E281FB19C4716B9CD01EE1 /* Fonts */ = {
@@ -149,6 +162,7 @@
 		96F8D26FDD9965A0BAA0B9E3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				525064689C99CE3910D225F1 /* Capabilities */,
 				928C96FE7B071CD275D78C13 /* Storage */,
 			);
 			path = Core;
@@ -177,7 +191,7 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		"TEMP_01063530-0702-4FC9-A977-4EB3487E34CC" /* Features */ = {
+		"TEMP_EF05A57E-85D3-4046-9635-B6084B805F8F" /* Features */ = {
 			isa = PBXGroup;
 			children = (
 			);
@@ -282,6 +296,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B942A6F130D212AA769CB19 /* CapabilityTests.swift in Sources */,
 				62BE1CCC9FEE0BA00560D2E3 /* PersistenceTests.swift in Sources */,
 				F72580E8DD2271831D3DF578 /* ProfileTests.swift in Sources */,
 			);
@@ -291,6 +306,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A27BE7051006DE096036BF4B /* CapabilityService.swift in Sources */,
 				D5A7963D83294C7FAF61C127 /* CompletionScreen.swift in Sources */,
 				8AD820F05EE6D3FD992320E7 /* DesignSystem.swift in Sources */,
 				3D0FCDDFDDD2FAFEE04DB5D7 /* FitOutApp.swift in Sources */,
