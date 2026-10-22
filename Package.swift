@@ -8,6 +8,6 @@ let package = Package(
     products: [.library(name: "FitOutCore", targets: ["FitOutCore"])],
     targets: [
         .target(name: "FitOutCore", path: "FitOut/Models"),
-        .testTarget(name: "FitOutCoreTests", dependencies: ["FitOutCore"], path: "FitOutTests")
+        .testTarget(name: "FitOutCoreTests", dependencies: ["FitOutCore"], path: "FitOutTests", sources: ["ProfileTests.swift"])
     ]
 )

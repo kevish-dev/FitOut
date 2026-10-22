@@ -10,20 +10,25 @@
 		06A9BCD86F6C2D129BC73EB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E3271F3A8C5AB14221648D0 /* Assets.xcassets */; };
 		0E07556CD688B8D6530A9E60 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F964206E6311DF336277F6 /* OnboardingView.swift */; };
 		156E6362BF68F230ADE91059 /* FitnessProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */; };
+		1F7DACD3DBA74924AF66B797 /* StorageContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDB9EE50477E60A26DBC1B9E /* StorageContracts.swift */; };
 		2617E173D09B5BCE84BE4BDB /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */; };
 		3D0FCDDFDDD2FAFEE04DB5D7 /* FitOutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */; };
+		400EA581DAF184E2BB8CADEE /* SwiftDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D8E4F8336E4F1028340F5B /* SwiftDataRepository.swift */; };
 		480D8ECEDE1F6EA2DDBD14DE /* orbitron-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */; };
+		62BE1CCC9FEE0BA00560D2E3 /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A058FE4B0C32CA6DE72AE792 /* PersistenceTests.swift */; };
 		658BB85E1C3604F63C39C81F /* rajdhani-500.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A2F37F01FD300A00EF4835A9 /* rajdhani-500.ttf */; };
 		6CBD24737E9791E340618F8C /* orbitron-700.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7B7F21158E5B770C62F60AEA /* orbitron-700.ttf */; };
 		7A60A927198B8CA10B48DBFF /* rajdhani-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 13D8096CF5ED44F3B8DB0F09 /* rajdhani-LICENSE.txt */; };
 		8AD820F05EE6D3FD992320E7 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A26CE3AA6A76836F4D85A5 /* DesignSystem.swift */; };
 		9C036E9CEDA55B18D3D1E99A /* OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8521FB8F40CDC52DC0E729F9 /* OnboardingStore.swift */; };
+		9D144F2A7794EE4800D52D36 /* FitOutSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = A258C80F9DA85FC523368FD7 /* FitOutSchema.swift */; };
 		A7E156778D3E4B51FA4CAF2F /* GoalsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD588983899ED41104F7B633 /* GoalsScreen.swift */; };
 		BC19655BC5CEB954886742C5 /* rajdhani-600.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 89FD33D70129134AC4DC66B7 /* rajdhani-600.ttf */; };
 		BE0A9D2A52CF99228401F17C /* orbitron-800.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 79A505A2868DBC24CC79D1F9 /* orbitron-800.ttf */; };
 		C6C53448DF71B23CB21F2770 /* GenderAgeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70527C9CBB10BD40886D6C27 /* GenderAgeScreen.swift */; };
 		D102DDDF2F4894AB66F3D49B /* WeightScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D780BFF22DAED374AF64BE1 /* WeightScreen.swift */; };
 		D5A7963D83294C7FAF61C127 /* CompletionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309FF4CAB360D8D7F7C65114 /* CompletionScreen.swift */; };
+		E6CF4753B7D56EE3FC3BB3F7 /* PersistenceFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 981149BAB7F28B936CA7D8AA /* PersistenceFactory.swift */; };
 		F72580E8DD2271831D3DF578 /* ProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A679CD19EA0DF1595351C3D /* ProfileTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -42,6 +47,7 @@
 		13D8096CF5ED44F3B8DB0F09 /* rajdhani-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "rajdhani-LICENSE.txt"; sourceTree = "<group>"; };
 		1E3271F3A8C5AB14221648D0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		24F964206E6311DF336277F6 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		27D8E4F8336E4F1028340F5B /* SwiftDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataRepository.swift; sourceTree = "<group>"; };
 		29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessProfile.swift; sourceTree = "<group>"; };
 		309FF4CAB360D8D7F7C65114 /* CompletionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionScreen.swift; sourceTree = "<group>"; };
 		5B34B8171F92F92C919FA673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -52,8 +58,12 @@
 		89FD33D70129134AC4DC66B7 /* rajdhani-600.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "rajdhani-600.ttf"; sourceTree = "<group>"; };
 		8D780BFF22DAED374AF64BE1 /* WeightScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightScreen.swift; sourceTree = "<group>"; };
 		91A26CE3AA6A76836F4D85A5 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
+		981149BAB7F28B936CA7D8AA /* PersistenceFactory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceFactory.swift; sourceTree = "<group>"; };
+		A058FE4B0C32CA6DE72AE792 /* PersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTests.swift; sourceTree = "<group>"; };
+		A258C80F9DA85FC523368FD7 /* FitOutSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitOutSchema.swift; sourceTree = "<group>"; };
 		A2F37F01FD300A00EF4835A9 /* rajdhani-500.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "rajdhani-500.ttf"; sourceTree = "<group>"; };
 		AD588983899ED41104F7B633 /* GoalsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsScreen.swift; sourceTree = "<group>"; };
+		BDB9EE50477E60A26DBC1B9E /* StorageContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageContracts.swift; sourceTree = "<group>"; };
 		BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "orbitron-LICENSE.txt"; sourceTree = "<group>"; };
 		C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitOutApp.swift; sourceTree = "<group>"; };
 		CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
@@ -65,6 +75,7 @@
 		3EC67EAD137BE1CFEDEA8F7E /* FitOutTests */ = {
 			isa = PBXGroup;
 			children = (
+				A058FE4B0C32CA6DE72AE792 /* PersistenceTests.swift */,
 				0A679CD19EA0DF1595351C3D /* ProfileTests.swift */,
 			);
 			path = FitOutTests;
@@ -75,6 +86,7 @@
 			children = (
 				C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */,
 				5B34B8171F92F92C919FA673 /* Info.plist */,
+				96F8D26FDD9965A0BAA0B9E3 /* Core */,
 				C0AD828A82DD9D4AC603FDBD /* Models */,
 				B6DADE99E6B30E0A1D76405F /* Views */,
 			);
@@ -123,6 +135,25 @@
 			path = FitOut/Resources;
 			sourceTree = "<group>";
 		};
+		928C96FE7B071CD275D78C13 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				A258C80F9DA85FC523368FD7 /* FitOutSchema.swift */,
+				981149BAB7F28B936CA7D8AA /* PersistenceFactory.swift */,
+				BDB9EE50477E60A26DBC1B9E /* StorageContracts.swift */,
+				27D8E4F8336E4F1028340F5B /* SwiftDataRepository.swift */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		96F8D26FDD9965A0BAA0B9E3 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				928C96FE7B071CD275D78C13 /* Storage */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
 		B6DADE99E6B30E0A1D76405F /* Views */ = {
 			isa = PBXGroup;
 			children = (
@@ -144,6 +175,13 @@
 				8521FB8F40CDC52DC0E729F9 /* OnboardingStore.swift */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		"TEMP_01063530-0702-4FC9-A977-4EB3487E34CC" /* Features */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Features;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -244,6 +282,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				62BE1CCC9FEE0BA00560D2E3 /* PersistenceTests.swift in Sources */,
 				F72580E8DD2271831D3DF578 /* ProfileTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -255,12 +294,16 @@
 				D5A7963D83294C7FAF61C127 /* CompletionScreen.swift in Sources */,
 				8AD820F05EE6D3FD992320E7 /* DesignSystem.swift in Sources */,
 				3D0FCDDFDDD2FAFEE04DB5D7 /* FitOutApp.swift in Sources */,
+				9D144F2A7794EE4800D52D36 /* FitOutSchema.swift in Sources */,
 				156E6362BF68F230ADE91059 /* FitnessProfile.swift in Sources */,
 				C6C53448DF71B23CB21F2770 /* GenderAgeScreen.swift in Sources */,
 				A7E156778D3E4B51FA4CAF2F /* GoalsScreen.swift in Sources */,
 				9C036E9CEDA55B18D3D1E99A /* OnboardingStore.swift in Sources */,
 				0E07556CD688B8D6530A9E60 /* OnboardingView.swift in Sources */,
+				E6CF4753B7D56EE3FC3BB3F7 /* PersistenceFactory.swift in Sources */,
 				2617E173D09B5BCE84BE4BDB /* ProfileScreen.swift in Sources */,
+				1F7DACD3DBA74924AF66B797 /* StorageContracts.swift in Sources */,
+				400EA581DAF184E2BB8CADEE /* SwiftDataRepository.swift in Sources */,
 				D102DDDF2F4894AB66F3D49B /* WeightScreen.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -412,9 +455,9 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.app;
+				SDKROOT = iphoneos;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -466,9 +509,9 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.app;
+				SDKROOT = iphoneos;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
