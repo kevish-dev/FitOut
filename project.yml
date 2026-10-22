@@ -1,0 +1,57 @@
+name: FitOut
+options:
+  bundleIdPrefix: com.fitout
+  deploymentTarget:
+    iOS: "18.0"
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    TARGETED_DEVICE_FAMILY: "1"
+    CODE_SIGN_STYLE: Automatic
+targets:
+  FitOut:
+    type: application
+    platform: iOS
+    sources:
+      - path: FitOut
+        excludes: [Resources]
+      - path: FitOut/Resources
+        buildPhase: resources
+    info:
+      path: FitOut/Info.plist
+      properties:
+        CFBundleDisplayName: FitOut
+        UILaunchScreen: {}
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
+        UIUserInterfaceStyle: Dark
+        UIAppFonts: [orbitron-700.ttf, orbitron-800.ttf, rajdhani-500.ttf, rajdhani-600.ttf]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fitout.app
+        TARGETED_DEVICE_FAMILY: "1"
+        SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
+        SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+  FitOutTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources: [FitOutTests]
+    dependencies:
+      - target: FitOut
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        TARGETED_DEVICE_FAMILY: "1"
+schemes:
+  FitOut:
+    build:
+      targets:
+        FitOut: all
+    test:
+      debugEnabled: false
+      targets: [FitOutTests]
+    run:
+      debugEnabled: false

@@ -1,0 +1,509 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		06A9BCD86F6C2D129BC73EB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E3271F3A8C5AB14221648D0 /* Assets.xcassets */; };
+		0E07556CD688B8D6530A9E60 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F964206E6311DF336277F6 /* OnboardingView.swift */; };
+		156E6362BF68F230ADE91059 /* FitnessProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */; };
+		2617E173D09B5BCE84BE4BDB /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */; };
+		3D0FCDDFDDD2FAFEE04DB5D7 /* FitOutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */; };
+		480D8ECEDE1F6EA2DDBD14DE /* orbitron-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */; };
+		658BB85E1C3604F63C39C81F /* rajdhani-500.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A2F37F01FD300A00EF4835A9 /* rajdhani-500.ttf */; };
+		6CBD24737E9791E340618F8C /* orbitron-700.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7B7F21158E5B770C62F60AEA /* orbitron-700.ttf */; };
+		7A60A927198B8CA10B48DBFF /* rajdhani-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 13D8096CF5ED44F3B8DB0F09 /* rajdhani-LICENSE.txt */; };
+		8AD820F05EE6D3FD992320E7 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A26CE3AA6A76836F4D85A5 /* DesignSystem.swift */; };
+		9C036E9CEDA55B18D3D1E99A /* OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8521FB8F40CDC52DC0E729F9 /* OnboardingStore.swift */; };
+		A7E156778D3E4B51FA4CAF2F /* GoalsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD588983899ED41104F7B633 /* GoalsScreen.swift */; };
+		BC19655BC5CEB954886742C5 /* rajdhani-600.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 89FD33D70129134AC4DC66B7 /* rajdhani-600.ttf */; };
+		BE0A9D2A52CF99228401F17C /* orbitron-800.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 79A505A2868DBC24CC79D1F9 /* orbitron-800.ttf */; };
+		C6C53448DF71B23CB21F2770 /* GenderAgeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70527C9CBB10BD40886D6C27 /* GenderAgeScreen.swift */; };
+		D102DDDF2F4894AB66F3D49B /* WeightScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D780BFF22DAED374AF64BE1 /* WeightScreen.swift */; };
+		D5A7963D83294C7FAF61C127 /* CompletionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309FF4CAB360D8D7F7C65114 /* CompletionScreen.swift */; };
+		F72580E8DD2271831D3DF578 /* ProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A679CD19EA0DF1595351C3D /* ProfileTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		80FE6E3E5FF60C6C50752F9C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CD7002275BB306B65B938AAA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 02D208A9E4DDDB35E13376FC;
+			remoteInfo = FitOut;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		0A679CD19EA0DF1595351C3D /* ProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTests.swift; sourceTree = "<group>"; };
+		13D8096CF5ED44F3B8DB0F09 /* rajdhani-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "rajdhani-LICENSE.txt"; sourceTree = "<group>"; };
+		1E3271F3A8C5AB14221648D0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		24F964206E6311DF336277F6 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
+		29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessProfile.swift; sourceTree = "<group>"; };
+		309FF4CAB360D8D7F7C65114 /* CompletionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionScreen.swift; sourceTree = "<group>"; };
+		5B34B8171F92F92C919FA673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		70527C9CBB10BD40886D6C27 /* GenderAgeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenderAgeScreen.swift; sourceTree = "<group>"; };
+		79A505A2868DBC24CC79D1F9 /* orbitron-800.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "orbitron-800.ttf"; sourceTree = "<group>"; };
+		7B7F21158E5B770C62F60AEA /* orbitron-700.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "orbitron-700.ttf"; sourceTree = "<group>"; };
+		8521FB8F40CDC52DC0E729F9 /* OnboardingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStore.swift; sourceTree = "<group>"; };
+		89FD33D70129134AC4DC66B7 /* rajdhani-600.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "rajdhani-600.ttf"; sourceTree = "<group>"; };
+		8D780BFF22DAED374AF64BE1 /* WeightScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightScreen.swift; sourceTree = "<group>"; };
+		91A26CE3AA6A76836F4D85A5 /* DesignSystem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DesignSystem.swift; sourceTree = "<group>"; };
+		A2F37F01FD300A00EF4835A9 /* rajdhani-500.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "rajdhani-500.ttf"; sourceTree = "<group>"; };
+		AD588983899ED41104F7B633 /* GoalsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsScreen.swift; sourceTree = "<group>"; };
+		BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "orbitron-LICENSE.txt"; sourceTree = "<group>"; };
+		C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitOutApp.swift; sourceTree = "<group>"; };
+		CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
+		D02EE5C7D0EC131F25C78957 /* FitOut.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FitOut.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5AD094E75EDCD00D742446D /* FitOutTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FitOutTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		3EC67EAD137BE1CFEDEA8F7E /* FitOutTests */ = {
+			isa = PBXGroup;
+			children = (
+				0A679CD19EA0DF1595351C3D /* ProfileTests.swift */,
+			);
+			path = FitOutTests;
+			sourceTree = "<group>";
+		};
+		48659561E6BB884030CAF67C /* FitOut */ = {
+			isa = PBXGroup;
+			children = (
+				C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */,
+				5B34B8171F92F92C919FA673 /* Info.plist */,
+				C0AD828A82DD9D4AC603FDBD /* Models */,
+				B6DADE99E6B30E0A1D76405F /* Views */,
+			);
+			path = FitOut;
+			sourceTree = "<group>";
+		};
+		59E281FB19C4716B9CD01EE1 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				7B7F21158E5B770C62F60AEA /* orbitron-700.ttf */,
+				79A505A2868DBC24CC79D1F9 /* orbitron-800.ttf */,
+				BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */,
+				A2F37F01FD300A00EF4835A9 /* rajdhani-500.ttf */,
+				89FD33D70129134AC4DC66B7 /* rajdhani-600.ttf */,
+				13D8096CF5ED44F3B8DB0F09 /* rajdhani-LICENSE.txt */,
+			);
+			path = Fonts;
+			sourceTree = "<group>";
+		};
+		5FEAC53828D14C15F2A2AEC4 = {
+			isa = PBXGroup;
+			children = (
+				48659561E6BB884030CAF67C /* FitOut */,
+				3EC67EAD137BE1CFEDEA8F7E /* FitOutTests */,
+				7CB8137DB05D7711D63E1418 /* Resources */,
+				761AC60A8C4B270E557381C5 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		761AC60A8C4B270E557381C5 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D02EE5C7D0EC131F25C78957 /* FitOut.app */,
+				D5AD094E75EDCD00D742446D /* FitOutTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		7CB8137DB05D7711D63E1418 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				1E3271F3A8C5AB14221648D0 /* Assets.xcassets */,
+				59E281FB19C4716B9CD01EE1 /* Fonts */,
+			);
+			name = Resources;
+			path = FitOut/Resources;
+			sourceTree = "<group>";
+		};
+		B6DADE99E6B30E0A1D76405F /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				309FF4CAB360D8D7F7C65114 /* CompletionScreen.swift */,
+				91A26CE3AA6A76836F4D85A5 /* DesignSystem.swift */,
+				70527C9CBB10BD40886D6C27 /* GenderAgeScreen.swift */,
+				AD588983899ED41104F7B633 /* GoalsScreen.swift */,
+				24F964206E6311DF336277F6 /* OnboardingView.swift */,
+				CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */,
+				8D780BFF22DAED374AF64BE1 /* WeightScreen.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		C0AD828A82DD9D4AC603FDBD /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */,
+				8521FB8F40CDC52DC0E729F9 /* OnboardingStore.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		02D208A9E4DDDB35E13376FC /* FitOut */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 67F63E6582793053579D6BA4 /* Build configuration list for PBXNativeTarget "FitOut" */;
+			buildPhases = (
+				C497FA13674B9649FD4A95D6 /* Sources */,
+				513865FFE2EF7396D2748DAD /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FitOut;
+			packageProductDependencies = (
+			);
+			productName = FitOut;
+			productReference = D02EE5C7D0EC131F25C78957 /* FitOut.app */;
+			productType = "com.apple.product-type.application";
+		};
+		DA5212B1524CAF4ECD5F8642 /* FitOutTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2353130C61C388B78A3A7280 /* Build configuration list for PBXNativeTarget "FitOutTests" */;
+			buildPhases = (
+				3FE4AF1667ED812810DA2F2D /* Sources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				6928F48FB10652C561FFB140 /* PBXTargetDependency */,
+			);
+			name = FitOutTests;
+			packageProductDependencies = (
+			);
+			productName = FitOutTests;
+			productReference = D5AD094E75EDCD00D742446D /* FitOutTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CD7002275BB306B65B938AAA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1430;
+				TargetAttributes = {
+					02D208A9E4DDDB35E13376FC = {
+						ProvisioningStyle = Automatic;
+					};
+					DA5212B1524CAF4ECD5F8642 = {
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = D24211E7F54F117FAEE5815F /* Build configuration list for PBXProject "FitOut" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 5FEAC53828D14C15F2A2AEC4;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 761AC60A8C4B270E557381C5 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				02D208A9E4DDDB35E13376FC /* FitOut */,
+				DA5212B1524CAF4ECD5F8642 /* FitOutTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		513865FFE2EF7396D2748DAD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				06A9BCD86F6C2D129BC73EB0 /* Assets.xcassets in Resources */,
+				6CBD24737E9791E340618F8C /* orbitron-700.ttf in Resources */,
+				BE0A9D2A52CF99228401F17C /* orbitron-800.ttf in Resources */,
+				480D8ECEDE1F6EA2DDBD14DE /* orbitron-LICENSE.txt in Resources */,
+				658BB85E1C3604F63C39C81F /* rajdhani-500.ttf in Resources */,
+				BC19655BC5CEB954886742C5 /* rajdhani-600.ttf in Resources */,
+				7A60A927198B8CA10B48DBFF /* rajdhani-LICENSE.txt in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3FE4AF1667ED812810DA2F2D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F72580E8DD2271831D3DF578 /* ProfileTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C497FA13674B9649FD4A95D6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D5A7963D83294C7FAF61C127 /* CompletionScreen.swift in Sources */,
+				8AD820F05EE6D3FD992320E7 /* DesignSystem.swift in Sources */,
+				3D0FCDDFDDD2FAFEE04DB5D7 /* FitOutApp.swift in Sources */,
+				156E6362BF68F230ADE91059 /* FitnessProfile.swift in Sources */,
+				C6C53448DF71B23CB21F2770 /* GenderAgeScreen.swift in Sources */,
+				A7E156778D3E4B51FA4CAF2F /* GoalsScreen.swift in Sources */,
+				9C036E9CEDA55B18D3D1E99A /* OnboardingStore.swift in Sources */,
+				0E07556CD688B8D6530A9E60 /* OnboardingView.swift in Sources */,
+				2617E173D09B5BCE84BE4BDB /* ProfileScreen.swift in Sources */,
+				D102DDDF2F4894AB66F3D49B /* WeightScreen.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		6928F48FB10652C561FFB140 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 02D208A9E4DDDB35E13376FC /* FitOut */;
+			targetProxy = 80FE6E3E5FF60C6C50752F9C /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		036A20F2D65B93763FC954D1 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		1D3E9DF5637D67C1DA8C80A7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		60864AF63D521116C5F6A6DA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = FitOut/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.app;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		8D703989CE2984441E330B75 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.FitOutTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FitOut.app/FitOut";
+			};
+			name = Release;
+		};
+		A64BC33B1E5B5DFE0C5D64F2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				GENERATE_INFOPLIST_FILE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.FitOutTests;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FitOut.app/FitOut";
+			};
+			name = Debug;
+		};
+		DB8267BA6DF5DC6E8B9F573B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = FitOut/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.app;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2353130C61C388B78A3A7280 /* Build configuration list for PBXNativeTarget "FitOutTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A64BC33B1E5B5DFE0C5D64F2 /* Debug */,
+				8D703989CE2984441E330B75 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		67F63E6582793053579D6BA4 /* Build configuration list for PBXNativeTarget "FitOut" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				60864AF63D521116C5F6A6DA /* Debug */,
+				DB8267BA6DF5DC6E8B9F573B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		D24211E7F54F117FAEE5815F /* Build configuration list for PBXProject "FitOut" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1D3E9DF5637D67C1DA8C80A7 /* Debug */,
+				036A20F2D65B93763FC954D1 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CD7002275BB306B65B938AAA /* Project object */;
+}
