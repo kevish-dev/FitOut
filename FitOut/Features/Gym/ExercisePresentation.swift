@@ -83,3 +83,67 @@ struct ExerciseFilter {
             .replacingOccurrences(of: "-", with: "").replacingOccurrences(of: "/", with: " ")
     }
 }
+
+enum ExerciseLibraryScope: String, CaseIterable, Identifiable {
+    case all = "All", favorites = "Favorites", custom = "My exercises"
+    var id: Self { self }
+}
+
+enum ExerciseSortOrder: String, CaseIterable, Identifiable {
+    case nameAscending = "Name: A–Z", nameDescending = "Name: Z–A", muscle = "Muscle group", equipment = "Equipment"
+    var id: Self { self }
+    var shortTitle: String {
+        switch self { case .nameAscending: "A–Z"; case .nameDescending: "Z–A"; case .muscle: "Muscle"; case .equipment: "Equipment" }
+    }
+    func sorted(_ exercises: [ExerciseDefinition]) -> [ExerciseDefinition] {
+        func compare(_ left: String, _ right: String) -> ComparisonResult {
+            left.compare(right, options: [.caseInsensitive, .diacriticInsensitive, .numeric], locale: .current)
+        }
+        return exercises.sorted { left, right in
+            let primary: ComparisonResult
+            switch self {
+            case .nameAscending: primary = compare(left.name, right.name)
+            case .nameDescending: primary = compare(right.name, left.name)
+            case .muscle: primary = compare(left.muscles.first?.title ?? "", right.muscles.first?.title ?? "")
+            case .equipment: primary = compare(left.equipment, right.equipment)
+            }
+            if primary != .orderedSame { return primary == .orderedAscending }
+            let name = compare(left.name, right.name)
+            return name == .orderedSame ? left.id < right.id : name == .orderedAscending
+        }
+    }
+}
+
+struct ExerciseBrowseFilters: Equatable {
+    var muscles: [Muscle] = []
+    var category: ExerciseCategory?
+    var equipment: ExerciseEquipment?
+    var count: Int { muscles.count + (category == nil ? 0 : 1) + (equipment == nil ? 0 : 1) }
+}
+
+struct ExerciseLibraryQuery {
+    var search = ""
+    var scope: ExerciseLibraryScope = .all
+    var filters = ExerciseBrowseFilters()
+    var sort: ExerciseSortOrder = .nameAscending
+
+    func results(in exercises: [ExerciseDefinition]) -> [ExerciseDefinition] {
+        let filter = ExerciseFilter(search: search, muscles: filters.muscles, favoritesOnly: scope == .favorites,
+                                    category: filters.category, equipment: filters.equipment)
+        return sort.sorted(exercises.filter { filter.matches($0) && (scope != .custom || $0.isCustom) })
+    }
+}
+
+/// Search, filters and sorting never change the order in which movements are added.
+struct ExercisePickerSelection {
+    private(set) var ids: [String] = []
+    mutating func add(_ id: String) { if !ids.contains(id) { ids.append(id) } }
+    mutating func remove(_ id: String) { ids.removeAll { $0 == id } }
+    mutating func toggle(_ id: String) { if ids.contains(id) { remove(id) } else { add(id) } }
+    mutating func clear() { ids = [] }
+    mutating func retainAvailable(_ available: Set<String>) { ids.removeAll { !available.contains($0) } }
+    func exercises(in catalogue: [ExerciseDefinition]) -> [ExerciseDefinition] {
+        let byID = Dictionary(catalogue.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        return ids.compactMap { byID[$0] }
+    }
+}

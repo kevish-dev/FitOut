@@ -6,6 +6,32 @@ Search covers names, aliases, equipment, movement patterns and primary/secondary
 
 Exercises have appropriate weight/repetition, repetition-only or time/distance tracking. Band and assisted movements use repetition-only tracking rather than contributing an invented load to weighted volume. The catalogue does not prescribe a personalized routine.
 
+## Browsing and selection
+
+The library, routine add/replace picker and live workout picker use the same
+`ExerciseBrowser`. The search field, All/Favorites/My exercises scopes and
+filter/sort controls share a consistent layout. Larger exercise illustrations
+are fitted without cropping. Each card has options for details and persistent
+favorites, alongside its browse/select action; buttons are not nested.
+
+- Sort by name in either direction, primary muscle group or equipment. Sorting
+  uses case/diacritic-insensitive natural comparisons with stable ID tie-breaks;
+  no invented recency or popularity values are used.
+- Filters are edited in a sheet with muscle/equipment/type chips and the existing
+  muscle map. Its result count respects the current search and scope. Apply
+  commits the draft; Cancel discards it. Active filters can be removed directly
+  from the results, including a muscle-only filter.
+- Multi-select shows chosen positions on the cards and a fixed Add button. The
+  selection tray exposes hidden selections in their chosen order and supports
+  removal or clearing. Search, filter and sort changes do not remove or reorder
+  selected exercises. Removed catalogue entries are reconciled out of selection.
+- New custom exercises are named from the search and seeded with selected muscle
+  filters. Save requires a name and primary muscle. Creating one in a multi-picker
+  selects it once; in a single picker it is returned after the editor dismisses.
+- Search focus collapses secondary controls to make room above the keyboard.
+  Done stays beside the search field. Filter grids and controls adapt to larger
+  accessibility sizes. Content and footer use the shared page/card spacing.
+
 ## Bundled exercise images
 
 21 original illustrations supplied in `Imgs/` are bundled in the asset catalogue. [EXERCISE_ARTWORK.json](EXERCISE_ARTWORK.json) records each source filename, assigned exercise, dimensions and SHA-256 hash. Originals are copied without cropping, recoloring or resizing. They are available offline.
@@ -45,4 +71,4 @@ Until a matching image is bundled, rows show a neutral category symbol. Exercise
 
 The original 13 exercise IDs and tracking types are unchanged. Existing routines, templates and workout snapshots continue to refer to the same exercises. On store initialization, missing built-in entries are added and system metadata is refreshed while preserving favorites and custom records. Reopening does not duplicate exercises. Images and categories are resolved from catalogue metadata; no persistence schema migration is needed.
 
-`ExerciseCatalogueTests` covers unique entries and image keys, bundled-image resolution, legacy/template references, search/filter behavior, tracking types and upgrades from an existing library. Tests are compiled but app/simulator execution is intentionally left to the project owner.
+`ExerciseCatalogueTests` covers unique entries and image keys, bundled-image resolution, legacy/template references, search/filter/sort behavior, chosen-order preservation, tracking types and upgrades from an existing library. App, widgets and test targets are compiled with an unsigned generic-iOS `build-for-testing`; app/simulator execution and running tests are intentionally left to the project owner.

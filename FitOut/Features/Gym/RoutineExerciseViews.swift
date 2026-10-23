@@ -253,77 +253,12 @@ struct RoutineExercisePicker: View {
     let store: GymStore
     let multiple: Bool
     let onSelect: ([ExerciseDefinition]) -> Void
-    @State private var search = ""
-    @State private var selected: [String] = []
-    @State private var favorites = false
-    @State private var category: ExerciseCategory?
-    @State private var equipment: ExerciseEquipment?
-    @State private var muscle: Muscle?
-    @State private var custom: ExerciseDefinition?
-    @State private var created: ExerciseDefinition?
-    @Environment(\.dismiss) private var dismiss
-    private var filtered: [ExerciseDefinition] {
-        store.exercises.filter(ExerciseFilter(search: search, muscles: muscle.map { [$0] } ?? [], favoritesOnly: favorites, category: category, equipment: equipment).matches)
-    }
     var body: some View {
         NavigationStack {
-            List {
-                Section {
-                    Toggle("Favorites only", isOn: $favorites)
-                    ExerciseFilterControls(category: $category, equipment: $equipment)
-                    Picker("Muscle", selection: $muscle) {
-                        Text("All muscles").tag(nil as Muscle?)
-                        ForEach(Muscle.allCases) { Text($0.title).tag(Optional($0)) }
-                    }
-                    Button("Create custom exercise", systemImage: "plus") { custom = ExerciseDefinition(name: search, muscles: muscle.map { [$0] } ?? [], isCustom: true) }
-                    if muscle != nil || category != nil || equipment != nil || favorites {
-                        Button("Reset filters") { muscle = nil; category = nil; equipment = nil; favorites = false }
-                    }
-                }
-                Section("\(filtered.count) exercises") {
-                    ForEach(filtered) { exercise in
-                        Button {
-                            if !multiple { onSelect([exercise]); return }
-                            if selected.contains(exercise.id) { selected.removeAll { $0 == exercise.id } }
-                            else { selected.append(exercise.id) }
-                        } label: {
-                            HStack(spacing: 12) {
-                                ExerciseLibraryRow(exercise: exercise)
-                                Image(systemName: selected.contains(exercise.id) ? "checkmark.circle.fill" : multiple ? "circle" : "arrow.right")
-                                    .foregroundStyle(FitTheme.dashboardAccent)
-                            }.padding(.vertical, 5)
-                        }.buttonStyle(.plain).accessibilityIdentifier("pickExercise-\(exercise.id)")
-                            .accessibilityLabel(exercise.name)
-                            .accessibilityValue(selected.contains(exercise.id) ? "Selected" : "Not selected")
-                    }
-                    if filtered.isEmpty { Text("No matching exercises. Change the filters or create your own.").font(FitTheme.body(14)).foregroundStyle(.secondary) }
-                }
-                if !multiple { Text("Changing the tracking type resets set targets for this exercise.").font(FitTheme.body(12)).foregroundStyle(.secondary) }
-            }
-            .navigationTitle(multiple ? "Add exercises" : "Replace exercise")
-            .navigationBarTitleDisplayMode(.inline)
-            .searchable(text: $search, prompt: "Name, muscle or equipment")
-            .font(FitTheme.body(14))
-            .scrollContentBackground(.hidden).background(FitTheme.dashboardBackground)
-            .toolbar {
-                ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
-                if multiple {
-                    ToolbarItem(placement: .confirmationAction) {
-                        Button("Add \(selected.count)") { onSelect(selected.compactMap { store.exercise($0) }) }
-                            .disabled(selected.isEmpty).accessibilityIdentifier("confirmRoutineExercises")
-                    }
-                }
-            }
-            .sheet(item: $custom, onDismiss: {
-                if !multiple, let created { onSelect([created]) }
-                created = nil
-            }) { exercise in
-                CustomExerciseEditor(store: store, exercise: exercise) { saved in
-                    if multiple { selected.append(saved.id) }
-                    else { created = saved }
-                }
-            }
-        }.tint(FitTheme.dashboardAccent)
+            ExerciseBrowser(store: store, title: multiple ? "Add exercises" : "Replace exercise",
+                            mode: multiple ? .multiple : .single,
+                            selectionHint: multiple ? nil : "Changing the tracking type resets set targets for this exercise.", onSelect: onSelect)
+        }
     }
 }
 

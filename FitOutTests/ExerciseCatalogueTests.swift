@@ -4,6 +4,42 @@ import UIKit
 @testable import FitOut
 
 final class ExerciseCatalogueTests: XCTestCase {
+    func testLibrarySortingAndScopesCombineWithSearchAndEquipment() {
+        let alpha = ExerciseDefinition(id: "a", name: "Alpha row", muscles: [.upperBack], equipment: "Cable machine")
+        let custom = ExerciseDefinition(id: "c", name: "alpha row", muscles: [.upperBack], equipment: "Dumbbells", isCustom: true)
+        let curl = ExerciseDefinition(id: "b", name: "Beta curl", muscles: [.biceps], equipment: "Dumbbells", isFavorite: true)
+        let press = ExerciseDefinition(id: "z", name: "Z press", muscles: [.shoulders], equipment: "Barbell", isFavorite: true)
+        let entries = [press, custom, curl, alpha]
+        XCTAssertEqual(ExerciseSortOrder.nameAscending.sorted(entries).map(\.id), ["a", "c", "b", "z"])
+        XCTAssertEqual(ExerciseSortOrder.nameDescending.sorted(entries).map(\.id), ["z", "b", "a", "c"])
+        XCTAssertEqual(ExerciseSortOrder.muscle.sorted(entries).map(\.id), ["b", "z", "a", "c"])
+        XCTAssertEqual(ExerciseSortOrder.equipment.sorted(entries).map(\.id), ["z", "a", "c", "b"])
+        var query = ExerciseLibraryQuery(search: " ROW ", scope: .custom,
+            filters: ExerciseBrowseFilters(muscles: [.upperBack], equipment: .dumbbell))
+        XCTAssertEqual(query.results(in: entries).map(\.id), ["c"])
+        query.scope = .favorites; query.search = "curl"; query.filters.muscles = []
+        XCTAssertEqual(query.results(in: entries).map(\.id), ["b"])
+        query.filters.category = .cardio
+        XCTAssertTrue(query.results(in: entries).isEmpty)
+    }
+
+    func testPickerKeepsChosenOrderWhenResultsAreFilteredSortedOrRemoved() {
+        let entries = [
+            ExerciseDefinition(id: "a", name: "Needle press", muscles: [.chest]),
+            ExerciseDefinition(id: "b", name: "B", muscles: [.upperBack]),
+            ExerciseDefinition(id: "c", name: "C", muscles: [.quadriceps])
+        ]
+        var selection = ExercisePickerSelection()
+        selection.add("c"); selection.add("a"); selection.add("b"); selection.add("a")
+        let query = ExerciseLibraryQuery(search: "Needle", sort: .nameDescending)
+        XCTAssertEqual(query.results(in: entries).map(\.id), ["a"])
+        XCTAssertEqual(selection.exercises(in: query.sort.sorted(entries)).map(\.id), ["c", "a", "b"])
+        selection.remove("a"); selection.add("a")
+        XCTAssertEqual(selection.ids, ["c", "b", "a"])
+        selection.retainAvailable(["a", "c"])
+        XCTAssertEqual(selection.exercises(in: entries).map(\.id), ["c", "a"])
+    }
+
     func testCatalogueHasCompleteUniqueSystemEntriesAndStableLegacyIDs() {
         let all = ExerciseCatalogue.all
         XCTAssertGreaterThanOrEqual(all.count, 140)

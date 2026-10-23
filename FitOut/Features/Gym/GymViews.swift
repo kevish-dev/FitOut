@@ -25,52 +25,12 @@ struct MuscleSelection: View {
 }
 
 struct ExerciseLibrary: View {
-    @Bindable var store: GymStore
+    let store: GymStore
     var onSelect: ((ExerciseDefinition) -> Void)? = nil
-    @State private var search = ""
-    @State private var muscles: [Muscle] = []
-    @State private var favorites = false
-    @State private var category: ExerciseCategory?
-    @State private var equipment: ExerciseEquipment?
-    @State private var showMap = false
-    @State private var custom: ExerciseDefinition?
-    @Environment(\.dismiss) private var dismiss
-    private var filtered: [ExerciseDefinition] {
-        store.exercises.filter(ExerciseFilter(search: search, muscles: muscles, favoritesOnly: favorites, category: category, equipment: equipment).matches)
-    }
     var body: some View {
-        List {
-            Section {
-                Toggle("Favorites only", isOn: $favorites)
-                ExerciseFilterControls(category: $category, equipment: $equipment)
-                Button(muscles.isEmpty ? "Filter by muscle" : "Muscles: \(muscles.map(\.title).joined(separator: ", "))") { showMap = true }
-                if !muscles.isEmpty { Button("Clear muscle filter") { muscles = [] } }
-                if category != nil || equipment != nil || favorites {
-                    Button("Reset filters") { category = nil; equipment = nil; favorites = false; muscles = [] }
-                }
-            } footer: { Text("Muscle filters include primary and secondary muscles.") }
-            Section("\(filtered.count) exercises") {
-                if filtered.isEmpty { Text("No matching exercises. Adjust filters or create your own.").foregroundStyle(.secondary) }
-                ForEach(filtered) { exercise in
-                    if let onSelect {
-                        Button { onSelect(exercise) } label: { ExerciseLibraryRow(exercise: exercise) }
-                            .buttonStyle(.plain).accessibilityLabel(exercise.name)
-                    } else {
-                        NavigationLink { ExerciseDetail(store: store, exerciseID: exercise.id) } label: { ExerciseLibraryRow(exercise: exercise) }
-                    }
-                }
-            }
-        }.navigationTitle("Exercise library").searchable(text: $search, prompt: "Name, muscle or equipment")
-            .font(FitTheme.body(14)).tint(FitTheme.dashboardAccent)
-            .scrollContentBackground(.hidden).background(FitTheme.dashboardBackground)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Custom exercise", systemImage: "plus") { custom = ExerciseDefinition(name: "", muscles: [], isCustom: true) }
-                }
-                if onSelect != nil { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
-            }
-            .sheet(isPresented: $showMap) { NavigationStack { MuscleMapView(selection: $muscles).toolbar { Button("Done") { showMap = false } } } }
-            .sheet(item: $custom) { CustomExerciseEditor(store: store, exercise: $0) }
+        ExerciseBrowser(store: store, title: onSelect == nil ? "Exercise library" : "Add exercise",
+                        mode: onSelect == nil ? .browse : .single,
+                        onSelect: { exercises in if let first = exercises.first { onSelect?(first) } })
     }
 }
 struct ExerciseDetail: View {
@@ -121,14 +81,18 @@ struct CustomExerciseEditor: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Exercise name", text: $exercise.name).accessibilityIdentifier("customExerciseName")
+                    TextField("Exercise name", text: $exercise.name).font(FitTheme.section(18)).accessibilityIdentifier("customExerciseName")
                     Picker("Track", selection: $exercise.kind) {
                         Text("Weight & reps").tag(ExerciseKind.weighted)
                         Text("Reps only").tag(ExerciseKind.bodyweight)
                         Text("Time & distance").tag(ExerciseKind.duration)
                     }
                 }
-                Section("Primary muscles") { MuscleSelection(selection: $exercise.muscles) }
+                Section {
+                    MuscleSelection(selection: $exercise.muscles)
+                } header: { Text("Primary muscles") } footer: {
+                    if exercise.muscles.isEmpty { Text("Choose at least one primary muscle to save.") }
+                }
                 Section {
                     DisclosureGroup("Details (optional)") {
                         TextField("Equipment", text: $exercise.equipment)
@@ -139,10 +103,15 @@ struct CustomExerciseEditor: View {
                     }
                 }
                 if let error = store.error { Text(error).foregroundStyle(.red) }
-            }.navigationTitle("Custom exercise").toolbar {
+            }.navigationTitle("Custom exercise").navigationBarTitleDisplayMode(.inline)
+                .font(FitTheme.body(14)).scrollContentBackground(.hidden).background(FitTheme.dashboardBackground)
+                .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
-                ToolbarItem(placement: .confirmationAction) { Button("Save") { if store.saveExercise(exercise) { onSaved?(exercise); dismiss() } } }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { if store.saveExercise(exercise) { onSaved?(exercise); dismiss() } }
+                        .disabled(exercise.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || exercise.muscles.isEmpty)
+                }
             }
-        }
+        }.tint(FitTheme.dashboardAccent).preferredColorScheme(.dark)
     }
 }

@@ -183,9 +183,10 @@ private final class ExerciseImageScrollView: UIScrollView, UIScrollViewDelegate 
 
 struct ExerciseLibraryRow: View {
     let exercise: ExerciseDefinition
+    var artworkSize: CGFloat = 56
     var body: some View {
         HStack(spacing: 12) {
-            ExerciseArtwork(exercise: exercise)
+            ExerciseArtwork(exercise: exercise, size: artworkSize)
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 5) {
                     Text(exercise.name).font(FitTheme.section(15)).foregroundStyle(.primary)
@@ -198,20 +199,5 @@ struct ExerciseLibraryRow: View {
             }
             Spacer(minLength: 0)
         }.padding(.vertical, 4)
-    }
-}
-
-struct ExerciseFilterControls: View {
-    @Binding var category: ExerciseCategory?
-    @Binding var equipment: ExerciseEquipment?
-    var body: some View {
-        Picker("Type", selection: $category) {
-            Text("All types").tag(nil as ExerciseCategory?)
-            ForEach(ExerciseCategory.allCases) { Text($0.rawValue).tag(Optional($0)) }
-        }
-        Picker("Equipment", selection: $equipment) {
-            Text("All equipment").tag(nil as ExerciseEquipment?)
-            ForEach(ExerciseEquipment.allCases) { Text($0.rawValue).tag(Optional($0)) }
-        }
     }
 }
