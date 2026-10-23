@@ -19,6 +19,7 @@ struct WorkoutsPanel: View {
                 }
             }
             NavigationLink("Workout history") { WorkoutHistory(store: store, unit: unit) }
+            NavigationLink("Analytics and calendar") { AnalyticsView(store: store, gym: gym, unit: unit) }
             if let error = store.error { Text(error).foregroundStyle(.red) }
         }
 
@@ -70,7 +71,7 @@ struct ActiveWorkoutView: View {
                     Button("Add exercise") { replacing = nil; selecting = true }.accessibilityIdentifier("workoutAddExercise")
                     Button("Finish workout") { finishing = true }.accessibilityIdentifier("finishWorkout")
                 }
-            } else if let finished { WorkoutSummary(session: finished, unit: unit) }
+            } else if let finished { WorkoutSummary(session: finished, unit: unit, history: store.history) }
             else { ContentUnavailableView("No active workout", systemImage: "dumbbell", description: Text("Your ended sessions are in workout history.")) }
         }.navigationTitle(finished == nil ? "Workout" : "Workout summary")
             .toolbar { Button("Close") { dismiss() } }
@@ -121,6 +122,7 @@ struct WorkoutSetEditor: View {
 struct WorkoutSummary: View {
     let session: WorkoutSession
     let unit: WeightUnit
+    var history: [WorkoutSession] = []
     var body: some View {
         List {
             Section(session.title) {
@@ -129,6 +131,7 @@ struct WorkoutSummary: View {
                 Text("\(session.completedExercises) exercises · \(session.completedSets.count) sets · \(Int(session.duration() / 60)) min")
                 Text("Weighted volume: \(unit.display(session.volumeKG).formatted()) \(unit.rawValue)·reps")
                 Text("Working and drop sets only. Bodyweight and duration work are recorded separately.").font(.caption).foregroundStyle(.secondary)
+                ForEach(Array(Set(WorkoutAnalytics.newRecords(in: session, history: history))).sorted(), id: \.self) { Text("New personal record: " + $0).foregroundStyle(FitTheme.orange) }
                 if !session.notes.isEmpty { Text(session.notes) }
             }
             ForEach(session.entries) { entry in
@@ -155,7 +158,7 @@ struct WorkoutHistory: View {
             if store.history.isEmpty { ContentUnavailableView("No workout history", systemImage: "calendar", description: Text("Finished, skipped and abandoned workouts will appear here.")) }
             if let error = store.error { Text(error).foregroundStyle(.red) }
             ForEach(store.history) { session in
-                NavigationLink { WorkoutSummary(session: session, unit: unit) } label: {
+                NavigationLink { WorkoutSummary(session: session, unit: unit, history: store.history) } label: {
                     VStack(alignment: .leading) { Text(session.title); Text("\(session.startedAt.formatted(date: .abbreviated, time: .shortened)) · \(session.status.rawValue)").font(.caption).foregroundStyle(.secondary) }
                 }.swipeActions { Button("Delete", role: .destructive) { deleting = session.id } }
             }

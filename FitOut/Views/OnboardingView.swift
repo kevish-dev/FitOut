@@ -74,6 +74,16 @@ struct OnboardingView: View {
 
 struct WelcomeScreen: View {
     let onStart: () -> Void
+    @State private var slideOffset: CGFloat = 0
+    @State private var started = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private func start() {
+        guard !started else { return }
+        started = true
+        onStart()
+    }
+
     var body: some View {
         GeometryReader { geometry in
             let width = geometry.size.width
@@ -116,22 +126,47 @@ struct WelcomeScreen: View {
                 .offset(y: geometry.size.height * 0.36)
                 VStack {
                     Spacer()
-                    Button(action: onStart) {
-                        HStack(spacing: 0) {
+                    GeometryReader { track in
+                        let travel = max(0, track.size.width - 64)
+                        ZStack(alignment: .leading) {
+                            Text("Get Started")
+                                .font(FitTheme.label(17)).tracking(1)
+                                .foregroundStyle(FitTheme.orange)
+                                .frame(maxWidth: .infinity)
+                                .padding(.leading, 64)
                             Image(systemName: "arrow.right")
                                 .font(.system(size: 28, weight: .medium))
                                 .foregroundStyle(.black)
                                 .frame(width: 64, height: 55)
                                 .background(FitTheme.orange, in: RoundedRectangle(cornerRadius: 9))
-                            Text("Get Started")
-                                .font(FitTheme.label(17)).tracking(1)
-                                .foregroundStyle(FitTheme.orange)
-                                .frame(maxWidth: .infinity)
+                                .contentShape(Rectangle())
+                                .offset(x: slideOffset)
+                                .gesture(DragGesture(minimumDistance: 3)
+                                    .onChanged { value in
+                                        guard !started else { return }
+                                        slideOffset = min(travel, max(0, value.translation.width))
+                                    }
+                                    .onEnded { _ in
+                                        if travel > 0 && slideOffset >= travel * 0.85 {
+                                            slideOffset = travel
+                                            start()
+                                        } else {
+                                            withAnimation(reduceMotion ? nil : .spring(response: 0.3)) {
+                                                slideOffset = 0
+                                            }
+                                        }
+                                    })
                         }
+                        .frame(height: 55)
                         .background(.black.opacity(0.5))
                         .fitSurface(radius: 9)
                     }
-                    .buttonStyle(.plain)
+                    .frame(height: 55)
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel("Get Started")
+                    .accessibilityHint("Slide the arrow to the right to continue, or double tap.")
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityAction { start() }
                     .accessibilityIdentifier("getStartedButton")
                     .padding(.horizontal, width * 0.073)
                     .padding(.bottom, 25)

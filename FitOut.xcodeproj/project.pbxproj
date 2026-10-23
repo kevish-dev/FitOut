@@ -10,9 +10,12 @@
 		06A9BCD86F6C2D129BC73EB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E3271F3A8C5AB14221648D0 /* Assets.xcassets */; };
 		0E07556CD688B8D6530A9E60 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F964206E6311DF336277F6 /* OnboardingView.swift */; };
 		11A573DB6810866EECAACD3E /* anatomy-back.svg in Resources */ = {isa = PBXBuildFile; fileRef = 715F3387E890ADC5B895F3A2 /* anatomy-back.svg */; };
+		141EE55133A31464CAD067CE /* AnalyticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 576F88756261A41893E58D4F /* AnalyticsView.swift */; };
 		156E6362BF68F230ADE91059 /* FitnessProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */; };
+		1975EAD2999B084B2337BEE6 /* AnalyticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C07A9882386626872680CEC6 /* AnalyticsTests.swift */; };
 		1A2E0672CCC681BB73519871 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4390ECBBEC38020095B4A64 /* ProfileStore.swift */; };
 		1F7DACD3DBA74924AF66B797 /* StorageContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDB9EE50477E60A26DBC1B9E /* StorageContracts.swift */; };
+		206EB269AF44C0E9246349E0 /* WorkoutAnalytics.swift in Sources */ = {isa = PBXBuildFile; fileRef = A33DD1A98A596C1D0E0B0E77 /* WorkoutAnalytics.swift */; };
 		2617E173D09B5BCE84BE4BDB /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */; };
 		2E4C3452809992F793CEB2CF /* WorkoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0135BF17EBB23D2A4697DF93 /* WorkoutTests.swift */; };
 		2EBB211AD9F827804A7908A4 /* MuscleMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB14C4F70280EF0115F7335 /* MuscleMapView.swift */; };
@@ -82,12 +85,12 @@
 		0A679CD19EA0DF1595351C3D /* ProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTests.swift; sourceTree = "<group>"; };
 		13D8096CF5ED44F3B8DB0F09 /* rajdhani-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "rajdhani-LICENSE.txt"; sourceTree = "<group>"; };
 		19FBD164460FD92A1C24AAB5 /* AppShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShell.swift; sourceTree = "<group>"; };
-		1A4014C1F26D7CC18537D616 /* anatomy-front.svg */ = {isa = PBXFileReference; path = "anatomy-front.svg"; sourceTree = "<group>"; };
+		1A4014C1F26D7CC18537D616 /* anatomy-front.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "anatomy-front.svg"; sourceTree = "<group>"; };
 		1CB30D4C5814397627BDB0B2 /* GymDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymDomain.swift; sourceTree = "<group>"; };
 		1D52F2D538BAF90A8EC8C058 /* FoundationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationUITests.swift; sourceTree = "<group>"; };
 		1E3271F3A8C5AB14221648D0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1EF1F36E15CD4D7EE06A0D2E /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
-		225CBBBAFAD77B14558CE657 /* FitOutUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FitOutUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		225CBBBAFAD77B14558CE657 /* FitOutUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FitOutUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		24F964206E6311DF336277F6 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		27D8E4F8336E4F1028340F5B /* SwiftDataRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataRepository.swift; sourceTree = "<group>"; };
 		29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessProfile.swift; sourceTree = "<group>"; };
@@ -95,13 +98,14 @@
 		3A021907062FDBB04C15A0C0 /* WorkoutViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutViews.swift; sourceTree = "<group>"; };
 		3C567C8D61D3B676E423195F /* GymTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymTests.swift; sourceTree = "<group>"; };
 		3CB14C4F70280EF0115F7335 /* MuscleMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuscleMapView.swift; sourceTree = "<group>"; };
+		576F88756261A41893E58D4F /* AnalyticsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsView.swift; sourceTree = "<group>"; };
 		57957907296D2DBDC134F5D0 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		57BE158ECDB43A8891AB07FC /* CapabilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityService.swift; sourceTree = "<group>"; };
 		5AEE9E63110719C6D5B3A80D /* HealthAccessService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAccessService.swift; sourceTree = "<group>"; };
 		5B34B8171F92F92C919FA673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5DEF03BD38389CEDA762EF8C /* ProfileFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFlow.swift; sourceTree = "<group>"; };
 		70527C9CBB10BD40886D6C27 /* GenderAgeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenderAgeScreen.swift; sourceTree = "<group>"; };
-		715F3387E890ADC5B895F3A2 /* anatomy-back.svg */ = {isa = PBXFileReference; path = "anatomy-back.svg"; sourceTree = "<group>"; };
+		715F3387E890ADC5B895F3A2 /* anatomy-back.svg */ = {isa = PBXFileReference; lastKnownFileType = text; path = "anatomy-back.svg"; sourceTree = "<group>"; };
 		72817576713C4A5AA7D1B887 /* ProfileFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFlowTests.swift; sourceTree = "<group>"; };
 		79A505A2868DBC24CC79D1F9 /* orbitron-800.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "orbitron-800.ttf"; sourceTree = "<group>"; };
 		7B7F21158E5B770C62F60AEA /* orbitron-700.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "orbitron-700.ttf"; sourceTree = "<group>"; };
@@ -114,16 +118,18 @@
 		A058FE4B0C32CA6DE72AE792 /* PersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTests.swift; sourceTree = "<group>"; };
 		A258C80F9DA85FC523368FD7 /* FitOutSchema.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitOutSchema.swift; sourceTree = "<group>"; };
 		A2F37F01FD300A00EF4835A9 /* rajdhani-500.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "rajdhani-500.ttf"; sourceTree = "<group>"; };
+		A33DD1A98A596C1D0E0B0E77 /* WorkoutAnalytics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutAnalytics.swift; sourceTree = "<group>"; };
 		AD588983899ED41104F7B633 /* GoalsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsScreen.swift; sourceTree = "<group>"; };
 		BDB9EE50477E60A26DBC1B9E /* StorageContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageContracts.swift; sourceTree = "<group>"; };
 		BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "orbitron-LICENSE.txt"; sourceTree = "<group>"; };
+		C07A9882386626872680CEC6 /* AnalyticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsTests.swift; sourceTree = "<group>"; };
 		C4390ECBBEC38020095B4A64 /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
 		C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitOutApp.swift; sourceTree = "<group>"; };
 		CAAC5C11121AB108582FC0DA /* GymViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymViews.swift; sourceTree = "<group>"; };
 		CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		CFD2CE5BC329C64331DF47D3 /* FitOut.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitOut.entitlements; sourceTree = "<group>"; };
-		D02EE5C7D0EC131F25C78957 /* FitOut.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FitOut.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		D5AD094E75EDCD00D742446D /* FitOutTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FitOutTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		D02EE5C7D0EC131F25C78957 /* FitOut.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FitOut.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D5AD094E75EDCD00D742446D /* FitOutTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FitOutTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E06E72006F94C883E88ADE79 /* CapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityTests.swift; sourceTree = "<group>"; };
 		EC0A690C035D4AB3D44FC0B4 /* HomeStateTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeStateTests.swift; sourceTree = "<group>"; };
 		F1A70F1DCCB97A4EBEC48816 /* SchemaV3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaV3.swift; sourceTree = "<group>"; };
@@ -146,6 +152,7 @@
 		3EC67EAD137BE1CFEDEA8F7E /* FitOutTests */ = {
 			isa = PBXGroup;
 			children = (
+				C07A9882386626872680CEC6 /* AnalyticsTests.swift */,
 				E06E72006F94C883E88ADE79 /* CapabilityTests.swift */,
 				3C567C8D61D3B676E423195F /* GymTests.swift */,
 				EC0A690C035D4AB3D44FC0B4 /* HomeStateTests.swift */,
@@ -350,6 +357,8 @@
 		D7CB24A5F6FD15559F06C45B /* Workouts */ = {
 			isa = PBXGroup;
 			children = (
+				576F88756261A41893E58D4F /* AnalyticsView.swift */,
+				A33DD1A98A596C1D0E0B0E77 /* WorkoutAnalytics.swift */,
 				F64CF237F05F4B664C4635D0 /* WorkoutDomain.swift */,
 				FBF6F87A7C43F94EB7659B2B /* WorkoutStore.swift */,
 				3A021907062FDBB04C15A0C0 /* WorkoutViews.swift */,
@@ -480,6 +489,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1975EAD2999B084B2337BEE6 /* AnalyticsTests.swift in Sources */,
 				5B942A6F130D212AA769CB19 /* CapabilityTests.swift in Sources */,
 				BDAA84C9C2710E807F76BCE1 /* GymTests.swift in Sources */,
 				D324000D4C1EEA9116EF694A /* HomeStateTests.swift in Sources */,
@@ -502,6 +512,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				141EE55133A31464CAD067CE /* AnalyticsView.swift in Sources */,
 				F7A1ABE565D291DF77DC198D /* AppContainer.swift in Sources */,
 				ED2558509B3DB7B76721EC4E /* AppShell.swift in Sources */,
 				A27BE7051006DE096036BF4B /* CapabilityService.swift in Sources */,
@@ -532,6 +543,7 @@
 				1F7DACD3DBA74924AF66B797 /* StorageContracts.swift in Sources */,
 				400EA581DAF184E2BB8CADEE /* SwiftDataRepository.swift in Sources */,
 				D102DDDF2F4894AB66F3D49B /* WeightScreen.swift in Sources */,
+				206EB269AF44C0E9246349E0 /* WorkoutAnalytics.swift in Sources */,
 				64BC209FD9A2757292A10F6A /* WorkoutDomain.swift in Sources */,
 				62C7FEB84A2FB545B3C55A3B /* WorkoutStore.swift in Sources */,
 				88BF229BBC6209C3AE009A9D /* WorkoutViews.swift in Sources */,
@@ -681,16 +693,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
 				CODE_SIGN_ENTITLEMENTS = FitOut/FitOut.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5ZYXTW5M3R;
 				INFOPLIST_FILE = FitOut/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kevishsewliya.fitout;
 				SDKROOT = iphoneos;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -702,13 +716,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 5ZYXTW5M3R;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.FitOutUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kevishsewliya.fitout.uitests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = FitOut;
@@ -719,13 +734,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 5ZYXTW5M3R;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.FitOutUITests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kevishsewliya.fitout.uitests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_TARGET_NAME = FitOut;
@@ -736,13 +752,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 5ZYXTW5M3R;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.FitOutTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kevishsewliya.fitout.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FitOut.app/FitOut";
@@ -753,13 +770,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
+				DEVELOPMENT_TEAM = 5ZYXTW5M3R;
 				GENERATE_INFOPLIST_FILE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.FitOutTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kevishsewliya.fitout.tests;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FitOut.app/FitOut";
@@ -770,16 +788,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS = NO;
 				CODE_SIGN_ENTITLEMENTS = FitOut/FitOut.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5ZYXTW5M3R;
 				INFOPLIST_FILE = FitOut/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.fitout.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.kevishsewliya.fitout;
 				SDKROOT = iphoneos;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;

@@ -54,6 +54,7 @@ struct ProfileScreen: View {
                 Text("Choose your avatar").font(.system(size: 16, weight: .semibold))
                 HStack(spacing: 0) {
                     Button {
+                        photo = nil
                         profile.usesPhoto = false
                         isNameFocused = false
                     } label: {
@@ -65,6 +66,8 @@ struct ProfileScreen: View {
                     }.buttonStyle(.plain)
                     Button {
                         isNameFocused = false
+                        photoError = nil
+                        photo = nil
                         showPhotoPicker = true
                     } label: {
                         Label("Upload", systemImage: "square.and.arrow.up")
@@ -74,7 +77,6 @@ struct ProfileScreen: View {
                             .fitSurface(selected: profile.usesPhoto, radius: 13)
                     }
                     .buttonStyle(.plain)
-                    .photosPicker(isPresented: $showPhotoPicker, selection: $photo, matching: .images)
                     .accessibilityIdentifier("uploadAvatarButton")
                 }.fitSurface(radius: 13)
             }
@@ -104,6 +106,7 @@ struct ProfileScreen: View {
                 }
             }.padding(.top, 4)
         }
+        .photosPicker(isPresented: $showPhotoPicker, selection: $photo, matching: .images)
         .task(id: photo) { await loadPhoto() }
         .alert("Photo unavailable", isPresented: Binding(get: { photoError != nil }, set: { if !$0 { photoError = nil } })) {
             Button("OK", role: .cancel) { photoError = nil }
@@ -115,6 +118,7 @@ struct ProfileScreen: View {
             ForEach(emojis, id: \.self) { emoji in
                 let selected = profile.emoji == emoji && !profile.usesPhoto
                 Button {
+                    photo = nil
                     profile.emoji = emoji
                     profile.usesPhoto = false
                     selectedAvatar = true
@@ -155,8 +159,16 @@ struct ProfileScreen: View {
                 let scaled = CGSize(width: original.size.width * ratio, height: original.size.height * ratio)
                 original.draw(in: CGRect(x: (size.width - scaled.width) / 2, y: (size.height - scaled.height) / 2, width: scaled.width, height: scaled.height))
             }
-            profile.photoData = resized.jpegData(compressionQuality: 0.85)
-            profile.usesPhoto = true
+            guard let encoded = resized.jpegData(compressionQuality: 0.85) else {
+                photoError = "This photo could not be prepared. Please try another image."
+                return
+            }
+            // The binding derives usesPhoto from saved avatar data. Commit both
+            // together so it cannot discard the image between field updates.
+            var updated = profile
+            updated.photoData = encoded
+            updated.usesPhoto = true
+            profile = updated
             selectedAvatar = true
         } catch is CancellationError {
             return

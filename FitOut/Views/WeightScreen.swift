@@ -3,11 +3,15 @@ import SwiftUI
 struct WeightScreen: View {
     @Binding var profile: FitnessProfile
     var scale: CGFloat = 1
+    var targetEnabled = true
+    var onEnableTarget: (() -> Void)? = nil
     @State private var isTarget = false
+    @State private var previewKG: Double?
 
     private var weight: Binding<Double> {
-        Binding(get: { isTarget ? profile.targetWeightKG : profile.currentWeightKG }, set: {
-            if isTarget { profile.targetWeightKG = $0 } else { profile.currentWeightKG = $0 }
+        let target = isTarget
+        return Binding(get: { target ? profile.targetWeightKG : profile.currentWeightKG }, set: {
+            if target { profile.targetWeightKG = $0 } else { profile.currentWeightKG = $0 }
         })
     }
 
@@ -23,7 +27,7 @@ struct WeightScreen: View {
             .frame(maxWidth: 258 * scale)
             .padding(.bottom, 28 * scale)
             HStack(alignment: .firstTextBaseline, spacing: 8) {
-                Text(profile.unit.display(weight.wrappedValue), format: .number.precision(.fractionLength(0...1)))
+                Text(profile.unit.display(previewKG ?? weight.wrappedValue), format: .number.precision(.fractionLength(0...1)))
                     .font(FitTheme.display(44 * scale))
                     .contentTransition(.numericText())
                     .lineLimit(1).minimumScaleFactor(0.5)
@@ -35,7 +39,7 @@ struct WeightScreen: View {
             .accessibilityElement(children: .combine)
             .accessibilityIdentifier("weightValue")
             .padding(.bottom, 30 * scale)
-            WeightRuler(kilograms: weight, unit: profile.unit)
+            WeightRuler(kilograms: weight, unit: profile.unit, onPreview: { previewKG = $0 })
                 .id("\(isTarget)-\(profile.unit.rawValue)")
                 .frame(height: 88 * scale)
                 .padding(.horizontal, -12)
@@ -60,10 +64,16 @@ struct WeightScreen: View {
             .fitSurface(radius: 12)
             .frame(width: 156 * scale)
         }
+        .onChange(of: targetEnabled) { _, enabled in if !enabled { isTarget = false } }
+        .onChange(of: isTarget) { _, _ in previewKG = nil }
+        .onChange(of: profile.unit) { _, _ in previewKG = nil }
     }
 
     private func weightTab(_ title: String, target: Bool) -> some View {
-        Button { isTarget = target } label: {
+        Button {
+            if target && !targetEnabled { onEnableTarget?() }
+            isTarget = target
+        } label: {
             Text(title).font(FitTheme.body(18).weight(.semibold))
                 .foregroundStyle(isTarget == target ? FitTheme.orange : .white.opacity(0.85))
                 .frame(maxWidth: .infinity).frame(height: 38)
@@ -78,37 +88,81 @@ struct WeightScreen: View {
 struct WeightRuler: View {
     @Binding var kilograms: Double
     let unit: WeightUnit
-    @State private var dragStart: Double?
-    private let pointsPerUnit: CGFloat = 50
+    var onPreview: ((Double) -> Void)? = nil
+    @State private var selectedTick: Int?
+    @State private var isScrolling = false
+    private let tickWidth: CGFloat = 10
+
+    private var ticks: ClosedRange<Int> { unit.range.lowerBound * 5 ... unit.range.upperBound * 5 }
+
+    private func tick(for kilograms: Double) -> Int {
+        min(ticks.upperBound, max(ticks.lowerBound, Int((unit.display(kilograms) * 5).rounded())))
+    }
+
+    private func commitSelection(updatePreview: Bool = true) {
+        guard let selectedTick else { return }
+        let value = min(250, max(25, unit.kilograms(Double(selectedTick) / 5)))
+        if abs(kilograms - value) > 0.00001 { kilograms = value }
+        if updatePreview { onPreview?(value) }
+    }
 
     private func setDisplayedWeight(_ value: Double) {
         let bounded = min(Double(unit.range.upperBound), max(Double(unit.range.lowerBound), value))
         let snapped = (bounded * 5).rounded() / 5
         kilograms = min(250, max(25, unit.kilograms(snapped)))
+        selectedTick = tick(for: kilograms)
+        onPreview?(kilograms)
     }
 
     var body: some View {
-        let displayed = unit.display(kilograms)
+        let displayed = selectedTick.map { Double($0) / 5 } ?? unit.display(kilograms)
         let accent = FitTheme.orange
-        Canvas { context, size in
-            let centerTick = Int((displayed * 5).rounded())
-            let visibleTicks = Int(size.width / 10 / 2) + 2
-            for tick in (centerTick - visibleTicks)...(centerTick + visibleTicks) {
-                guard (unit.range.lowerBound * 5 ... unit.range.upperBound * 5).contains(tick) else { continue }
-                let major = tick.isMultiple(of: 5)
-                let x = size.width / 2 + (CGFloat(tick) / 5 - displayed) * pointsPerUnit
-                let selected = abs(x - size.width / 2) < 2
-                if major {
-                    let label = Text("\(tick / 5)")
-                        .font(.system(size: 12, weight: selected ? .bold : .medium))
-                        .foregroundColor(selected ? accent : .white.opacity(0.7))
-                    context.draw(label, at: CGPoint(x: x, y: 8))
+        GeometryReader { geometry in
+            ScrollView(.horizontal) {
+                LazyHStack(alignment: .top, spacing: 0) {
+                    ForEach(ticks, id: \.self) { tick in
+                        let major = tick.isMultiple(of: 5)
+                        let selected = selectedTick == tick
+                        Color.clear
+                            .frame(width: tickWidth, height: 88)
+                            .overlay(alignment: .top) {
+                                if major {
+                                    Text("\(tick / 5)")
+                                        .font(.system(size: 12, weight: selected ? .bold : .medium))
+                                        .foregroundStyle(selected ? accent : .white.opacity(0.7))
+                                        .fixedSize().offset(y: 1)
+                                }
+                            }
+                            .overlay(alignment: .top) {
+                                Rectangle()
+                                    .fill(.white.opacity(major ? 0.65 : 0.4))
+                                    .frame(width: major ? 1.3 : 1, height: major ? 48 : 25)
+                                    .offset(y: major ? 24 : 37)
+                            }
+                            .id(tick)
+                    }
                 }
-                var tickPath = Path()
-                tickPath.move(to: CGPoint(x: x, y: 24))
-                tickPath.addLine(to: CGPoint(x: x, y: major ? 72 : 50))
-                context.stroke(tickPath, with: .color(selected ? accent : .white.opacity(major ? 0.65 : 0.4)), lineWidth: major ? 1.3 : 1)
+                .scrollTargetLayout()
             }
+            .safeAreaPadding(.horizontal, max(0, (geometry.size.width - tickWidth) / 2))
+            .scrollIndicators(.hidden)
+            .scrollTargetBehavior(.viewAligned)
+            .scrollPosition(id: $selectedTick, anchor: .center)
+            .onAppear { selectedTick = tick(for: kilograms) }
+            .onChange(of: selectedTick) { _, tick in
+                if isScrolling, let tick { onPreview?(min(250, max(25, unit.kilograms(Double(tick) / 5)))) }
+            }
+            .onChange(of: kilograms) { _, value in
+                if !isScrolling { selectedTick = tick(for: value) }
+            }
+            .onScrollPhaseChange { _, phase in
+                isScrolling = phase != .idle
+                if phase == .idle {
+                    commitSelection()
+                    UISelectionFeedbackGenerator().selectionChanged()
+                }
+            }
+            .onDisappear { if isScrolling { commitSelection(updatePreview: false) } }
         }
         .mask { LinearGradient(colors: [.clear, .black, .black, .black, .clear], startPoint: .leading, endPoint: .trailing) }
         .overlay(alignment: .top) {
@@ -117,16 +171,6 @@ struct WeightRuler: View {
                 Image(systemName: "triangle.fill").font(.system(size: 11)).foregroundStyle(accent)
             }.padding(.top, 24).allowsHitTesting(false)
         }
-        .contentShape(Rectangle())
-        .gesture(DragGesture(minimumDistance: 3)
-            .onChanged { value in
-                if dragStart == nil { dragStart = displayed }
-                setDisplayedWeight((dragStart ?? displayed) - value.translation.width / pointsPerUnit)
-            }
-            .onEnded { _ in
-                dragStart = nil
-                UISelectionFeedbackGenerator().selectionChanged()
-            })
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Weight ruler")
         .accessibilityValue("\(displayed.formatted(.number.precision(.fractionLength(0...1)))) \(unit.rawValue)")

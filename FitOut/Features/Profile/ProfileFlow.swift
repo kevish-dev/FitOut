@@ -1,37 +1,287 @@
 import SwiftUI
 import PhotosUI
 
+// The reference screens share presentation with the original onboarding, while
+// ProfileStore remains the sole owner of the persisted, canonical profile.
 struct ProfileFlow: View {
     @Bindable var store: ProfileStore
+    @State private var showNameError = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var referenceProfile: Binding<FitnessProfile> {
+        Binding(get: {
+            var value = FitnessProfile()
+            let draft = store.draft
+            value.name = draft.name; value.age = draft.age
+            value.gender = draft.gender ?? .male
+            value.emoji = draft.emoji; value.photoData = draft.avatarData
+            value.usesPhoto = draft.avatarData != nil
+            value.currentWeightKG = draft.currentWeightKG
+            value.targetWeightKG = draft.targetWeightKG ?? draft.currentWeightKG
+            value.unit = draft.weightUnit
+            return value
+        }, set: { value in
+            var draft = store.draft
+            draft.name = value.name; draft.age = value.age
+            // An untouched optional gender must remain unspecified.
+            if value.gender != (draft.gender ?? .male) { draft.gender = value.gender }
+            draft.emoji = value.emoji
+            draft.avatarData = value.usesPhoto ? value.photoData : nil
+            draft.currentWeightKG = value.currentWeightKG
+            if draft.targetWeightKG != nil { draft.targetWeightKG = value.targetWeightKG }
+            draft.weightUnit = value.unit
+            store.draft = draft
+        })
+    }
+
     var body: some View {
-        NavigationStack {
-            Group {
-                if store.draft.step == 0 { WelcomeScreen { store.draft.step = 1 } }
-                else if store.draft.step == 1 {
-                    List {
-                        Section { Text("Choose one primary goal. You can change it in Settings.") }
-                        ForEach(PrimaryGoal.allCases) { goal in
-                            Button { store.draft.primaryGoal = goal } label: {
-                                HStack { Text(goal.rawValue); Spacer(); if store.draft.primaryGoal == goal { Image(systemName: "checkmark.circle.fill") } }
-                            }.accessibilityAddTraits(store.draft.primaryGoal == goal ? .isSelected : [])
+        ZStack {
+            FitTheme.background.ignoresSafeArea()
+            if store.draft.step == 0 {
+                WelcomeScreen { store.draft.step = 1 }
+            } else {
+                GeometryReader { geometry in
+                    let scale = min(geometry.size.width / 390, 1.15)
+                    VStack(spacing: 0) {
+                        StepProgress(step: min(5, store.draft.step), totalSteps: 5)
+                            .padding(.top, 24).padding(.bottom, 36)
+                        ScrollView {
+                            VStack(spacing: 16) {
+                                switch store.draft.step {
+                                case 1:
+                                    ProfileScreen(profile: referenceProfile, showNameError: showNameError, scale: scale)
+                                case 2:
+                                    GenderAgeScreen(profile: referenceProfile, scale: scale,
+                                        selectedGender: store.draft.gender,
+                                        onGenderSelected: { store.draft.gender = $0 })
+                                    Button("Prefer not to say") { store.draft.gender = nil }
+                                        .foregroundStyle(store.draft.gender == nil ? FitTheme.orange : .secondary)
+                                        .accessibilityAddTraits(store.draft.gender == nil ? .isSelected : [])
+                                case 3:
+                                    HeightScreen(heightCM: $store.draft.heightCM, unit: $store.draft.heightUnit, scale: scale)
+                                case 4:
+                                    WeightScreen(profile: referenceProfile, scale: scale,
+                                        targetEnabled: store.draft.targetWeightKG != nil,
+                                        onEnableTarget: { store.draft.targetWeightKG = store.draft.currentWeightKG })
+                                    measurementFields
+                                default:
+                                    goalSelection(scale: scale)
+                                }
+                            }
+                            .frame(maxWidth: 460).frame(maxWidth: .infinity)
+                            .padding(.horizontal, 25).padding(.bottom, 16)
                         }
-                        Button("Continue") { store.draft.step = 2 }
-                            .disabled(store.draft.primaryGoal == nil).accessibilityIdentifier("profileContinue")
-                        Button("Back") { store.draft.step = 0 }
-                    }.navigationTitle("Your fitness goal")
-                } else {
-                    Form {
-                        ProfileFields(profile: $store.draft)
-                        Button("Create my journey") { _ = store.complete() }.accessibilityIdentifier("completeProfile")
-                        Button("Back") { store.draft.step = 1 }
-                    }.navigationTitle("Your profile")
+                        .scrollIndicators(.hidden)
+                        .scrollDismissesKeyboard(.interactively)
+                        .id(store.draft.step)
+                        HStack(spacing: 14) {
+                            BackButton {
+                                showNameError = false
+                                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
+                                    store.draft.step = max(0, store.draft.step - 1)
+                                }
+                            }
+                            if store.draft.step >= 5 {
+                                SlideToFinish(enabled: store.draft.validationMessage == nil) { _ = store.complete() }
+                            } else {
+                                Spacer()
+                                NextButton { advance() }
+                            }
+                        }
+                        .padding(.horizontal, 30).padding(.top, 12).padding(.bottom, 22)
+                    }
                 }
             }
-            .alert("Profile could not be saved", isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
-                Button("Retry save") { store.saveDraft() }
-                Button("OK", role: .cancel) { store.error = nil }
-            } message: { Text(store.error ?? "") }
         }
+        .foregroundStyle(.white)
+        .preferredColorScheme(.dark)
+        .tint(FitTheme.orange)
+        .alert("Profile could not be saved", isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
+            Button("Retry save") { store.saveDraft() }
+            Button("OK", role: .cancel) { store.error = nil }
+        } message: { Text(store.error ?? "") }
+    }
+
+    private func advance() {
+        if store.draft.step == 1 && (store.draft.trimmedName.isEmpty || store.draft.trimmedName.count > 40) {
+            showNameError = true
+            return
+        }
+        if store.draft.step == 3 && (!store.draft.heightCM.isFinite || !(80...250).contains(store.draft.heightCM)) {
+            store.error = "Height must be between 80 and 250 cm."
+            return
+        }
+        showNameError = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) {
+            store.draft.step = min(5, store.draft.step + 1)
+        }
+    }
+
+    private var measurementFields: some View {
+        VStack(spacing: 16) {
+            Toggle("Set a target weight (optional)", isOn: Binding(
+                get: { store.draft.targetWeightKG != nil },
+                set: { store.draft.targetWeightKG = $0 ? store.draft.currentWeightKG : nil }))
+        }
+        .font(FitTheme.body(18)).padding(16).fitSurface(radius: 14)
+    }
+
+    private func goalSelection(scale: CGFloat) -> some View {
+        VStack(spacing: 0) {
+            ScreenHeading(first: "Your Fitness", accent: "Goals", size: 31 * scale)
+                .padding(.bottom, 46 * scale)
+            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16 * scale) {
+                ForEach(PrimaryGoal.allCases) { goal in
+                    let selected = store.draft.primaryGoal == goal
+                    Button { store.draft.primaryGoal = goal } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: goal.symbol).font(.system(size: 21 * scale, weight: .semibold))
+                            Text(goal.rawValue).font(.system(size: 13 * scale, weight: .semibold))
+                                .lineLimit(2).minimumScaleFactor(0.85)
+                        }
+                        .foregroundStyle(selected ? FitTheme.orange : .white)
+                        .padding(.horizontal, 12).frame(maxWidth: .infinity)
+                        .frame(height: 62 * scale).fitSurface(selected: selected, radius: 15)
+                    }
+                    .buttonStyle(.plain).accessibilityLabel(goal.rawValue)
+                    .accessibilityAddTraits(selected ? .isSelected : [])
+                }
+            }
+            Text("Choose one primary goal. You can change it in Settings.")
+                .font(FitTheme.body(16)).foregroundStyle(.secondary).padding(.top, 20)
+        }
+    }
+}
+
+private extension PrimaryGoal {
+    var symbol: String {
+        switch self {
+        case .muscle: "dumbbell.fill"
+        case .fatLoss: "flame"
+        case .recomposition: "figure.stand"
+        case .strength: "chart.bar.fill"
+        case .endurance: "figure.run"
+        case .fitness: "heart.fill"
+        }
+    }
+}
+
+private struct HeightScreen: View {
+    @Binding var heightCM: Double
+    @Binding var unit: HeightUnit
+    var scale: CGFloat = 1
+
+    var body: some View {
+        VStack(spacing: 0) {
+            ScreenHeading(first: "What’s your", accent: "height?", size: 30 * scale)
+            Text("Used for better progress tracking.")
+                .font(FitTheme.body(18)).foregroundStyle(.white.opacity(0.6))
+                .padding(.top, 12).padding(.bottom, 30 * scale)
+            HeightWheel(heightCM: $heightCM, unit: unit, scale: scale)
+                .id(unit)
+                .frame(width: 230 * scale, height: 300 * scale)
+                .padding(.bottom, 30 * scale)
+            HStack(spacing: 0) {
+                unitButton("cm", value: .cm)
+                unitButton("in", value: .feet)
+            }
+            .fitSurface(radius: 12)
+            .frame(width: 156 * scale)
+        }
+    }
+
+    private func unitButton(_ title: String, value: HeightUnit) -> some View {
+        Button {
+            unit = value
+            UISelectionFeedbackGenerator().selectionChanged()
+        } label: {
+            Text(title).font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(unit == value ? FitTheme.orange : .white.opacity(0.8))
+                .frame(maxWidth: .infinity).frame(height: 42)
+                .fitSurface(selected: unit == value, radius: 12)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(value == .cm ? "Centimeters" : "Inches")
+        .accessibilityAddTraits(unit == value ? .isSelected : [])
+    }
+}
+
+private struct HeightWheel: View {
+    @Binding var heightCM: Double
+    let unit: HeightUnit
+    let scale: CGFloat
+    @State private var selectedTick: Int?
+    @State private var isScrolling = false
+    private var imperial: Bool { unit != .cm }
+    private var ticks: ClosedRange<Int> { imperial ? 315...984 : 80...250 }
+    private var rowHeight: CGFloat { 52 * scale }
+    private var currentTick: Int {
+        let value = imperial ? heightCM / 2.54 * 10 : heightCM
+        return min(ticks.upperBound, max(ticks.lowerBound, Int(value.rounded())))
+    }
+
+    private func commit() {
+        guard let selectedTick else { return }
+        let value = imperial ? Double(selectedTick) / 10 * 2.54 : Double(selectedTick)
+        let bounded = min(250, max(80, value))
+        if abs(heightCM - bounded) > 0.00001 { heightCM = bounded }
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            ZStack {
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(FitTheme.orange.opacity(0.07))
+                    .overlay { RoundedRectangle(cornerRadius: 16).stroke(FitTheme.orange, lineWidth: 1.4) }
+                    .frame(height: rowHeight + 12)
+                    .allowsHitTesting(false)
+                ScrollView(.vertical) {
+                    LazyVStack(spacing: 0) {
+                        ForEach(ticks, id: \.self) { tick in
+                            let selected = tick == selectedTick
+                            HStack(alignment: .firstTextBaseline, spacing: 7) {
+                                Text(imperial ? (Double(tick) / 10).formatted(.number.precision(.fractionLength(0...1))) : String(tick))
+                                    .font(selected ? FitTheme.display(32 * scale) : FitTheme.body(25 * scale))
+                                    .foregroundStyle(selected ? FitTheme.orange : .white.opacity(0.55))
+                                if selected {
+                                    Text(imperial ? "in" : "cm")
+                                        .font(FitTheme.body(17)).foregroundStyle(.white.opacity(0.6))
+                                }
+                            }
+                            .frame(maxWidth: .infinity).frame(height: rowHeight)
+                            .id(tick)
+                        }
+                    }
+                    .scrollTargetLayout()
+                }
+                .safeAreaPadding(.vertical, max(0, (geometry.size.height - rowHeight) / 2))
+                .scrollIndicators(.hidden)
+                .scrollTargetBehavior(.viewAligned)
+                .scrollPosition(id: $selectedTick, anchor: .center)
+                .mask { LinearGradient(colors: [.clear, .black, .black, .clear], startPoint: .top, endPoint: .bottom) }
+                .onAppear { selectedTick = currentTick }
+                .onChange(of: heightCM) { _, _ in if !isScrolling { selectedTick = currentTick } }
+                .onScrollPhaseChange { _, phase in
+                    isScrolling = phase != .idle
+                    if phase == .idle { commit() }
+                }
+                .onDisappear { if isScrolling { commit() } }
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Your height")
+        .accessibilityValue(imperial ? "\((Double(selectedTick ?? currentTick) / 10).formatted()) inches" : "\(selectedTick ?? currentTick) centimeters")
+        .accessibilityAdjustableAction { direction in
+            let tick = selectedTick ?? currentTick
+            switch direction {
+            case .increment: selectedTick = min(ticks.upperBound, tick + 1)
+            case .decrement: selectedTick = max(ticks.lowerBound, tick - 1)
+            @unknown default: return
+            }
+            commit()
+        }
+        .accessibilityIdentifier("heightPicker")
     }
 }
 

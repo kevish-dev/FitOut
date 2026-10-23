@@ -1,6 +1,6 @@
 name: FitOut
 options:
-  bundleIdPrefix: com.fitout
+  bundleIdPrefix: com.kevishsewliya.fitout
   deploymentTarget:
     iOS: "18.0"
 settings:
@@ -8,6 +8,7 @@ settings:
     SWIFT_VERSION: "6.0"
     TARGETED_DEVICE_FAMILY: "1"
     CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: 5ZYXTW5M3R
 targets:
   FitOut:
     type: application
@@ -34,12 +35,13 @@ targets:
         com.apple.developer.healthkit: true
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.fitout.app
+        PRODUCT_BUNDLE_IDENTIFIER: com.kevishsewliya.fitout
         TARGETED_DEVICE_FAMILY: "1"
         SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: NO
         SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD: NO
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
+        ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: NO
   FitOutTests:
     type: bundle.unit-test
     platform: iOS
@@ -48,6 +50,7 @@ targets:
       - target: FitOut
     settings:
       base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kevishsewliya.fitout.tests
         GENERATE_INFOPLIST_FILE: YES
         TARGETED_DEVICE_FAMILY: "1"
   FitOutUITests:
@@ -58,6 +61,7 @@ targets:
       - target: FitOut
     settings:
       base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kevishsewliya.fitout.uitests
         GENERATE_INFOPLIST_FILE: YES
         TARGETED_DEVICE_FAMILY: "1"
 schemes:
@@ -67,6 +71,6 @@ schemes:
         FitOut: all
     test:
       debugEnabled: false
-      targets: [FitOutTests, FitOutUITests]
+      targets: [FitOutTests, {name: FitOutUITests, selectedTests: [FoundationUITests/testWorkoutSetSurvivesTerminationAndFinishes]}]
     run:
       debugEnabled: false

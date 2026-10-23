@@ -4,6 +4,14 @@ enum FitTheme {
     static let orange = Color(red: 1, green: 0.27, blue: 0.015)
     static let background = Color(red: 0.018, green: 0.018, blue: 0.018)
     static let border = Color.white.opacity(0.19)
+    // Dashboard palette from the FitOut brand guidelines. The reference
+    // onboarding retains its existing styling.
+    static let dashboardAccent = Color(red: 1, green: 77.0 / 255, blue: 0)
+    static let dashboardBackground = Color(red: 11.0 / 255, green: 11.0 / 255, blue: 13.0 / 255)
+    static let surface = Color(red: 21.0 / 255, green: 21.0 / 255, blue: 24.0 / 255)
+    static let elevated = Color(red: 34.0 / 255, green: 34.0 / 255, blue: 38.0 / 255)
+    static let textSecondary = Color(red: 161.0 / 255, green: 161.0 / 255, blue: 170.0 / 255)
+    static let subtleBorder = Color(red: 41.0 / 255, green: 41.0 / 255, blue: 46.0 / 255)
     static func display(_ size: CGFloat) -> Font { .custom("Orbitron-ExtraBold", size: size, relativeTo: .title) }
     static func label(_ size: CGFloat) -> Font { .custom("Orbitron-Bold", size: size, relativeTo: .headline) }
     static func body(_ size: CGFloat) -> Font { .custom("Rajdhani-Medium", size: size, relativeTo: .body) }
@@ -29,8 +37,44 @@ struct Surface: ViewModifier {
 }
 
 extension View {
+    func dashboardGlass<S: Shape>(in shape: S, highlighted: Bool = false, interactive: Bool = false) -> some View {
+        modifier(DashboardGlass(shape: shape, highlighted: highlighted, interactive: interactive))
+    }
+
     func fitSurface(selected: Bool = false, radius: CGFloat = 16) -> some View {
         modifier(Surface(selected: selected, radius: radius))
+    }
+}
+
+private struct DashboardGlass<S: Shape>: ViewModifier {
+    let shape: S
+    let highlighted: Bool
+    let interactive: Bool
+    @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if reduceTransparency {
+            content
+                .background(FitTheme.elevated, in: shape)
+                .overlay { shape.stroke(highlighted ? FitTheme.dashboardAccent : .white.opacity(0.18), lineWidth: 1) }
+        } else if #available(iOS 26.0, *) {
+            content.glassEffect(
+                .regular.tint(highlighted ? FitTheme.dashboardAccent.opacity(0.18) : FitTheme.surface.opacity(0.25))
+                    .interactive(interactive),
+                in: shape
+            )
+        } else {
+            content
+                .background(.ultraThinMaterial, in: shape)
+                .background(FitTheme.surface.opacity(0.35), in: shape)
+                .overlay {
+                    shape.stroke(
+                        LinearGradient(colors: [.white.opacity(highlighted ? 0.38 : 0.24), .white.opacity(0.05), .white.opacity(0.12)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                        lineWidth: 1
+                    )
+                }
+        }
     }
 }
 
@@ -54,15 +98,16 @@ struct ScreenHeading: View {
 
 struct StepProgress: View {
     let step: Int
+    var totalSteps = 4
     var body: some View {
         HStack(spacing: 5) {
-            ForEach(1...4, id: \.self) { index in
+            ForEach(1...totalSteps, id: \.self) { index in
                 Capsule().fill(index <= step ? FitTheme.orange : Color.white.opacity(0.13))
                     .frame(width: 23, height: 6)
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Setup step \(step) of 4")
+        .accessibilityLabel("Setup step \(step) of \(totalSteps)")
     }
 }
 
@@ -110,6 +155,9 @@ struct SlideToFinish: View {
         finished = true
         UINotificationFeedbackGenerator().notificationOccurred(.success)
         action()
+        // A failed persistence attempt must allow another slide after retry.
+        finished = false
+        offset = 0
     }
 
     var body: some View {
@@ -147,7 +195,7 @@ struct SlideToFinish: View {
             .opacity(enabled ? 1 : 0.45)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel("Create my journey")
-            .accessibilityHint(enabled ? "Double tap to save your profile" : "Select at least one fitness goal first")
+            .accessibilityHint(enabled ? "Double tap to save your profile" : "Complete your profile and choose a primary fitness goal first")
             .accessibilityAddTraits(.isButton)
             .accessibilityAction { finish() }
             .accessibilityIdentifier("createJourneySlider")

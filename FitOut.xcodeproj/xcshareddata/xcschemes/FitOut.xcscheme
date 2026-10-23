@@ -52,7 +52,8 @@
          </TestableReference>
          <TestableReference
             skipped = "NO"
-            parallelizable = "NO">
+            parallelizable = "NO"
+            useTestSelectionWhitelist = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "9561B3C23D9BBE9E8F9C3BFC"
@@ -60,6 +61,13 @@
                BlueprintName = "FitOutUITests"
                ReferencedContainer = "container:FitOut.xcodeproj">
             </BuildableReference>
+            <SelectedTests>
+               <Test Identifier = "FoundationUITests/testOnboardingCompletionAndRelaunch">
+               </Test>
+               <Test
+                  Identifier = "FoundationUITests/testWorkoutSetSurvivesTerminationAndFinishes">
+               </Test>
+            </SelectedTests>
          </TestableReference>
       </Testables>
       <CommandLineArguments>

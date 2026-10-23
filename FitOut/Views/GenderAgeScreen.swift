@@ -3,15 +3,18 @@ import SwiftUI
 struct GenderAgeScreen: View {
     @Binding var profile: FitnessProfile
     var scale: CGFloat = 1
+    var selectedGender: Gender? = nil
+    var onGenderSelected: ((Gender) -> Void)? = nil
     var body: some View {
         VStack(spacing: 0) {
             ScreenHeading(first: "What’s your", accent: "gender?", size: 30 * scale)
                 .padding(.bottom, 24 * scale)
             VStack(spacing: 10) {
                 ForEach(Gender.allCases, id: \.self) { gender in
-                    let selected = profile.gender == gender
+                    let selected = onGenderSelected == nil ? profile.gender == gender : selectedGender == gender
                     Button {
-                        profile.gender = gender
+                        if let onGenderSelected { onGenderSelected(gender) }
+                        else { profile.gender = gender }
                         UISelectionFeedbackGenerator().selectionChanged()
                     } label: {
                         VStack(spacing: 2) {
@@ -39,23 +42,40 @@ struct GenderAgeScreen: View {
 
 struct AgeWheel: View {
     @Binding var age: Int
-    @GestureState private var dragOffset: CGFloat = 0
+    @State private var selectedAge: Int?
+    @State private var isScrolling = false
     private let rowHeight: CGFloat = 27
 
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                ForEach(-3...3, id: \.self) { delta in
-                    let value = age + delta
-                    if (13...100).contains(value) {
-                        let distance = abs(CGFloat(delta) * rowHeight + dragOffset)
-                        Text("\(value)")
-                            .font(distance < rowHeight / 2 ? FitTheme.display(27) : FitTheme.body(22))
-                            .foregroundStyle(distance < rowHeight / 2 ? FitTheme.orange : .white.opacity(0.4))
-                            .frame(maxWidth: .infinity).frame(height: rowHeight)
-                            .offset(y: CGFloat(delta) * rowHeight + dragOffset)
-                            .onTapGesture { age = value }
+                ScrollView(.vertical) {
+                    LazyVStack(spacing: 0) {
+                        ForEach(13...100, id: \.self) { value in
+                            Text("\(value)")
+                                .font(selectedAge == value ? FitTheme.display(27) : FitTheme.body(22))
+                                .foregroundStyle(selectedAge == value ? FitTheme.orange : .white.opacity(0.4))
+                                .frame(maxWidth: .infinity).frame(height: rowHeight)
+                                .id(value)
+                        }
                     }
+                    .scrollTargetLayout()
+                }
+                .safeAreaPadding(.vertical, max(0, (geometry.size.height - rowHeight) / 2))
+                .scrollIndicators(.hidden)
+                .scrollTargetBehavior(.viewAligned)
+                .scrollPosition(id: $selectedAge, anchor: .center)
+                .onScrollPhaseChange { _, phase in
+                    isScrolling = phase != .idle
+                    if phase == .idle, let selectedAge, selectedAge != age {
+                        age = selectedAge
+                        UISelectionFeedbackGenerator().selectionChanged()
+                    }
+                }
+                .onAppear { selectedAge = age }
+                .onChange(of: age) { _, value in if !isScrolling { selectedAge = value } }
+                .onDisappear {
+                    if isScrolling, let selectedAge { age = selectedAge }
                 }
                 HStack {
                     Capsule().fill(FitTheme.orange).frame(width: 2.5)
@@ -67,21 +87,13 @@ struct AgeWheel: View {
                 .allowsHitTesting(false)
             }
             .frame(width: geometry.size.width, height: geometry.size.height)
-            .contentShape(Rectangle())
             .clipped()
             .mask { LinearGradient(colors: [.clear, .black, .black, .clear], startPoint: .top, endPoint: .bottom) }
-            .gesture(DragGesture(minimumDistance: 3)
-                .updating($dragOffset) { value, state, _ in state = value.translation.height }
-                .onEnded { value in
-                    let change = Int((-value.translation.height / rowHeight).rounded())
-                    age = min(100, max(13, age + change))
-                    UISelectionFeedbackGenerator().selectionChanged()
-                })
         }
         .fitSurface(radius: 23)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Your age")
-        .accessibilityValue("\(age) years")
+        .accessibilityValue("\(selectedAge ?? age) years")
         .accessibilityAdjustableAction { direction in
             switch direction {
             case .increment: age = min(100, age + 1)
