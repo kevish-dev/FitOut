@@ -10,8 +10,10 @@
 		06A9BCD86F6C2D129BC73EB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E3271F3A8C5AB14221648D0 /* Assets.xcassets */; };
 		0E07556CD688B8D6530A9E60 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F964206E6311DF336277F6 /* OnboardingView.swift */; };
 		156E6362BF68F230ADE91059 /* FitnessProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */; };
+		1A2E0672CCC681BB73519871 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4390ECBBEC38020095B4A64 /* ProfileStore.swift */; };
 		1F7DACD3DBA74924AF66B797 /* StorageContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDB9EE50477E60A26DBC1B9E /* StorageContracts.swift */; };
 		2617E173D09B5BCE84BE4BDB /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */; };
+		37C4694B7C3AEB0D1B942C58 /* ProfileFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72817576713C4A5AA7D1B887 /* ProfileFlowTests.swift */; };
 		3D0FCDDFDDD2FAFEE04DB5D7 /* FitOutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */; };
 		400EA581DAF184E2BB8CADEE /* SwiftDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D8E4F8336E4F1028340F5B /* SwiftDataRepository.swift */; };
 		480D8ECEDE1F6EA2DDBD14DE /* orbitron-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */; };
@@ -20,15 +22,18 @@
 		658BB85E1C3604F63C39C81F /* rajdhani-500.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A2F37F01FD300A00EF4835A9 /* rajdhani-500.ttf */; };
 		6CBD24737E9791E340618F8C /* orbitron-700.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 7B7F21158E5B770C62F60AEA /* orbitron-700.ttf */; };
 		7A60A927198B8CA10B48DBFF /* rajdhani-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = 13D8096CF5ED44F3B8DB0F09 /* rajdhani-LICENSE.txt */; };
+		7E44EC60720A80DB8952DA4E /* SchemaV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3CC2EF639E56A13F8937099 /* SchemaV2.swift */; };
 		8AD820F05EE6D3FD992320E7 /* DesignSystem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91A26CE3AA6A76836F4D85A5 /* DesignSystem.swift */; };
 		9C036E9CEDA55B18D3D1E99A /* OnboardingStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8521FB8F40CDC52DC0E729F9 /* OnboardingStore.swift */; };
 		9D144F2A7794EE4800D52D36 /* FitOutSchema.swift in Sources */ = {isa = PBXBuildFile; fileRef = A258C80F9DA85FC523368FD7 /* FitOutSchema.swift */; };
 		A27BE7051006DE096036BF4B /* CapabilityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57BE158ECDB43A8891AB07FC /* CapabilityService.swift */; };
 		A7E156778D3E4B51FA4CAF2F /* GoalsScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD588983899ED41104F7B633 /* GoalsScreen.swift */; };
 		BC19655BC5CEB954886742C5 /* rajdhani-600.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 89FD33D70129134AC4DC66B7 /* rajdhani-600.ttf */; };
+		BD568EC624BACF7396E9ED33 /* ProfileFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DEF03BD38389CEDA762EF8C /* ProfileFlow.swift */; };
 		BE0A9D2A52CF99228401F17C /* orbitron-800.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 79A505A2868DBC24CC79D1F9 /* orbitron-800.ttf */; };
 		C6C53448DF71B23CB21F2770 /* GenderAgeScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70527C9CBB10BD40886D6C27 /* GenderAgeScreen.swift */; };
 		D102DDDF2F4894AB66F3D49B /* WeightScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D780BFF22DAED374AF64BE1 /* WeightScreen.swift */; };
+		D54F861D1C9E8CB9948862A3 /* ProfileData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6C83017864B4399804BEB5 /* ProfileData.swift */; };
 		D5A7963D83294C7FAF61C127 /* CompletionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309FF4CAB360D8D7F7C65114 /* CompletionScreen.swift */; };
 		E6CF4753B7D56EE3FC3BB3F7 /* PersistenceFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 981149BAB7F28B936CA7D8AA /* PersistenceFactory.swift */; };
 		ED2558509B3DB7B76721EC4E /* AppShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19FBD164460FD92A1C24AAB5 /* AppShell.swift */; };
@@ -68,9 +73,12 @@
 		57957907296D2DBDC134F5D0 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		57BE158ECDB43A8891AB07FC /* CapabilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityService.swift; sourceTree = "<group>"; };
 		5B34B8171F92F92C919FA673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		5DEF03BD38389CEDA762EF8C /* ProfileFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFlow.swift; sourceTree = "<group>"; };
 		70527C9CBB10BD40886D6C27 /* GenderAgeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenderAgeScreen.swift; sourceTree = "<group>"; };
+		72817576713C4A5AA7D1B887 /* ProfileFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFlowTests.swift; sourceTree = "<group>"; };
 		79A505A2868DBC24CC79D1F9 /* orbitron-800.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "orbitron-800.ttf"; sourceTree = "<group>"; };
 		7B7F21158E5B770C62F60AEA /* orbitron-700.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "orbitron-700.ttf"; sourceTree = "<group>"; };
+		7C6C83017864B4399804BEB5 /* ProfileData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileData.swift; sourceTree = "<group>"; };
 		8521FB8F40CDC52DC0E729F9 /* OnboardingStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingStore.swift; sourceTree = "<group>"; };
 		89FD33D70129134AC4DC66B7 /* rajdhani-600.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "rajdhani-600.ttf"; sourceTree = "<group>"; };
 		8D780BFF22DAED374AF64BE1 /* WeightScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeightScreen.swift; sourceTree = "<group>"; };
@@ -82,11 +90,13 @@
 		AD588983899ED41104F7B633 /* GoalsScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalsScreen.swift; sourceTree = "<group>"; };
 		BDB9EE50477E60A26DBC1B9E /* StorageContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageContracts.swift; sourceTree = "<group>"; };
 		BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "orbitron-LICENSE.txt"; sourceTree = "<group>"; };
+		C4390ECBBEC38020095B4A64 /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
 		C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitOutApp.swift; sourceTree = "<group>"; };
 		CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		D02EE5C7D0EC131F25C78957 /* FitOut.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FitOut.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D5AD094E75EDCD00D742446D /* FitOutTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = FitOutTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		E06E72006F94C883E88ADE79 /* CapabilityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityTests.swift; sourceTree = "<group>"; };
+		F3CC2EF639E56A13F8937099 /* SchemaV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaV2.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -95,6 +105,7 @@
 			children = (
 				E06E72006F94C883E88ADE79 /* CapabilityTests.swift */,
 				A058FE4B0C32CA6DE72AE792 /* PersistenceTests.swift */,
+				72817576713C4A5AA7D1B887 /* ProfileFlowTests.swift */,
 				0A679CD19EA0DF1595351C3D /* ProfileTests.swift */,
 			);
 			path = FitOutTests;
@@ -179,6 +190,7 @@
 			children = (
 				A258C80F9DA85FC523368FD7 /* FitOutSchema.swift */,
 				981149BAB7F28B936CA7D8AA /* PersistenceFactory.swift */,
+				F3CC2EF639E56A13F8937099 /* SchemaV2.swift */,
 				BDB9EE50477E60A26DBC1B9E /* StorageContracts.swift */,
 				27D8E4F8336E4F1028340F5B /* SwiftDataRepository.swift */,
 			);
@@ -228,6 +240,7 @@
 		D183E7CB113F4BAC2015FDBE /* Features */ = {
 			isa = PBXGroup;
 			children = (
+				D61C2EFE1C38136A70D759AE /* Profile */,
 				53EBEA5497E668D73C1D6CDF /* Shell */,
 			);
 			path = Features;
@@ -239,6 +252,16 @@
 				1D52F2D538BAF90A8EC8C058 /* FoundationUITests.swift */,
 			);
 			path = FitOutUITests;
+			sourceTree = "<group>";
+		};
+		D61C2EFE1C38136A70D759AE /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				7C6C83017864B4399804BEB5 /* ProfileData.swift */,
+				5DEF03BD38389CEDA762EF8C /* ProfileFlow.swift */,
+				C4390ECBBEC38020095B4A64 /* ProfileStore.swift */,
+			);
+			path = Profile;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -364,6 +387,7 @@
 			files = (
 				5B942A6F130D212AA769CB19 /* CapabilityTests.swift in Sources */,
 				62BE1CCC9FEE0BA00560D2E3 /* PersistenceTests.swift in Sources */,
+				37C4694B7C3AEB0D1B942C58 /* ProfileFlowTests.swift in Sources */,
 				F72580E8DD2271831D3DF578 /* ProfileTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -393,7 +417,11 @@
 				9C036E9CEDA55B18D3D1E99A /* OnboardingStore.swift in Sources */,
 				0E07556CD688B8D6530A9E60 /* OnboardingView.swift in Sources */,
 				E6CF4753B7D56EE3FC3BB3F7 /* PersistenceFactory.swift in Sources */,
+				D54F861D1C9E8CB9948862A3 /* ProfileData.swift in Sources */,
+				BD568EC624BACF7396E9ED33 /* ProfileFlow.swift in Sources */,
 				2617E173D09B5BCE84BE4BDB /* ProfileScreen.swift in Sources */,
+				1A2E0672CCC681BB73519871 /* ProfileStore.swift in Sources */,
+				7E44EC60720A80DB8952DA4E /* SchemaV2.swift in Sources */,
 				1F7DACD3DBA74924AF66B797 /* StorageContracts.swift in Sources */,
 				400EA581DAF184E2BB8CADEE /* SwiftDataRepository.swift in Sources */,
 				D102DDDF2F4894AB66F3D49B /* WeightScreen.swift in Sources */,

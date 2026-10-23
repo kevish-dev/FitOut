@@ -7,7 +7,7 @@ struct AppShell: View {
         TabView(selection: $tab) {
             NavigationStack {
                 List {
-                    Section { Text("Welcome, \(container.onboarding.profile.trimmedName)").font(.title2.bold()) }
+                    Section { Text("Welcome, \(container.profile.draft.trimmedName)").font(.title2.bold()) }
                     Section("Get started") {
                         Button("Gym routines") { tab = 1 }
                         Button("Nutrition and hydration") { tab = 2 }
@@ -40,8 +40,8 @@ struct FoundationSettings: View {
     var body: some View {
         List {
             Section("Profile") {
-                LabeledContent("Name", value: container.onboarding.profile.trimmedName)
-                Button("Edit profile") { container.onboarding.editProfile() }
+                LabeledContent("Name", value: container.profile.draft.trimmedName)
+                NavigationLink("Edit profile") { ProfileEditor(store: container.profile) }
             }
             Section("Privacy") { Text("FitOut stores your data on this iPhone. No account, analytics, or external AI service is used.") }
             Section("Device capabilities") {

@@ -13,9 +13,9 @@ struct AppRoot: View {
     var body: some View {
         Group {
             if let container {
-                if container.onboarding.profile.completedAt != nil {
+                if container.profile.draft.completedAt != nil {
                     AppShell(container: container)
-                } else { OnboardingView(store: container.onboarding) }
+                } else { ProfileFlow(store: container.profile) }
             } else if let failure {
                 ContentUnavailableView {
                     Label("Your data could not be opened", systemImage: "externaldrive.badge.exclamationmark")

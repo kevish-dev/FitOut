@@ -4,6 +4,8 @@ import json
 import shutil
 import subprocess
 source = max(Path('/Users/kevishsewliya/Library/Developer/Xcode/DerivedData').glob('FitOut-*/Logs/Test/*.xcresult'), key=lambda p: p.stat().st_mtime)
+if not (source / 'Info.plist').exists():
+    raise SystemExit('Latest Xcode test run is still in progress; no completed result yet.')
 target = Path('.build/LatestTests.xcresult')
 if target.exists():
     shutil.rmtree(target)
