@@ -20,6 +20,8 @@
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>NSHealthShareUsageDescription</key>
+	<string>FitOut reads selected activity, workouts, nutrition and body measurements to show your personal progress.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>orbitron-700.ttf</string>

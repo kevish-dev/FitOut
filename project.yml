@@ -21,12 +21,17 @@ targets:
       path: FitOut/Info.plist
       properties:
         CFBundleDisplayName: FitOut
+        NSHealthShareUsageDescription: FitOut reads selected activity, workouts, nutrition and body measurements to show your personal progress.
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         UIUserInterfaceStyle: Dark
         UIAppFonts: [orbitron-700.ttf, orbitron-800.ttf, rajdhani-500.ttf, rajdhani-600.ttf]
+    entitlements:
+      path: FitOut/FitOut.entitlements
+      properties:
+        com.apple.developer.healthkit: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fitout.app

@@ -59,3 +59,9 @@ Checked installed SDK interfaces and Apple documentation for:
 - [ImagePlaygroundViewController.isAvailable](https://developer.apple.com/documentation/imageplayground/imageplaygroundviewcontroller/isavailable), gated at iOS 18.2+. This check does not invoke an image-generation workflow.
 
 No beta-only generation APIs or external AI providers are used.
+
+## Phase sequencing dependencies
+
+- Phase 2 introduces the Home state resolver and renders all planned/rest/completed states using deterministic inputs. Production remains empty until Phase 3/4 supplies real routines/sessions; no fixtures are inserted to make those states appear.
+- The HealthKit read-only permission service, entitlement and usage description are introduced as a narrow Phase 2 dependency of the required Connect action. Querying/normalization stays in Phase 7. A completed authorization request never implies granted read access.
+- Home quick actions route to each module; their specific log forms arrive with their owning phase. Final end-to-end verification must revisit all quick actions once those modules exist.
