@@ -82,10 +82,8 @@ struct RoutineCreationSheet: View {
         } label: {
             HStack(alignment: .center, spacing: 12) {
                 if template == .custom {
-                    Image(systemName: "slider.horizontal.3")
-                        .font(.system(size: 20, weight: .medium))
-                        .foregroundStyle(FitTheme.dashboardAccent)
-                        .frame(width: 40, height: 44)
+                    Image("RoutineEquipment").resizable().scaledToFit()
+                        .frame(width: 64, height: 64).accessibilityHidden(true)
                 }
                 VStack(alignment: .leading, spacing: 5) {
                     Text(template == .custom ? "Build from scratch" : template.rawValue)
@@ -93,6 +91,14 @@ struct RoutineCreationSheet: View {
                     Text(template == .custom ? "Pick your own days and exercises" : "\(sample.trainingDays.count) days / week · \(template.creationDetail)")
                         .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
                         .fixedSize(horizontal: false, vertical: true)
+                    if template != .custom {
+                        HStack(spacing: 4) {
+                            ForEach(sample.days.sorted { $0.weekday < $1.weekday }) { day in
+                                Capsule().fill(day.kind == .workout ? FitTheme.dashboardAccent.opacity(isSelected ? 1 : 0.45) : FitTheme.textSecondary.opacity(0.2))
+                                    .frame(width: 16, height: 3)
+                            }
+                        }.padding(.top, 3).accessibilityHidden(true)
+                    }
                 }
                 Spacer(minLength: 8)
                 Image(systemName: isSelected ? "checkmark.circle.fill" : "circle")

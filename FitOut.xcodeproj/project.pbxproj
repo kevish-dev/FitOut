@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F13000000000000000000001 /* RoutineEditorVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13000000000000000000002 /* RoutineEditorVisuals.swift */; };
 		F12000000000000000000001 /* RoutineCreationSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = F12000000000000000000002 /* RoutineCreationSheet.swift */; };
 		F07000000000000000000007 /* ExerciseCatalogueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F07000000000000000000008 /* ExerciseCatalogueTests.swift */; };
 		F07000000000000000000005 /* ExerciseArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = F07000000000000000000006 /* ExerciseArtwork.swift */; };
@@ -133,6 +134,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F13000000000000000000002 /* RoutineEditorVisuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineEditorVisuals.swift; sourceTree = "<group>"; };
 		F12000000000000000000002 /* RoutineCreationSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineCreationSheet.swift; sourceTree = "<group>"; };
 		F07000000000000000000008 /* ExerciseCatalogueTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCatalogueTests.swift; sourceTree = "<group>"; };
 		F07000000000000000000006 /* ExerciseArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseArtwork.swift; sourceTree = "<group>"; };
@@ -355,6 +357,7 @@
 				F06000000000000000000006 /* RoutineExerciseViews.swift */,
 				F06000000000000000000008 /* RoutineLibraryView.swift */,
 				F12000000000000000000002 /* RoutineCreationSheet.swift */,
+				F13000000000000000000002 /* RoutineEditorVisuals.swift */,
 				3CB14C4F70280EF0115F7335 /* MuscleMapView.swift */,
 			);
 			path = Gym;
@@ -734,6 +737,7 @@
 				F06000000000000000000005 /* RoutineExerciseViews.swift in Sources */,
 				F06000000000000000000007 /* RoutineLibraryView.swift in Sources */,
 				F12000000000000000000001 /* RoutineCreationSheet.swift in Sources */,
+				F13000000000000000000001 /* RoutineEditorVisuals.swift in Sources */,
 				F06000000000000000000009 /* SchemaV5.swift in Sources */,
 				BF7ED8EFBB46FD7861BEF151 /* HealthAccessService.swift in Sources */,
 				FDD3F4CB01C5764E178106B1 /* HomeState.swift in Sources */,

@@ -11,10 +11,13 @@ second sheet or a dismiss/present race. My Routines preserves an existing active
 routine when creating another one. Existing plans and drafts open directly.
 
 The builder is one sheet with three stages: Schedule, Workouts, and Review.
-Stages share one draft and a fixed bottom action. Changing stages resets scroll
+Icon-based stage controls stay above the scrolling editor. Stages share one
+draft and a fixed bottom action. Changing stages resets scroll
 position; choosing a weekday brings its chip into view. Content uses the shared
 20 pt page inset, 16 pt section/card spacing, Inter UI text, and restrained glass
-surfaces. Set rows use quiet inset fields rather than more glass panels.
+surfaces. Set rows use quiet inset fields rather than more glass panels. See
+[ROUTINE_DESIGN.md](ROUTINE_DESIGN.md) for the illustrated editor and generated
+asset provenance.
 
 - Schedule: name the plan in a labeled field with a visible focus state, select
   training weekdays, leave other days open or

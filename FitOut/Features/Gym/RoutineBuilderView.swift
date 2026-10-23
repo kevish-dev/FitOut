@@ -39,12 +39,15 @@ struct RoutineEditor: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
-                    Picker("Routine stage", selection: $stage) {
-                        ForEach(RoutineEditorStage.allCases) { Text($0.rawValue).tag($0) }
-                    }.pickerStyle(.segmented).accessibilityIdentifier("routineStages")
                     if restored { status("Unsaved draft restored", symbol: "arrow.counterclockwise") }
                     if let message { status(message, symbol: "checkmark.circle") }
-                    if let issue { Text(issue).font(FitTheme.body(13)).foregroundStyle(.orange).accessibilityIdentifier("routineValidation") }
+                    if let issue {
+                        Label(issue, systemImage: "exclamationmark.circle")
+                            .font(FitTheme.body(13)).foregroundStyle(.orange)
+                            .padding(12).frame(maxWidth: .infinity, alignment: .leading)
+                            .background(.orange.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+                            .accessibilityIdentifier("routineValidation")
+                    }
                     switch stage {
                     case .schedule: schedule
                     case .workouts: workout
@@ -56,6 +59,14 @@ struct RoutineEditor: View {
                 .frame(maxWidth: .infinity)
             }
             .id(stage)
+            .safeAreaInset(edge: .top, spacing: 0) {
+                RoutineStageBar(selection: $stage)
+                    .padding(.horizontal, FitTheme.pageInset).padding(.vertical, 10)
+                    .frame(maxWidth: 600).frame(maxWidth: .infinity)
+                    .background(FitTheme.dashboardBackground)
+            }
+            .scrollIndicators(.hidden)
+            .scrollBounceBehavior(.basedOnSize)
             .scrollDismissesKeyboard(.interactively)
             .background(FitTheme.dashboardBackground)
             .safeAreaInset(edge: .bottom, spacing: 0) { footer }
@@ -112,7 +123,7 @@ struct RoutineEditor: View {
 
     private var schedule: some View {
         VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
-            heading("Plan your week", detail: "Name your routine and choose when you train.")
+            RoutinePlanHero(routine: routine)
             VStack(alignment: .leading, spacing: 8) {
                 Text("Routine name").font(FitTheme.medium(13)).foregroundStyle(FitTheme.textSecondary)
                 TextField("e.g. My strength plan", text: $routine.name).font(FitTheme.section(18))
@@ -127,29 +138,47 @@ struct RoutineEditor: View {
             }
             VStack(alignment: .leading, spacing: 14) {
                 HStack {
-                    Text("Training days").font(FitTheme.section(16))
+                    Label("Training days", systemImage: "calendar").font(FitTheme.section(16))
                     Spacer()
-                    Text("\(routine.trainingDays.count) / 7").font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
+                    Text("\(routine.trainingDays.count) / 7").font(FitTheme.medium(12)).monospacedDigit()
+                        .foregroundStyle(FitTheme.dashboardAccent)
+                        .padding(.horizontal, 10).padding(.vertical, 6)
+                        .background(FitTheme.dashboardAccent.opacity(0.1), in: Capsule())
                 }
                 trainingDayPicker
-                Text("On other days").font(FitTheme.medium(13)).foregroundStyle(FitTheme.textSecondary)
-                Picker("Other days", selection: $otherDays) {
-                    Text("As set").tag(nil as RoutineDayKind?)
-                    Text("Open").tag(Optional(RoutineDayKind.flexible))
-                    Text("Rest").tag(Optional(RoutineDayKind.rest))
-                }.pickerStyle(.segmented)
+                HStack(spacing: 12) {
+                    Image(systemName: otherDays == .rest ? "moon" : "circle.dashed")
+                        .foregroundStyle(FitTheme.dashboardAccent).frame(width: 26)
+                    Text("Other days").font(FitTheme.medium(14))
+                    Spacer(minLength: 0)
+                    Picker("Other days", selection: $otherDays) {
+                        Text("Keep as set").tag(nil as RoutineDayKind?)
+                        Text("Open").tag(Optional(RoutineDayKind.flexible))
+                        Text("Rest").tag(Optional(RoutineDayKind.rest))
+                    }.pickerStyle(.menu).labelsHidden().font(FitTheme.medium(13))
                     .onChange(of: otherDays) { _, kind in
                         guard let kind else { return }
                         for index in routine.days.indices where routine.days[index].kind != .workout { routine.days[index].kind = kind }
                     }
+                }.padding(.horizontal, 14).frame(minHeight: 54)
+                    .background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 14))
                 Text(otherDays == .rest ? "Unselected days are marked as rest." : otherDays == .flexible ? "Open days have no scheduled workout." : "Each day keeps its current open or rest setting.")
                     .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
             }
-            DisclosureGroup("Start date (optional)") {
+            DisclosureGroup {
                 Toggle("Start on a specific day", isOn: Binding(get: { routine.startsOn != nil }, set: { routine.startsOn = $0 ? Calendar.current.startOfDay(for: .now) : nil }))
                 if routine.startsOn != nil {
                     DatePicker("Starts", selection: Binding(get: { routine.startsOn ?? .now }, set: { routine.startsOn = $0 }), displayedComponents: .date)
                 }
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "calendar.badge.clock").font(.system(size: 21)).foregroundStyle(FitTheme.dashboardAccent)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Start date").font(FitTheme.medium(14))
+                        Text(routine.startsOn.map { $0.formatted(date: .abbreviated, time: .omitted) } ?? "Whenever you're ready")
+                            .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                    }
+                }.frame(minHeight: 40)
             }.font(FitTheme.body(14)).routinePanel()
         }
     }
@@ -181,18 +210,25 @@ struct RoutineEditor: View {
                         Image(systemName: selected ? "checkmark.circle.fill" : "circle")
                     }.padding(.horizontal, 16)
                 } else {
-                    VStack(spacing: 10) {
-                        Text(String(RoutineSchedule.weekdays[index].prefix(3))).font(FitTheme.medium(12))
-                        Image(systemName: selected ? "checkmark.circle.fill" : "plus.circle")
-                            .font(.system(size: 17, weight: .regular))
+                    VStack(spacing: 8) {
+                        Image(systemName: selected ? "dumbbell.fill" : "plus")
+                            .font(.system(size: 16, weight: .medium))
+                            .frame(width: 44, height: 44)
+                            .dashboardGlass(in: Circle(), highlighted: selected, interactive: true)
+                            .overlay { Circle().strokeBorder(selected ? FitTheme.dashboardAccent.opacity(0.55) : .clear, lineWidth: 1) }
+                        Text(String(RoutineSchedule.weekdays[index].prefix(3))).font(FitTheme.medium(11))
                     }
                 }
             }
             .frame(minWidth: 44, maxWidth: .infinity, minHeight: 68)
             .foregroundStyle(selected ? FitTheme.dashboardAccent : FitTheme.textSecondary)
-            .dashboardGlass(in: RoundedRectangle(cornerRadius: 14), highlighted: selected, interactive: true)
+            .background {
+                if dynamicTypeSize.isAccessibilitySize {
+                    RoundedRectangle(cornerRadius: 14).fill(FitTheme.surface)
+                }
+            }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(RoutineEditorPressStyle())
         .accessibilityLabel(RoutineSchedule.weekdays[index])
         .accessibilityValue(selected ? "Training day" : "Not a training day")
         .accessibilityAddTraits(selected ? .isSelected : [])
@@ -208,10 +244,17 @@ struct RoutineEditor: View {
                             Button {
                                 withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) { weekday = index; message = nil; issue = nil }
                             } label: {
-                                Text(String(RoutineSchedule.weekdays[index].prefix(3))).font(FitTheme.button(13))
-                                    .padding(.horizontal, 15).frame(minHeight: 44)
-                                    .dashboardGlass(in: Capsule(), highlighted: weekday == index, interactive: true)
-                            }.buttonStyle(.plain).accessibilityIdentifier("routineEditDay-\(index)").id(index)
+                                VStack(spacing: 8) {
+                                    Text(String(RoutineSchedule.weekdays[index].prefix(3))).font(FitTheme.medium(12))
+                                    Image(systemName: (routine.days.first { $0.weekday == index }?.kind ?? .flexible).editorSymbol)
+                                        .font(.system(size: 16, weight: .medium))
+                                }
+                                .frame(minWidth: 50, minHeight: 68)
+                                .foregroundStyle(weekday == index ? FitTheme.dashboardAccent : FitTheme.textSecondary)
+                                .dashboardGlass(in: RoundedRectangle(cornerRadius: 16), highlighted: weekday == index, interactive: true)
+                            }.buttonStyle(RoutineEditorPressStyle()).accessibilityIdentifier("routineEditDay-\(index)").id(index)
+                                .accessibilityLabel(RoutineSchedule.weekdays[index])
+                                .accessibilityAddTraits(weekday == index ? .isSelected : [])
                         }
                     }.padding(.vertical, 2)
                 }
@@ -233,22 +276,27 @@ struct RoutineEditor: View {
                 } label: { Image(systemName: "ellipsis").frame(width: 44, height: 44).dashboardGlass(in: Circle(), interactive: true) }
                 .accessibilityLabel("Workout options")
             }
-            Picker("Day type", selection: $routine.days[dayIndex].kind) {
-                Text("Workout").tag(RoutineDayKind.workout)
-                Text("Rest").tag(RoutineDayKind.rest)
-                Text("Unassigned").tag(RoutineDayKind.flexible)
-            }.pickerStyle(.segmented)
+            RoutineDayKindControl(selection: $routine.days[dayIndex].kind)
                 .onChange(of: day.kind) { _, kind in
                     if kind == .workout && day.title.isEmpty { routine.days[dayIndex].title = "\(RoutineSchedule.weekdays[weekday]) workout" }
                 }
             if day.kind == .workout {
-                TextField("Workout name", text: $routine.days[dayIndex].title)
-                    .font(FitTheme.section(19)).padding(.vertical, 8).accessibilityIdentifier("routineWorkoutName")
-                if day.exercises.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text("Start with your first movement.").font(FitTheme.section(16))
-                        Text("Add from the library, create your own, or reuse a saved workout.").font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
-                    }.routinePanel()
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Workout name").font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
+                    HStack(spacing: 10) {
+                        TextField("e.g. Chest & triceps", text: $routine.days[dayIndex].title)
+                            .font(FitTheme.section(19)).accessibilityIdentifier("routineWorkoutName")
+                        Image(systemName: "pencil").font(.system(size: 14)).foregroundStyle(FitTheme.textSecondary).accessibilityHidden(true)
+                    }.padding(FitTheme.cardInset)
+                        .background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 14))
+                }
+                if !day.exercises.isEmpty {
+                    HStack {
+                        Text("Exercises").font(FitTheme.section(17))
+                        Spacer()
+                        Text("\(day.exercises.count) movements · \(day.exercises.reduce(0) { $0 + $1.setCount }) sets")
+                            .font(FitTheme.medium(11)).foregroundStyle(FitTheme.textSecondary)
+                    }.padding(.top, 4)
                 }
                 ForEach($routine.days[dayIndex].exercises) { $plan in
                     RoutineExerciseCard(plan: $plan, definition: store.exercise(plan.exerciseID), unit: unit,
@@ -266,10 +314,19 @@ struct RoutineEditor: View {
                     }
                 }
                 Button { sheet = .add } label: {
-                    Label("Add exercises", systemImage: "plus").font(FitTheme.button(15))
-                        .frame(maxWidth: .infinity, minHeight: 50)
-                        .dashboardGlass(in: RoundedRectangle(cornerRadius: 16), interactive: true)
-                }.buttonStyle(.plain).accessibilityIdentifier("routineAddExercises")
+                    VStack(spacing: 12) {
+                        if day.exercises.isEmpty {
+                            Image("RoutineEquipment").resizable().scaledToFit().frame(height: 120).accessibilityHidden(true)
+                            Text("Start with your first movement").font(FitTheme.section(17))
+                            Text("Choose exercises from the library or add your own.")
+                                .font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary).multilineTextAlignment(.center)
+                        }
+                        Label("Add exercises", systemImage: "plus.circle.fill").font(FitTheme.button(15))
+                            .foregroundStyle(FitTheme.dashboardAccent)
+                    }
+                    .padding(FitTheme.cardInset).frame(maxWidth: .infinity, minHeight: 54)
+                    .dashboardGlass(in: RoundedRectangle(cornerRadius: 20), interactive: true)
+                }.buttonStyle(RoutineEditorPressStyle()).accessibilityIdentifier("routineAddExercises")
                 DisclosureGroup("Workout details") {
                     VStack(alignment: .leading, spacing: 14) {
                         TextField("Notes (optional)", text: Binding(get: { day.notes ?? "" }, set: { routine.days[dayIndex].notes = $0 }), axis: .vertical)
@@ -283,31 +340,24 @@ struct RoutineEditor: View {
                     }.padding(.top, 12)
                 }.font(FitTheme.body(14)).routinePanel()
             } else {
-                heading(day.kind == .rest ? "A planned rest day." : "Keep this day open.", detail: day.exercises.isEmpty ? "You can change the day type whenever your schedule changes." : "Your exercises stay saved here if you switch back to Workout.")
-                    .padding(.vertical, 12)
+                RoutineDayPauseGraphic(kind: day.kind, hasExercises: !day.exercises.isEmpty)
             }
         }
     }
 
     private var review: some View {
         VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
-            heading(routine.name.isEmpty ? "Review your routine" : routine.name, detail: "\(routine.trainingDays.count) training days · repeats weekly")
+            RoutinePlanHero(routine: routine, reviewing: true)
+            HStack {
+                Text(routine.name.isEmpty ? "Review your routine" : routine.name).font(FitTheme.section(19))
+                Spacer()
+                Image(systemName: "repeat").foregroundStyle(FitTheme.dashboardAccent)
+            }
+            Text("Tap a day to make changes.").font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
             ForEach(routine.days.sorted { $0.weekday < $1.weekday }) { day in
                 Button { weekday = day.weekday; stage = .workouts } label: {
-                    HStack(alignment: .top, spacing: 12) {
-                        Text(String(RoutineSchedule.weekdays[day.weekday].prefix(3))).font(FitTheme.medium(12))
-                            .foregroundStyle(FitTheme.textSecondary).frame(width: 33, alignment: .leading)
-                        VStack(alignment: .leading, spacing: 5) {
-                            Text(day.kind == .workout ? day.title : day.kind == .rest ? "Rest day" : "Unassigned").font(FitTheme.section(15))
-                            if day.kind == .workout {
-                                Text("\(day.exercises.count) exercises · \(day.exercises.reduce(0) { $0 + $1.setCount }) sets")
-                                    .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-                            }
-                        }
-                        Spacer(minLength: 4)
-                        Image(systemName: "pencil").font(.system(size: 12)).foregroundStyle(FitTheme.dashboardAccent)
-                    }.frame(minHeight: 44, alignment: .center).routinePanel()
-                }.buttonStyle(.plain)
+                    RoutineReviewDay(day: day, exercise: day.exercises.first.flatMap { store.exercise($0.exerciseID) })
+                }.buttonStyle(RoutineEditorPressStyle())
             }
             Toggle(routine.archivedAt == nil ? "Use as active routine" : "Restore and use as active", isOn: Binding(get: { routine.isActive }, set: { value in
                 routine.isActive = value
@@ -345,7 +395,7 @@ struct RoutineEditor: View {
                     }.font(FitTheme.button(15)).padding(.horizontal, 18).frame(minHeight: 50)
                         .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(RoutineEditorPressStyle())
                 .disabled(stage == .schedule && !scheduleIsReady)
                 .opacity(stage == .schedule && !scheduleIsReady ? 0.45 : 1)
                 .accessibilityIdentifier(stage == .review ? "saveRoutine" : "routineContinue")
@@ -436,14 +486,10 @@ struct RoutineEditor: View {
         guard let from = day.exercises.firstIndex(where: { $0.id == id }), day.exercises.indices.contains(from + offset) else { return }
         routine.days[dayIndex].exercises.swapAt(from, from + offset)
     }
-    private func heading(_ title: String, detail: String) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(title).font(FitTheme.section(23))
-            Text(detail).font(FitTheme.body(14)).foregroundStyle(FitTheme.textSecondary)
-        }.fixedSize(horizontal: false, vertical: true)
-    }
     private func status(_ text: String, symbol: String) -> some View {
         Label(text, systemImage: symbol).font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
+            .padding(.horizontal, 12).padding(.vertical, 9)
+            .background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 12))
     }
 }
 

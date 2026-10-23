@@ -11,9 +11,24 @@ struct RoutineExerciseCard: View {
     let move: (Int) -> Void
     @State private var expanded = false
     @State private var removing = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private var targets: Binding<[PlannedSet]> {
         Binding(get: { plan.setTargets ?? [] }, set: { plan.setTargets = $0 })
+    }
+    private var targetSummary: String {
+        let values = plan.resolvedSets
+        if definition?.kind == .duration {
+            let times = Set(values.map(\.seconds))
+            if times.count == 1, let seconds = values.first?.seconds {
+                return seconds > 0 ? "\(seconds.formatted()) sec / set" : "Set a duration"
+            }
+            return "Timed targets"
+        }
+        let ranges = Set(values.map { "\($0.repMin)–\($0.repMax)" })
+        guard ranges.count == 1, let first = values.first else { return "Mixed rep targets" }
+        return first.repMin == first.repMax ? "\(first.repMin) reps" : "\(first.repMin)–\(first.repMax) reps"
     }
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -24,32 +39,54 @@ struct RoutineExerciseCard: View {
                         if definition?.kind == .duration { for index in values.indices { values[index].seconds = 30 } }
                         plan.setTargets = values
                     }
-                    expanded.toggle()
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) { expanded.toggle() }
                 } label: {
-                    HStack(alignment: .top, spacing: 10) {
-                        Image(systemName: expanded ? "chevron.down" : "chevron.right").font(.system(size: 11, weight: .semibold))
-                            .padding(.top, 4).foregroundStyle(FitTheme.dashboardAccent)
-                        ExerciseArtwork(exercise: definition, size: 44)
-                        VStack(alignment: .leading, spacing: 5) {
+                    HStack(alignment: .center, spacing: 12) {
+                        ExerciseArtwork(exercise: definition, size: typeSize.isAccessibilitySize ? 44 : 80)
+                        VStack(alignment: .leading, spacing: 7) {
                             Text(definition?.name ?? "Unavailable exercise").font(FitTheme.section(16))
-                            Text("\(plan.setCount) sets · \(plan.restSeconds)s default rest").font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                            if let definition {
+                                Text(definition.muscles.map(\.title).joined(separator: " · "))
+                                    .font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
+                            }
+                            Text("\(plan.setCount) sets · \(targetSummary)")
+                                .font(FitTheme.medium(12)).foregroundStyle(FitTheme.dashboardAccent)
+                            Label(expanded ? "Close set editor" : "Edit sets & reps", systemImage: expanded ? "chevron.up" : "slider.horizontal.3")
+                                .font(FitTheme.medium(11)).foregroundStyle(FitTheme.textSecondary)
                         }
                         Spacer(minLength: 0)
                     }.frame(minHeight: 44, alignment: .center).contentShape(Rectangle())
-                }.buttonStyle(.plain).accessibilityIdentifier("routineExercise-\(plan.exerciseID)")
+                }.buttonStyle(RoutineEditorPressStyle()).accessibilityIdentifier("routineExercise-\(plan.exerciseID)")
+                    .accessibilityValue(expanded ? "Set editor expanded" : "Set editor collapsed")
                 Menu {
                     Button("Replace exercise", systemImage: "arrow.triangle.2.circlepath", action: replace)
                     Button("Move up", systemImage: "arrow.up") { move(-1) }.disabled(!canMoveUp)
                     Button("Move down", systemImage: "arrow.down") { move(1) }.disabled(!canMoveDown)
                     Button("Remove exercise", role: .destructive) { removing = true }
-                } label: { Image(systemName: "ellipsis").frame(width: 44, height: 44) }
+                } label: {
+                    Image(systemName: "ellipsis").frame(width: 44, height: 44)
+                        .background(.white.opacity(0.035), in: Circle())
+                }
                 .accessibilityLabel("Options for \(definition?.name ?? "exercise")")
             }
             if expanded {
                 Divider().overlay(.white.opacity(0.1))
                 ExerciseImageButton(exercise: definition)
-                Stepper("Default rest: \(plan.restSeconds)s", value: $plan.restSeconds, in: 0...3600, step: 15)
-                    .font(FitTheme.medium(13))
+                VStack(alignment: .leading, spacing: 10) {
+                    Stepper(value: $plan.restSeconds, in: 0...3600, step: 15) {
+                        Label("Default rest · \(plan.restSeconds)s", systemImage: "timer").font(FitTheme.medium(13))
+                    }
+                    if typeSize.isAccessibilitySize {
+                        VStack(spacing: 8) { restChoices }
+                    } else {
+                        ViewThatFits(in: .horizontal) {
+                            HStack(spacing: 8) { restChoices }
+                            VStack(spacing: 8) { restChoices }
+                        }
+                    }
+                }
+                Label("Set targets", systemImage: "slider.horizontal.3")
+                    .font(FitTheme.section(14)).padding(.top, 4)
                 ForEach(targets) { $target in
                     let index = (plan.setTargets ?? []).firstIndex { $0.id == target.id } ?? 0
                     PlannedSetRow(target: $target, number: index + 1, kind: definition?.kind ?? .weighted, unit: unit,
@@ -69,6 +106,8 @@ struct RoutineExerciseCard: View {
                     }
                 } label: {
                     Label("Add set", systemImage: "plus").font(FitTheme.button(13)).frame(maxWidth: .infinity, minHeight: 44)
+                        .background(.white.opacity(0.035), in: RoundedRectangle(cornerRadius: 12))
+                        .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(FitTheme.subtleBorder, style: StrokeStyle(lineWidth: 1, dash: [4])) }
                 }
                 .disabled((plan.setTargets?.count ?? 0) >= 40)
                 .accessibilityIdentifier("routineAddSet")
@@ -80,9 +119,24 @@ struct RoutineExerciseCard: View {
                 }.font(FitTheme.medium(13))
             }
         }
-        .routinePanel()
+        .padding(FitTheme.cardInset)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .dashboardGlass(in: RoundedRectangle(cornerRadius: 22), highlighted: expanded)
         .confirmationDialog("Remove \(definition?.name ?? "this exercise")?", isPresented: $removing, titleVisibility: .visible) {
             Button("Remove exercise", role: .destructive, action: remove)
+        }
+    }
+    private var restChoices: some View {
+        ForEach([30, 60, 90, 120], id: \.self) { seconds in
+            Button { plan.restSeconds = seconds } label: {
+                Text("\(seconds)s").font(FitTheme.medium(12)).monospacedDigit()
+                    .frame(minWidth: 44, maxWidth: .infinity, minHeight: 44)
+                    .foregroundStyle(plan.restSeconds == seconds ? FitTheme.dashboardAccent : FitTheme.textSecondary)
+                    .background(plan.restSeconds == seconds ? FitTheme.dashboardAccent.opacity(0.1) : FitTheme.dashboardBackground.opacity(0.5), in: RoundedRectangle(cornerRadius: 12))
+            }
+            .buttonStyle(RoutineEditorPressStyle())
+            .accessibilityLabel("Set default rest to \(seconds) seconds")
+            .accessibilityAddTraits(plan.restSeconds == seconds ? .isSelected : [])
         }
     }
     private func duplicate(_ id: UUID) {
@@ -107,11 +161,19 @@ private struct PlannedSetRow: View {
     let canDuplicate: Bool
     let canMoveUp: Bool
     let canMoveDown: Bool
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    private var fieldLayout: AnyLayout {
+        typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 10)) : AnyLayout(HStackLayout(alignment: .top, spacing: 10))
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack {
-                Text("Set \(number)").font(FitTheme.section(13))
+                Text("\(number)").font(FitTheme.metric(13)).foregroundStyle(FitTheme.dashboardAccent)
+                    .frame(width: 32, height: 32)
+                    .background(FitTheme.dashboardAccent.opacity(0.1), in: Circle())
+                    .accessibilityLabel("Set \(number)")
                 Picker("Set \(number) type", selection: $target.type) {
                     ForEach(SetType.allCases, id: \.self) { Text($0.rawValue).tag($0) }
                 }.pickerStyle(.menu).font(FitTheme.medium(12)).labelsHidden()
@@ -127,7 +189,7 @@ private struct PlannedSetRow: View {
             if kind == .duration {
                 RoutineNumberField(title: "Seconds", value: Binding(get: { target.seconds }, set: { target.seconds = $0 ?? 0 }))
             } else {
-                HStack(alignment: .top, spacing: 10) {
+                fieldLayout {
                     RoutineNumberField(title: "Min reps", value: integer($target.repMin), integer: true)
                     RoutineNumberField(title: "Max reps", value: integer($target.repMax), integer: true)
                     if kind == .weighted {
@@ -136,7 +198,7 @@ private struct PlannedSetRow: View {
                 }
             }
             DisclosureGroup("Rest & effort (optional)") {
-                HStack(alignment: .top, spacing: 10) {
+                fieldLayout {
                     RoutineNumberField(title: "Rest, seconds", value: Binding(get: { target.restSeconds.map(Double.init) }, set: { value in
                         if let value, value.isFinite, abs(value) < 100_000 { target.restSeconds = Int(value) }
                         else if value == nil { target.restSeconds = nil }
@@ -156,7 +218,8 @@ private struct PlannedSetRow: View {
             }
         }
         .padding(12)
-        .background(.white.opacity(0.035), in: RoundedRectangle(cornerRadius: 12))
+        .background(FitTheme.dashboardBackground.opacity(0.6), in: RoundedRectangle(cornerRadius: 16))
+        .overlay { RoundedRectangle(cornerRadius: 16).strokeBorder(.white.opacity(0.05), lineWidth: 1) }
         .accessibilityElement(children: .contain)
     }
     private func integer(_ value: Binding<Int>) -> Binding<Double?> {
@@ -170,14 +233,17 @@ private struct RoutineNumberField: View {
     let title: String
     @Binding var value: Double?
     var integer = false
+    @FocusState private var focused: Bool
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
             Text(title).font(FitTheme.medium(11)).foregroundStyle(FitTheme.textSecondary)
             TextField("—", value: $value, format: .number.precision(.fractionLength(0...2)))
-                .font(FitTheme.body(16)).monospacedDigit()
+                .font(FitTheme.strong(18)).monospacedDigit().multilineTextAlignment(.center)
                 .keyboardType(integer ? .numberPad : .decimalPad)
-                .padding(.horizontal, 10).frame(minHeight: 44)
-                .background(FitTheme.dashboardBackground.opacity(0.6), in: RoundedRectangle(cornerRadius: 10))
+                .focused($focused)
+                .padding(.horizontal, 10).frame(minHeight: 48)
+                .background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 10))
+                .overlay { RoundedRectangle(cornerRadius: 10).strokeBorder(focused ? FitTheme.dashboardAccent : FitTheme.subtleBorder, lineWidth: 1) }
                 .accessibilityLabel(title)
         }.frame(maxWidth: .infinity, alignment: .leading)
     }
