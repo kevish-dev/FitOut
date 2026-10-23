@@ -56,7 +56,8 @@ struct AppShell: View {
                     .transition(.opacity)
                 }
             }
-            .padding(.top, 16)
+            // Center the 52 pt menu control on the native 44 pt navigation row.
+            .padding(.top, -4)
             .padding(.trailing, FitTheme.pageInset)
         }
         .accessibilityAction(.escape) { menuOpen = false }
