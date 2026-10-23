@@ -47,6 +47,7 @@ struct RoutineExerciseCard: View {
             }
             if expanded {
                 Divider().overlay(.white.opacity(0.1))
+                ExerciseImageButton(exercise: definition)
                 Stepper("Default rest: \(plan.restSeconds)s", value: $plan.restSeconds, in: 0...3600, step: 15)
                     .font(FitTheme.medium(13))
                 ForEach(targets) { $target in

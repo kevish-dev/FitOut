@@ -68,7 +68,7 @@ struct ActiveWorkoutView: View {
                             }.buttonStyle(.borderless)
                         } header: {
                             HStack(spacing: 10) {
-                                ExerciseArtwork(exercise: gym.exercise(entry.exercise.id), size: 40)
+                                ExerciseImageButton(exercise: entry.exercise, style: .thumbnail(40))
                                 Text(entry.exercise.name + (entry.skipped ? " · Skipped" : ""))
                                     .font(FitTheme.section(14))
                             }.textCase(nil).padding(.vertical, 4)
@@ -164,7 +164,7 @@ struct WorkoutSummary: View {
                     if !entry.notes.isEmpty { Text(entry.notes) }
                 } header: {
                     HStack(spacing: 10) {
-                        ExerciseArtwork(exercise: ExerciseCatalogue.byID[entry.exercise.id], size: 40)
+                        ExerciseImageButton(exercise: entry.exercise, style: .thumbnail(40))
                         Text(entry.exercise.name).font(FitTheme.section(14))
                     }.textCase(nil).padding(.vertical, 4)
                 }

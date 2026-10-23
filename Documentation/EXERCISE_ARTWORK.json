@@ -1,0 +1,170 @@
+[
+  {
+    "exerciseID": "machine-chest-press",
+    "assetName": "exercise-machine-chest-press",
+    "sourceFile": "Chest/3D Chest Press Machine Render.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "cb6d89c7ddfc075a446256d54b0f343399bfb00d36bc1c449ccfc54c0ffdc2c0"
+  },
+  {
+    "exerciseID": "incline-machine-chest-press",
+    "assetName": "exercise-incline-machine-chest-press",
+    "sourceFile": "Chest/Incline Chest Press Upper Chest Highlight.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "4942e600ba8de0084a43d211b76e1f5555cfde351eb6bffc51186337047d5aa8"
+  },
+  {
+    "exerciseID": "pec-deck",
+    "assetName": "exercise-pec-deck",
+    "sourceFile": "Chest/Anatomical Pec Deck Chest Fly Illustration.png",
+    "width": 1312,
+    "height": 1199,
+    "sha256": "f972f55cc7d825b01c5ef3d37dc65804d17c1462f2376fb017bebca3a183283f"
+  },
+  {
+    "exerciseID": "extension",
+    "assetName": "exercise-extension",
+    "sourceFile": "Triceps/Anatomical Cable Triceps Pushdown.png",
+    "width": 1024,
+    "height": 1536,
+    "sha256": "d9704821f3a00987af46bba642ddea7b8dabee4d8f2ba7a31dd724200d52f27a"
+  },
+  {
+    "exerciseID": "rope-triceps-pushdown",
+    "assetName": "exercise-rope-triceps-pushdown",
+    "sourceFile": "Triceps/Anatomical Triceps Pushdown Machine.png",
+    "width": 1024,
+    "height": 1536,
+    "sha256": "c3f689c4d139b32effbd333ca852c1071d06d5474b0f15d3b413e1a39d5d81cd"
+  },
+  {
+    "exerciseID": "overhead-triceps-extension",
+    "assetName": "exercise-overhead-triceps-extension",
+    "sourceFile": "Triceps/Seated Overhead Triceps Extension Render.png",
+    "width": 1024,
+    "height": 1536,
+    "sha256": "9f1ffc91bc224158bb6c9769cc364f5f17da965f9e6780d58ebc071919c3b4da"
+  },
+  {
+    "exerciseID": "squat",
+    "assetName": "exercise-squat",
+    "sourceFile": "Legs/Anatomical Barbell Squat Guide.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "23bbe1ef732d51e74b9167ca3521e9458b38ac37e76167c78bb021375cf55f81"
+  },
+  {
+    "exerciseID": "leg-press",
+    "assetName": "exercise-leg-press",
+    "sourceFile": "Legs/Leg Press Anatomy_ Bent to Extended.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "7891e6616dabd8f0cec025c3c7b1b4723e71f3b9d41ded6bdf00cc8d6c0f4222"
+  },
+  {
+    "exerciseID": "leg-extension",
+    "assetName": "exercise-leg-extension",
+    "sourceFile": "Legs/Leg Extension and Curl Anatomy Guide.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "ef0bfb34c382bf9a422c6cf6a46c7f7d51fc787f5cd7138bf069f716a97bbc15"
+  },
+  {
+    "exerciseID": "crunch",
+    "assetName": "exercise-crunch",
+    "sourceFile": "Core/Crunch Exercise Anatomy_ Start and Finish Poses.png",
+    "width": 2172,
+    "height": 724,
+    "sha256": "e161678e50c28b239bffcdde3fe7c19984aba1e693cf4f653ef8c80e605726cf"
+  },
+  {
+    "exerciseID": "dragon-flag",
+    "assetName": "exercise-dragon-flag",
+    "sourceFile": "Core/Dragon Flag Exercise Progression.png",
+    "width": 2172,
+    "height": 724,
+    "sha256": "f66cd82c4200631bd4506f40473cb1c3b4d4021db63cad79f9529bbad67cdf97"
+  },
+  {
+    "exerciseID": "russian-twist",
+    "assetName": "exercise-russian-twist",
+    "sourceFile": "Core/Russian Twist Anatomy Guide.png",
+    "width": 2172,
+    "height": 724,
+    "sha256": "5ec3da404735b4472efadf2caa6be1fcaec61dbf1c26a87172f3f60cc1931c8e"
+  },
+  {
+    "exerciseID": "pulldown",
+    "assetName": "exercise-pulldown",
+    "sourceFile": "Back/Anatomical Lat Pulldown Illustration.png",
+    "width": 1024,
+    "height": 1536,
+    "sha256": "64a44569c2d10b0aa711754254f386f5709526546fd398e0053ce7cedeb391b5"
+  },
+  {
+    "exerciseID": "seated-cable-row",
+    "assetName": "exercise-seated-cable-row",
+    "sourceFile": "Back/Anatomical Seated Cable Row Machine.png",
+    "width": 1024,
+    "height": 1536,
+    "sha256": "cfc4c6b7020645e2a3836e2970879bf102d256b8ad074ffd8a22a27c852eff53"
+  },
+  {
+    "exerciseID": "face-pull",
+    "assetName": "exercise-face-pull",
+    "sourceFile": "Back/Cable Rope Face Pull Anatomy Illustration.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "f9c0f3956c7ac76ba69f09468ddc72166f2ab270ba63896781f6a84cc4c39fff"
+  },
+  {
+    "exerciseID": "arnold-press",
+    "assetName": "exercise-arnold-press",
+    "sourceFile": "Shoulder/Arnold Press Muscle Guide.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "2cc08c8d3a3c37523ca3d02d78a6c604ed38d75d47d9b22e5ddea73cf9e23d00"
+  },
+  {
+    "exerciseID": "seated-dumbbell-press",
+    "assetName": "exercise-seated-dumbbell-press",
+    "sourceFile": "Shoulder/Seated Dumbbell Shoulder Press Guide.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "acb1961e3b16a0204503ff1d173c9760fb296c95dc26f9f844ad737f196b9ec9"
+  },
+  {
+    "exerciseID": "raise",
+    "assetName": "exercise-raise",
+    "sourceFile": "Shoulder/Anatomical Dumbbell Lateral Raise Guide.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "23bb8c131d29f5e804749c941953e7972dd2dd723360ef4052123da34dd76ccf"
+  },
+  {
+    "exerciseID": "ez-bar-curl",
+    "assetName": "exercise-ez-bar-curl",
+    "sourceFile": "Biceps/Anatomical EZ-Bar Curl Demonstration.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "32e8dfb48bfea7d081519275fd01da72c40a71b44fa5406854315f5374294ac6"
+  },
+  {
+    "exerciseID": "incline-curl",
+    "assetName": "exercise-incline-curl",
+    "sourceFile": "Biceps/Incline Dumbbell Curl Anatomy Poses.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "0730907c1e818bef59b357cf2c108171ae73bf6462c8171b8a9863eed31681b5"
+  },
+  {
+    "exerciseID": "hammer-curl",
+    "assetName": "exercise-hammer-curl",
+    "sourceFile": "Biceps/Hammer Curl Anatomy Demonstration.png",
+    "width": 1536,
+    "height": 1024,
+    "sha256": "ccf98bca297654a08ba06dfc033d8563c7949f9be7abc199bf0cc7d9d6dfaf60"
+  }
+]

@@ -83,7 +83,7 @@ struct ExerciseDetail: View {
         List {
             if let exercise = store.exercise(exerciseID) {
                 Section {
-                    ExerciseArtwork(exercise: exercise, expanded: true)
+                    ExerciseImageButton(exercise: exercise, style: .detail)
                         .listRowInsets(EdgeInsets()).listRowBackground(Color.clear)
                 }
                 Section("Movement") {

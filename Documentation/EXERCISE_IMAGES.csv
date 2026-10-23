@@ -18,6 +18,7 @@ incline-dumbbell-bench,Incline dumbbell bench press,exercise-incline-dumbbell-be
 decline-bench,Decline bench press,exercise-decline-bench,exercise-decline-bench.png
 dumbbell-floor-press,Dumbbell floor press,exercise-dumbbell-floor-press,exercise-dumbbell-floor-press.png
 machine-chest-press,Machine chest press,exercise-machine-chest-press,exercise-machine-chest-press.png
+incline-machine-chest-press,Incline machine chest press,exercise-incline-machine-chest-press,exercise-incline-machine-chest-press.png
 dumbbell-fly,Dumbbell chest fly,exercise-dumbbell-fly,exercise-dumbbell-fly.png
 cable-fly,Cable chest fly,exercise-cable-fly,exercise-cable-fly.png
 pec-deck,Pec deck fly,exercise-pec-deck,exercise-pec-deck.png
@@ -59,6 +60,7 @@ concentration-curl,Concentration curl,exercise-concentration-curl,exercise-conce
 cable-curl,Cable curl,exercise-cable-curl,exercise-cable-curl.png
 reverse-curl,Reverse curl,exercise-reverse-curl,exercise-reverse-curl.png
 overhead-triceps-extension,Dumbbell overhead triceps extension,exercise-overhead-triceps-extension,exercise-overhead-triceps-extension.png
+rope-triceps-pushdown,Rope triceps pushdown,exercise-rope-triceps-pushdown,exercise-rope-triceps-pushdown.png
 cable-overhead-extension,Cable overhead triceps extension,exercise-cable-overhead-extension,exercise-cable-overhead-extension.png
 skull-crusher,Lying triceps extension,exercise-skull-crusher,exercise-skull-crusher.png
 triceps-kickback,Dumbbell triceps kickback,exercise-triceps-kickback,exercise-triceps-kickback.png
@@ -106,6 +108,7 @@ lying-leg-raise,Lying leg raise,exercise-lying-leg-raise,exercise-lying-leg-rais
 dead-bug,Dead bug,exercise-dead-bug,exercise-dead-bug.png
 bird-dog,Bird dog,exercise-bird-dog,exercise-bird-dog.png
 russian-twist,Russian twist,exercise-russian-twist,exercise-russian-twist.png
+dragon-flag,Dragon flag,exercise-dragon-flag,exercise-dragon-flag.png
 cable-crunch,Cable crunch,exercise-cable-crunch,exercise-cable-crunch.png
 cable-woodchop,Cable woodchop,exercise-cable-woodchop,exercise-cable-woodchop.png
 ab-wheel,Ab wheel rollout,exercise-ab-wheel,exercise-ab-wheel.png

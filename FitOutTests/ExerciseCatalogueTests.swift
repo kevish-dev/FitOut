@@ -1,5 +1,6 @@
 import XCTest
 import SwiftData
+import UIKit
 @testable import FitOut
 
 final class ExerciseCatalogueTests: XCTestCase {
@@ -32,6 +33,27 @@ final class ExerciseCatalogueTests: XCTestCase {
         XCTAssertEqual(ExerciseCatalogue.byID["bench"]?.imageAssetName, "exercise-bench")
         XCTAssertNil(ExerciseDefinition(id: "bench", name: "My exercise", muscles: [.chest], isCustom: true).imageAssetName)
         XCTAssertNil(ExerciseDefinition(id: "unknown", name: "Legacy exercise", muscles: [.chest]).imageAssetName)
+    }
+
+    func testSuppliedIllustrationsAreBundledForTheirExactExerciseVariants() throws {
+        let illustratedIDs = [
+            "machine-chest-press", "incline-machine-chest-press", "pec-deck",
+            "extension", "rope-triceps-pushdown", "overhead-triceps-extension",
+            "squat", "leg-press", "leg-extension", "crunch", "dragon-flag", "russian-twist",
+            "pulldown", "seated-cable-row", "face-pull", "arnold-press",
+            "seated-dumbbell-press", "raise", "ez-bar-curl", "incline-curl", "hammer-curl"
+        ]
+        for id in illustratedIDs {
+            let exercise = try XCTUnwrap(ExerciseCatalogue.byID[id], id)
+            let key = try XCTUnwrap(exercise.imageAssetName, id)
+            let image = try XCTUnwrap(UIImage(named: key), "Missing bundled image: \(key)")
+            XCTAssertGreaterThan(image.size.width, 0, id)
+            XCTAssertGreaterThan(image.size.height, 0, id)
+        }
+        XCTAssertEqual(ExerciseCatalogue.byID["incline-machine-chest-press"]?.equipmentFilters, [.machine])
+        XCTAssertTrue(try XCTUnwrap(ExerciseCatalogue.byID["rope-triceps-pushdown"]).equipmentFilters.contains(.cable))
+        XCTAssertEqual(ExerciseCatalogue.byID["dragon-flag"]?.kind, .bodyweight)
+        XCTAssertTrue(ExerciseFilter(search: "plate twist").matches(try XCTUnwrap(ExerciseCatalogue.byID["russian-twist"])))
     }
 
     func testSearchHandlesAliasesSpacingMusclesAndCombinedFilters() throws {
