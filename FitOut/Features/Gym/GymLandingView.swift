@@ -59,17 +59,9 @@ struct GymView: View {
                     .toolbar { Button("Close") { summary = nil } }
             }
         }
-        .confirmationDialog("Create a workout routine", isPresented: $showingTemplates, titleVisibility: .visible) {
-            ForEach(RoutineTemplate.allCases) { template in
-                Button(template == .custom ? "Build from scratch" : template.rawValue) {
-                    var routine = template.make()
-                    if template == .custom { routine.name = "My training plan" }
-                    routine.isActive = true
-                    editing = GymPlanEdit(routine: routine, weekday: templateWeekday)
-                }
-            }
-            Button("Cancel", role: .cancel) { }
-        } message: { Text("Start with an editable template or choose your own training days.") }
+        .sheet(isPresented: $showingTemplates, onDismiss: { now = .now }) {
+            RoutineCreationSheet(store: store, unit: unit, initialWeekday: templateWeekday)
+        }
         .alert("Could not update Gym", isPresented: Binding(get: { workouts.error != nil && !showingWorkout }, set: { if !$0 { workouts.error = nil } })) {
             Button("OK", role: .cancel) { workouts.error = nil }
         } message: { Text(workouts.error ?? "") }

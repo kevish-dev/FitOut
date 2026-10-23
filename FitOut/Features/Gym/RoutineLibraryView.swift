@@ -4,6 +4,7 @@ struct MyRoutinesView: View {
     @Bindable var store: GymStore
     var unit: WeightUnit = .kg
     @State private var editing: Routine?
+    @State private var creating = false
     @State private var deleting: Routine?
     @State private var archiving: Routine?
     @State private var deletingDraft: RoutineDraft?
@@ -11,16 +12,7 @@ struct MyRoutinesView: View {
     var body: some View {
         List {
             Section {
-                Menu {
-                    ForEach(RoutineTemplate.allCases) { template in
-                        Button(template == .custom ? "Build from scratch" : template.rawValue) {
-                            var routine = template.make()
-                            routine.name = template == .custom ? "My training plan" : routine.name
-                            routine.isActive = store.activeRoutine == nil
-                            editing = routine
-                        }
-                    }
-                } label: { Label("New routine", systemImage: "plus") }
+                Button { creating = true } label: { Label("New routine", systemImage: "plus") }
                 .accessibilityIdentifier("newRoutine")
             }
             if !store.drafts.isEmpty {
@@ -53,6 +45,7 @@ struct MyRoutinesView: View {
         }
         .navigationTitle("My routines")
         .sheet(item: $editing) { RoutineEditor(store: store, routine: $0, unit: unit) }
+        .sheet(isPresented: $creating) { RoutineCreationSheet(store: store, unit: unit, useAsActive: store.activeRoutine == nil) }
         .confirmationDialog("Delete this routine?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }), titleVisibility: .visible) {
             Button("Delete routine", role: .destructive) { if let deleting { store.deleteRoutine(deleting.id) }; deleting = nil }
         } message: { Text("The routine and its draft will be removed. Workout history stays saved.") }

@@ -9,6 +9,7 @@ struct HomeView: View {
     @State private var showWorkout = false
     @State private var showWater = false
     @State private var newRoutine: Routine?
+    @State private var creatingRoutine = false
     private var healthOverview: HealthOverview {
         let health = container.health.overview
         let local = container.hydration.state.localWater(at: .now)
@@ -178,6 +179,9 @@ struct HomeView: View {
         }
         .sheet(item: $newRoutine) { routine in
             RoutineEditor(store: container.gym, routine: routine, unit: container.profile.draft.weightUnit)
+        }
+        .sheet(isPresented: $creatingRoutine) {
+            RoutineCreationSheet(store: container.gym, unit: container.profile.draft.weightUnit)
         }
         .task {
             if !container.defaults.bool(forKey: "health.explainer.seen") { showHealth = true }
@@ -761,7 +765,8 @@ struct HomeView: View {
 
     private func openTodayWorkout() {
         if case .noRoutine = workout {
-            newRoutine = container.gym.activeRoutine ?? container.gym.resumableDraft?.routine ?? Routine(name: "My training plan", isActive: true)
+            if let routine = container.gym.activeRoutine ?? container.gym.resumableDraft?.routine { newRoutine = routine }
+            else { creatingRoutine = true }
             return
         }
         if container.workouts.active != nil {

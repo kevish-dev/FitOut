@@ -2,15 +2,28 @@
 
 ## Interaction
 
+Home, Gym setup and My Routines share a creation sheet. The initial selection
+does not create a routine or draft: the user chooses a blank plan or one of the
+five editable templates, compares descriptions and actual training-day counts,
+and previews the template's week before continuing. Cancel leaves storage
+unchanged. Continue opens the builder inside the same presentation, avoiding a
+second sheet or a dismiss/present race. My Routines preserves an existing active
+routine when creating another one. Existing plans and drafts open directly.
+
 The builder is one sheet with three stages: Schedule, Workouts, and Review.
 Stages share one draft and a fixed bottom action. Changing stages resets scroll
 position; choosing a weekday brings its chip into view. Content uses the shared
 20 pt page inset, 16 pt section/card spacing, Inter UI text, and restrained glass
 surfaces. Set rows use quiet inset fields rather than more glass panels.
 
-- Schedule: name the plan, select any training weekdays, leave other days open or
+- Schedule: name the plan in a labeled field with a visible focus state, select
+  training weekdays, leave other days open or
   mark them rest, and optionally choose a start date. Mixed day choices can stay
-  as set. Removing a training day keeps its exercises for later reuse.
+  as set. Weekday controls use three-letter labels and at least 44 pt tap targets;
+  narrower layouts wrap the week, and accessibility text sizes use full weekday
+  rows. The bottom action explains missing requirements and becomes available
+  after a name and at least one day are set. Removing a training day keeps its
+  exercises for later reuse.
 - Workouts: switch days in place; edit the name and type; add several exercises
   at once through a searchable, filterable sheet; or create a custom movement.
   Expand an exercise to edit independent sets, default rest, notes, and technique
@@ -71,8 +84,9 @@ history preservation, archive recovery, reusable workouts, and V4→V5 migration
 UI test source covers custom setup, adding an exercise, closing/relaunching a
 draft, saving, starting the planned session, and finishing it.
 
-Verification in this task is source-only: Swift syntax, isolated type checking
-using temporary macro/storage substitutes, Xcode project/plist validation, and
-diff whitespace checks. No app, simulator, device launch, or test execution was
-performed. Actual migration and interaction tests must run in Xcode on the user’s
-testing setup before those behaviors can be called runtime-verified.
+The popup changes are checked with Swift parsing, Xcode project validation,
+diff whitespace checks, and an unsigned generic-iOS `build-for-testing` of the
+app and test targets. The existing UI test flows are updated for template
+selection followed by Continue. No app, simulator or device launch, or test
+execution is performed. Migration and interaction tests still need runtime
+verification on the project owner's testing setup.
