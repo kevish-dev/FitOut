@@ -6,22 +6,24 @@ import Observation
     private let context: ModelContext
     private(set) var sessions: [WorkoutSession] = []
     var error: String?
+    var onChange: (() -> Void)?
     init(container: ModelContainer) throws { context = ModelContext(container); context.autosaveEnabled = false; try reload() }
     var active: WorkoutSession? { sessions.first(where: \.isActive) }
     var history: [WorkoutSession] { sessions.filter { !$0.isActive } }
-    private func reload() throws { sessions = try context.fetch(FetchDescriptor<FitOutSchemaV4.SessionRecord>()).map(\.value).sorted { $0.startedAt > $1.startedAt } }
+    func reload() throws {
+        let details = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<FitOutSchemaV5.SessionDetails>()).map { ($0.id, $0.payload) })
+        sessions = try context.fetch(FetchDescriptor<FitOutSchemaV4.SessionRecord>()).map { record in
+            guard let data = details[record.id] else { return record.value }
+            return try JSONDecoder().decode(SessionPlanDetails.self, from: data).applying(to: record.value)
+        }.sorted { $0.startedAt > $1.startedAt }
+    }
     @discardableResult func start(day: RoutineDay? = nil, routineID: UUID? = nil, catalogue: [ExerciseDefinition], now: Date = .now) -> Bool {
         guard active == nil else { error = "Resume or end the current workout first."; return false }
-        var session = WorkoutSession(routineID: routineID, title: day?.title.isEmpty == false ? day!.title : "Quick workout", startedAt: now)
-        if let day {
-            session.entries = day.exercises.compactMap { plan in
-                guard let exercise = catalogue.first(where: { $0.id == plan.exerciseID }) else { return nil }
-                let warmup = (0..<plan.warmupSets).map { _ in WorkoutSet(type: .warmup, reps: plan.repMin, loadKG: plan.loadKG ?? 0) }
-                let working = (0..<plan.sets).map { _ in WorkoutSet(reps: plan.repMin, loadKG: plan.loadKG ?? 0) }
-                return WorkoutEntry(exercise: exercise, sets: warmup + working, restSeconds: plan.restSeconds, notes: plan.notes)
-            }
-        }
-        return save(session)
+        do {
+            let session = try day.map { try PlannedWorkoutFactory.make(day: $0, routineID: routineID, catalogue: catalogue, now: now) }
+                ?? WorkoutSession(title: "Quick workout", startedAt: now)
+            return save(session)
+        } catch { self.error = error.localizedDescription; return false }
     }
     @discardableResult func update(_ mutation: (inout WorkoutSession) -> Void) -> Bool {
         guard var session = active else { error = "No active workout."; return false }
@@ -50,11 +52,16 @@ import Observation
             guard let e = session.entries.firstIndex(where: { $0.id == entryID }), let s = session.entries[e].sets.firstIndex(where: { $0.id == setID }) else { return }
             let completing = session.entries[e].sets[s].completedAt == nil
             session.entries[e].sets[s].completedAt = completing ? now : nil
-            session.restUntil = completing && entry.restSeconds > 0 ? now.addingTimeInterval(Double(entry.restSeconds)) : nil
+            let rest = set.restSeconds ?? entry.restSeconds
+            session.restUntil = completing && rest > 0 ? now.addingTimeInterval(Double(rest)) : nil
         }
     }
     @discardableResult func delete(_ id: UUID) -> Bool {
-        do { if let record = try context.fetch(FetchDescriptor<FitOutSchemaV4.SessionRecord>()).first(where: { $0.id == id }) { context.delete(record) }; try context.save(); try reload(); return true }
+        do {
+            if let record = try context.fetch(FetchDescriptor<FitOutSchemaV4.SessionRecord>()).first(where: { $0.id == id }) { context.delete(record) }
+            if let detail = try context.fetch(FetchDescriptor<FitOutSchemaV5.SessionDetails>()).first(where: { $0.id == id }) { context.delete(detail) }
+            try context.save(); try reload(); onChange?(); return true
+        }
         catch { context.rollback(); self.error = error.localizedDescription; return false }
     }
     private func save(_ session: WorkoutSession) -> Bool {
@@ -65,7 +72,11 @@ import Observation
                 record.title = session.title; record.endedAt = session.endedAt; record.status = session.status.rawValue; record.pausedAt = session.pausedAt; record.pausedSeconds = session.pausedSeconds; record.restUntil = session.restUntil; record.notes = session.notes
                 record.entries = session.entries.enumerated().map { FitOutSchemaV4.EntryRecord($0.element, position: $0.offset) }
             } else { context.insert(FitOutSchemaV4.SessionRecord(session)) }
-            try context.save(); try reload(); error = nil; return true
+            let payload = try JSONEncoder().encode(SessionPlanDetails(session))
+            if let details = try context.fetch(FetchDescriptor<FitOutSchemaV5.SessionDetails>()).first(where: { $0.id == session.id }) {
+                details.payload = payload
+            } else { context.insert(FitOutSchemaV5.SessionDetails(id: session.id, payload: payload)) }
+            try context.save(); try reload(); error = nil; onChange?(); return true
         } catch { context.rollback(); self.error = error.localizedDescription; return false }
     }
 }

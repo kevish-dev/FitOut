@@ -88,6 +88,6 @@ enum FitOutSchemaV1: VersionedSchema {
 }
 
 enum FitOutMigrationPlan: SchemaMigrationPlan {
-    static var schemas: [any VersionedSchema.Type] { [FitOutSchemaV1.self, FitOutSchemaV2.self, FitOutSchemaV3.self, FitOutSchemaV4.self] }
-    static var stages: [MigrationStage] { [.lightweight(fromVersion: FitOutSchemaV1.self, toVersion: FitOutSchemaV2.self), .lightweight(fromVersion: FitOutSchemaV2.self, toVersion: FitOutSchemaV3.self), .lightweight(fromVersion: FitOutSchemaV3.self, toVersion: FitOutSchemaV4.self)] }
+    static var schemas: [any VersionedSchema.Type] { [FitOutSchemaV1.self, FitOutSchemaV2.self, FitOutSchemaV3.self, FitOutSchemaV4.self, FitOutSchemaV5.self, FitOutSchemaV6.self] }
+    static var stages: [MigrationStage] { [.lightweight(fromVersion: FitOutSchemaV1.self, toVersion: FitOutSchemaV2.self), .lightweight(fromVersion: FitOutSchemaV2.self, toVersion: FitOutSchemaV3.self), .lightweight(fromVersion: FitOutSchemaV3.self, toVersion: FitOutSchemaV4.self), .lightweight(fromVersion: FitOutSchemaV4.self, toVersion: FitOutSchemaV5.self), .lightweight(fromVersion: FitOutSchemaV5.self, toVersion: FitOutSchemaV6.self)] }
 }

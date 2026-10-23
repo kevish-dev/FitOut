@@ -11,7 +11,20 @@ struct WorkoutSet: Identifiable, Codable, Equatable {
     var distanceMeters = 0.0
     var rpe: Double?
     var completedAt: Date?
-    var isValid: Bool { (0...1000).contains(reps) && loadKG.isFinite && (0...1000).contains(loadKG) && seconds.isFinite && (0...86400).contains(seconds) && distanceMeters.isFinite && (0...1_000_000).contains(distanceMeters) && (rpe == nil || (rpe!.isFinite && (1...10).contains(rpe!))) }
+    var restSeconds: Int?
+    var targetRPE: Double?
+    var targetRepMax: Int?
+    var plannedTarget: PlannedSet?
+    var isValid: Bool {
+        (0...1000).contains(reps) && loadKG.isFinite && (0...1000).contains(loadKG)
+            && seconds.isFinite && (0...86400).contains(seconds)
+            && distanceMeters.isFinite && (0...1_000_000).contains(distanceMeters)
+            && (rpe == nil || (rpe!.isFinite && (1...10).contains(rpe!)))
+            && (restSeconds == nil || (0...3600).contains(restSeconds!))
+            && (targetRPE == nil || (targetRPE!.isFinite && (1...10).contains(targetRPE!)))
+            && (targetRepMax == nil || (1...100).contains(targetRepMax!))
+            && (plannedTarget == nil || plannedTarget!.isValid)
+    }
 }
 struct WorkoutEntry: Identifiable, Codable, Equatable {
     var id = UUID()

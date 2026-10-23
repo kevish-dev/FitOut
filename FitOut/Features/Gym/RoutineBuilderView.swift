@@ -1,0 +1,404 @@
+import SwiftUI
+
+struct RoutineEditor: View {
+    let store: GymStore
+    @State var routine: Routine
+    var initialWeekday: Int? = nil
+    var unit: WeightUnit = .kg
+    @State private var stage: RoutineEditorStage = .schedule
+    @State private var weekday = 0
+    @State private var otherDays: RoutineDayKind? = .flexible
+    @State private var restored = false
+    @State private var loaded = false
+    @State private var finished = false
+    @State private var message: String?
+    @State private var issue: String?
+    @State private var sheet: RoutineBuilderSheet?
+    @State private var pendingCopy: RoutineDay?
+    @State private var pendingReuse: RoutineDay?
+    @State private var discard = false
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    private var draft: RoutineDraft { RoutineDraft(routine: routine, stage: stage, weekday: weekday, updatedAt: .distantPast) }
+    private var dayIndex: Int { routine.days.firstIndex { $0.weekday == weekday } ?? 0 }
+    private var day: RoutineDay { routine.days[dayIndex] }
+    private var draftIsStored: Bool {
+        guard let saved = store.drafts.first(where: { $0.id == routine.id }) else { return false }
+        return saved.routine == routine && saved.stage == stage && saved.weekday == weekday
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
+                    Picker("Routine stage", selection: $stage) {
+                        ForEach(RoutineEditorStage.allCases) { Text($0.rawValue).tag($0) }
+                    }.pickerStyle(.segmented).accessibilityIdentifier("routineStages")
+                    if restored { status("Unsaved draft restored", symbol: "arrow.counterclockwise") }
+                    if let message { status(message, symbol: "checkmark.circle") }
+                    if let issue { Text(issue).font(FitTheme.body(13)).foregroundStyle(.orange).accessibilityIdentifier("routineValidation") }
+                    switch stage {
+                    case .schedule: schedule
+                    case .workouts: workout
+                    case .review: review
+                    }
+                }
+                .frame(maxWidth: 560)
+                .padding(FitTheme.pageInset)
+                .frame(maxWidth: .infinity)
+            }
+            .id(stage)
+            .scrollDismissesKeyboard(.interactively)
+            .background(FitTheme.dashboardBackground)
+            .safeAreaInset(edge: .bottom, spacing: 0) { footer }
+            .navigationTitle("Edit routine")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) { Button("Close") { keepDraftAndClose() }.accessibilityIdentifier("closeRoutine") }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        Button("Discard unsaved changes", role: .destructive) { discard = true }
+                    } label: { Image(systemName: "ellipsis") }.accessibilityLabel("Routine options")
+                }
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") { UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) }
+                }
+            }
+        }
+        .tint(FitTheme.dashboardAccent)
+        .foregroundStyle(.white)
+        .onAppear(perform: restoreDraft)
+        .task(id: draft) {
+            guard loaded, !finished else { return }
+            do { try await Task.sleep(for: .milliseconds(450)) } catch { return }
+            guard !finished, !Task.isCancelled else { return }
+            persistDraft()
+        }
+        .onDisappear { if loaded && !finished { persistDraft() } }
+        .onChange(of: scenePhase) { _, value in if value != .active && loaded && !finished { persistDraft() } }
+        .onChange(of: stage) { _, value in
+            issue = nil; message = nil
+            if value == .schedule { synchronizeOtherDays() }
+        }
+        .interactiveDismissDisabled(loaded && !finished && !draftIsStored)
+        .sheet(item: $sheet, onDismiss: {
+            if let source = pendingReuse { pendingCopy = source; pendingReuse = nil }
+        }) { route in builderSheet(route) }
+        .confirmationDialog("Replace this day’s workout?", isPresented: Binding(get: { pendingCopy != nil }, set: { if !$0 { pendingCopy = nil } }), titleVisibility: .visible) {
+            Button("Replace workout", role: .destructive) { if let source = pendingCopy { RoutineSchedule.copy(source, to: weekday, in: &routine) }; pendingCopy = nil }
+            Button("Cancel", role: .cancel) { pendingCopy = nil }
+        } message: { Text("The workout on \(RoutineSchedule.weekdays[weekday]) will be replaced. Saved history is kept.") }
+        .confirmationDialog("Discard this draft?", isPresented: $discard, titleVisibility: .visible) {
+            Button("Discard draft", role: .destructive) {
+                if store.discardDraft(routine.id) { finished = true; dismiss() }
+                else { issue = store.error }
+            }
+        } message: { Text("Your saved routine and completed workouts stay unchanged.") }
+    }
+
+    private var schedule: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            heading("A week that fits you", detail: "Choose the days you want to train. Everything stays editable.")
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Routine name").font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
+                TextField("My training plan", text: $routine.name).font(FitTheme.section(18))
+                    .accessibilityIdentifier("routineName")
+            }.routinePanel()
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    Text("Training days").font(FitTheme.section(16))
+                    Spacer()
+                    Text("\(routine.trainingDays.count) / 7").font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
+                }
+                HStack(spacing: 4) {
+                    ForEach(0..<7, id: \.self) { index in
+                        let selected = routine.days.first { $0.weekday == index }?.kind == .workout
+                        Button { toggleDay(index) } label: {
+                            VStack(spacing: 10) {
+                                Text(String(RoutineSchedule.weekdays[index].prefix(1))).font(FitTheme.medium(13))
+                                Image(systemName: selected ? "checkmark" : "plus").font(.system(size: 12, weight: .semibold))
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 62)
+                            .foregroundStyle(selected ? FitTheme.dashboardAccent : FitTheme.textSecondary)
+                            .dashboardGlass(in: RoundedRectangle(cornerRadius: 13), highlighted: selected, interactive: true)
+                        }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel(RoutineSchedule.weekdays[index])
+                        .accessibilityValue(selected ? "Training day" : "Not a training day")
+                        .accessibilityIdentifier("routineTrainingDay-\(index)")
+                    }
+                }
+                Text("Other days").font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
+                Picker("Other days", selection: $otherDays) {
+                    Text("As set").tag(nil as RoutineDayKind?)
+                    Text("Unassigned").tag(Optional(RoutineDayKind.flexible))
+                    Text("Rest").tag(Optional(RoutineDayKind.rest))
+                }.pickerStyle(.segmented)
+                    .onChange(of: otherDays) { _, kind in
+                        guard let kind else { return }
+                        for index in routine.days.indices where routine.days[index].kind != .workout { routine.days[index].kind = kind }
+                    }
+            }
+            DisclosureGroup("Start date (optional)") {
+                Toggle("Start on a specific day", isOn: Binding(get: { routine.startsOn != nil }, set: { routine.startsOn = $0 ? Calendar.current.startOfDay(for: .now) : nil }))
+                if routine.startsOn != nil {
+                    DatePicker("Starts", selection: Binding(get: { routine.startsOn ?? .now }, set: { routine.startsOn = $0 }), displayedComponents: .date)
+                }
+            }.font(FitTheme.body(14)).routinePanel()
+        }
+    }
+
+    private var workout: some View {
+        VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
+            ScrollViewReader { proxy in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 8) {
+                        ForEach(0..<7, id: \.self) { index in
+                            Button {
+                                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) { weekday = index; message = nil; issue = nil }
+                            } label: {
+                                Text(String(RoutineSchedule.weekdays[index].prefix(3))).font(FitTheme.button(13))
+                                    .padding(.horizontal, 15).frame(minHeight: 44)
+                                    .dashboardGlass(in: Capsule(), highlighted: weekday == index, interactive: true)
+                            }.buttonStyle(.plain).accessibilityIdentifier("routineEditDay-\(index)").id(index)
+                        }
+                    }.padding(.vertical, 2)
+                }
+                .onAppear { proxy.scrollTo(weekday, anchor: .center) }
+                .onChange(of: weekday) { _, value in proxy.scrollTo(value, anchor: .center) }
+            }
+            HStack {
+                Text(RoutineSchedule.weekdays[weekday]).font(FitTheme.section(23))
+                Spacer()
+                Menu {
+                    Button("Use a saved workout", systemImage: "square.stack") { sheet = .reuse }
+                    if day.kind == .workout {
+                        Button("Copy to another day", systemImage: "doc.on.doc") { sheet = .copy }
+                        Button("Move to another day", systemImage: "arrow.left.arrow.right") { sheet = .move }
+                        Button("Save workout for reuse", systemImage: "bookmark") {
+                            if store.saveWorkout(day) { message = "Saved to reusable workouts" } else { issue = store.error }
+                        }
+                    }
+                } label: { Image(systemName: "ellipsis").frame(width: 44, height: 44).dashboardGlass(in: Circle(), interactive: true) }
+                .accessibilityLabel("Workout options")
+            }
+            Picker("Day type", selection: $routine.days[dayIndex].kind) {
+                Text("Workout").tag(RoutineDayKind.workout)
+                Text("Rest").tag(RoutineDayKind.rest)
+                Text("Unassigned").tag(RoutineDayKind.flexible)
+            }.pickerStyle(.segmented)
+                .onChange(of: day.kind) { _, kind in
+                    if kind == .workout && day.title.isEmpty { routine.days[dayIndex].title = "\(RoutineSchedule.weekdays[weekday]) workout" }
+                }
+            if day.kind == .workout {
+                TextField("Workout name", text: $routine.days[dayIndex].title)
+                    .font(FitTheme.section(19)).padding(.vertical, 8).accessibilityIdentifier("routineWorkoutName")
+                if day.exercises.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("Start with your first movement.").font(FitTheme.section(16))
+                        Text("Add from the library, create your own, or reuse a saved workout.").font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
+                    }.routinePanel()
+                }
+                ForEach($routine.days[dayIndex].exercises) { $plan in
+                    RoutineExerciseCard(plan: $plan, definition: store.exercise(plan.exerciseID), unit: unit,
+                        canMoveUp: day.exercises.first?.id != plan.id, canMoveDown: day.exercises.last?.id != plan.id,
+                        replace: { sheet = .replace(plan.id) },
+                        remove: { routine.days[dayIndex].exercises.removeAll { $0.id == plan.id } },
+                        move: { offset in moveExercise(plan.id, by: offset) })
+                    .draggable(plan.id.uuidString)
+                    .dropDestination(for: String.self) { ids, _ in
+                        guard let id = ids.first.flatMap(UUID.init(uuidString:)),
+                              let from = day.exercises.firstIndex(where: { $0.id == id }),
+                              let to = day.exercises.firstIndex(where: { $0.id == plan.id }), from != to else { return false }
+                        routine.days[dayIndex].exercises.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
+                        return true
+                    }
+                }
+                Button { sheet = .add } label: {
+                    Label("Add exercises", systemImage: "plus").font(FitTheme.button(15))
+                        .frame(maxWidth: .infinity, minHeight: 50)
+                        .dashboardGlass(in: RoundedRectangle(cornerRadius: 16), interactive: true)
+                }.buttonStyle(.plain).accessibilityIdentifier("routineAddExercises")
+                DisclosureGroup("Workout details") {
+                    VStack(alignment: .leading, spacing: 14) {
+                        TextField("Notes (optional)", text: Binding(get: { day.notes ?? "" }, set: { routine.days[dayIndex].notes = $0 }), axis: .vertical)
+                        Toggle("Duration target", isOn: Binding(get: { day.durationMinutes != nil }, set: { routine.days[dayIndex].durationMinutes = $0 ? 45 : nil }))
+                        if day.durationMinutes != nil {
+                            Stepper("\(day.durationMinutes ?? 45) minutes", value: Binding(get: { day.durationMinutes ?? 45 }, set: { routine.days[dayIndex].durationMinutes = $0 }), in: 1...600, step: 5)
+                        }
+                        Button { sheet = .muscles } label: {
+                            Label(day.muscles.isEmpty ? "Choose focus muscles" : day.muscles.map(\.title).joined(separator: ", "), systemImage: "figure.strengthtraining.traditional")
+                        }
+                    }.padding(.top, 12)
+                }.font(FitTheme.body(14)).routinePanel()
+            } else {
+                heading(day.kind == .rest ? "A planned rest day." : "Keep this day open.", detail: day.exercises.isEmpty ? "You can change the day type whenever your schedule changes." : "Your exercises stay saved here if you switch back to Workout.")
+                    .padding(.vertical, 12)
+            }
+        }
+    }
+
+    private var review: some View {
+        VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
+            heading(routine.name.isEmpty ? "Review your routine" : routine.name, detail: "\(routine.trainingDays.count) training days · repeats weekly")
+            ForEach(routine.days.sorted { $0.weekday < $1.weekday }) { day in
+                Button { weekday = day.weekday; stage = .workouts } label: {
+                    HStack(alignment: .top, spacing: 12) {
+                        Text(String(RoutineSchedule.weekdays[day.weekday].prefix(3))).font(FitTheme.medium(12))
+                            .foregroundStyle(FitTheme.textSecondary).frame(width: 33, alignment: .leading)
+                        VStack(alignment: .leading, spacing: 5) {
+                            Text(day.kind == .workout ? day.title : day.kind == .rest ? "Rest day" : "Unassigned").font(FitTheme.section(15))
+                            if day.kind == .workout {
+                                Text("\(day.exercises.count) exercises · \(day.exercises.reduce(0) { $0 + $1.setCount }) sets")
+                                    .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                            }
+                        }
+                        Spacer(minLength: 4)
+                        Image(systemName: "pencil").font(.system(size: 12)).foregroundStyle(FitTheme.dashboardAccent)
+                    }.frame(minHeight: 44, alignment: .center).routinePanel()
+                }.buttonStyle(.plain)
+            }
+            Toggle(routine.archivedAt == nil ? "Use as active routine" : "Restore and use as active", isOn: Binding(get: { routine.isActive }, set: { value in
+                routine.isActive = value
+                if value { routine.archivedAt = nil }
+            })).font(FitTheme.body(14)).routinePanel()
+            if let start = routine.startsOn {
+                Text("Starts \(start.formatted(date: .abbreviated, time: .omitted))").font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
+            }
+            if let error = store.readinessError(for: routine) {
+                Label(error, systemImage: "exclamationmark.circle").font(FitTheme.body(13)).foregroundStyle(.orange)
+                    .accessibilityIdentifier("routineReadiness")
+            } else {
+                Text("Ready to save. Your completed workout history stays unchanged.").font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+            }
+        }
+    }
+
+    private var footer: some View {
+        HStack(spacing: 12) {
+            if stage != .schedule {
+                Button { stage = stage == .review ? .workouts : .schedule } label: {
+                    Image(systemName: "arrow.left").frame(width: 50, height: 50).dashboardGlass(in: Circle(), interactive: true)
+                }.buttonStyle(.plain).accessibilityLabel("Previous step")
+            }
+            Button(action: advance) {
+                HStack {
+                    Text(stage == .review ? "Save routine" : stage == .schedule ? "Configure workouts" : "Review routine")
+                    Spacer()
+                    Image(systemName: stage == .review ? "checkmark" : "arrow.right")
+                }.font(FitTheme.button(15)).padding(.horizontal, 18).frame(minHeight: 50)
+                    .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier(stage == .review ? "saveRoutine" : "routineContinue")
+        }
+        .padding(.horizontal, FitTheme.pageInset).padding(.vertical, 12)
+        .background(.bar)
+    }
+
+    @ViewBuilder private func builderSheet(_ route: RoutineBuilderSheet) -> some View {
+        switch route {
+        case .add, .replace:
+            RoutineExercisePicker(store: store, multiple: route == .add) { selected in
+                if case .replace(let id) = route, let exercise = selected.first,
+                   let index = day.exercises.firstIndex(where: { $0.id == id }) {
+                    let previousKind = store.exercise(day.exercises[index].exerciseID)?.kind
+                    routine.days[dayIndex].exercises[index].exerciseID = exercise.id
+                    if previousKind != exercise.kind { routine.days[dayIndex].exercises[index].setTargets = PlannedExercise.make(for: exercise).resolvedSets }
+                } else {
+                    routine.days[dayIndex].exercises.append(contentsOf: selected.map { PlannedExercise.make(for: $0) })
+                }
+                sheet = nil
+            }
+        case .reuse:
+            RoutineReuseSheet(store: store) { source in
+                if !day.exercises.isEmpty { pendingReuse = source }
+                else { RoutineSchedule.copy(source, to: weekday, in: &routine) }
+                sheet = nil
+            }
+        case .copy, .move:
+            RoutineDayDestinationSheet(routine: routine, source: weekday, moving: route == .move) { target in
+                if route == .move { RoutineSchedule.move(dayID: day.id, to: target, in: &routine); weekday = target }
+                else { RoutineSchedule.copy(day, to: target, in: &routine) }
+                sheet = nil
+            }
+        case .muscles:
+            NavigationStack {
+                MuscleMapView(selection: $routine.days[dayIndex].muscles)
+                    .toolbar { Button("Done") { sheet = nil } }
+            }
+        }
+    }
+
+    private func restoreDraft() {
+        guard !loaded else { return }
+        if let saved = store.drafts.first(where: { $0.id == routine.id }) {
+            routine = saved.routine; stage = saved.stage; weekday = saved.weekday; restored = true
+            if let committed = store.routines.first(where: { $0.id == routine.id }) {
+                routine.archivedAt = committed.archivedAt; routine.isActive = committed.isActive
+            }
+        }
+        if let initialWeekday { weekday = initialWeekday; stage = .workouts }
+        else if !restored, store.routines.contains(where: { $0.id == routine.id }) { stage = .workouts; weekday = RoutineSchedule.weekday(for: .now) }
+        synchronizeOtherDays()
+        loaded = true
+    }
+    private func persistDraft() {
+        if !store.saveDraft(draft) { issue = store.error }
+    }
+    private func keepDraftAndClose() {
+        if store.saveDraft(draft) { finished = true; dismiss() } else { issue = store.error }
+    }
+    private func advance() {
+        issue = nil
+        switch stage {
+        case .schedule:
+            guard !routine.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { issue = "Give your routine a name."; return }
+            guard let first = routine.trainingDays.first else { issue = "Choose at least one training day."; return }
+            weekday = first.weekday; stage = .workouts
+        case .workouts: stage = .review
+        case .review:
+            if let error = store.readinessError(for: routine) { issue = error; return }
+            if store.save(routine, discardDraft: true) { finished = true; dismiss() } else { issue = store.error }
+        }
+    }
+    private func toggleDay(_ weekday: Int) {
+        guard let index = routine.days.firstIndex(where: { $0.weekday == weekday }) else { return }
+        routine.days[index].kind = routine.days[index].kind == .workout ? (otherDays ?? .flexible) : .workout
+        if routine.days[index].kind == .workout && routine.days[index].title.isEmpty {
+            routine.days[index].title = "\(RoutineSchedule.weekdays[weekday]) workout"
+        }
+    }
+    private func synchronizeOtherDays() {
+        let kinds = Set(routine.days.filter { $0.kind != .workout }.map(\.kind))
+        otherDays = kinds.count == 1 ? kinds.first : nil
+    }
+    private func moveExercise(_ id: UUID, by offset: Int) {
+        guard let from = day.exercises.firstIndex(where: { $0.id == id }), day.exercises.indices.contains(from + offset) else { return }
+        routine.days[dayIndex].exercises.swapAt(from, from + offset)
+    }
+    private func heading(_ title: String, detail: String) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title).font(FitTheme.section(23))
+            Text(detail).font(FitTheme.body(14)).foregroundStyle(FitTheme.textSecondary)
+        }.fixedSize(horizontal: false, vertical: true)
+    }
+    private func status(_ text: String, symbol: String) -> some View {
+        Label(text, systemImage: symbol).font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
+    }
+}
+
+private enum RoutineBuilderSheet: Hashable, Identifiable {
+    case add, replace(UUID), reuse, copy, move, muscles
+    var id: Self { self }
+}
+
+extension View {
+    func routinePanel() -> some View {
+        padding(FitTheme.cardInset).frame(maxWidth: .infinity, alignment: .leading)
+            .dashboardGlass(in: RoundedRectangle(cornerRadius: 18))
+    }
+}

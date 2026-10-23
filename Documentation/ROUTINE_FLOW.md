@@ -1,0 +1,78 @@
+# Workout routine flow
+
+## Interaction
+
+The builder is one sheet with three stages: Schedule, Workouts, and Review.
+Stages share one draft and a fixed bottom action. Changing stages resets scroll
+position; choosing a weekday brings its chip into view. Content uses the shared
+20 pt page inset, 16 pt section/card spacing, Inter UI text, and restrained glass
+surfaces. Set rows use quiet inset fields rather than more glass panels.
+
+- Schedule: name the plan, select any training weekdays, leave other days open or
+  mark them rest, and optionally choose a start date. Mixed day choices can stay
+  as set. Removing a training day keeps its exercises for later reuse.
+- Workouts: switch days in place; edit the name and type; add several exercises
+  at once through a searchable, filterable sheet; or create a custom movement.
+  Expand an exercise to edit independent sets, default rest, notes, and technique
+  instructions. Long-press/drag reorders exercises; menu actions offer accessible
+  move-up/down alternatives. Each set can be duplicated, moved, deleted, and
+  independently configured for type, rep range, load, rest, and optional effort.
+  Timed exercises have seconds and optional distance instead of load/reps fields.
+  Loads display in the profile's preferred kg/lb unit and persist in kilograms.
+- Workout options: explicitly copy to another weekday, swap with another day,
+  save a reusable workout, or reuse one from saved workouts or another routine.
+  Copies receive new exercise/set IDs. Overwriting a configured day asks first.
+- Review: inspect all seven days, tap a day to edit, choose whether to use the
+  routine as active, and save. Missing names, exercises, and invalid set targets
+  block completion with a specific message. An incomplete draft is still kept.
+
+My Routines supports editing, template creation (including Arnold Split),
+activation, independent duplication, archive/restore, and confirmed deletion.
+Reusable workouts are managed in the reuse sheet. Existing saved history is
+preserved when a routine is changed, archived, or deleted.
+
+## Recovery and persistence
+
+Drafts are saved after a short typing pause, on Close, when leaving the sheet,
+and when the scene becomes inactive. Close stays open if persistence fails.
+Interactive dismissal waits until the current draft is stored. Reopening a
+routine restores unsaved work and its stage/day; a new unfinished routine can be
+continued from Gym setup or My Routines. Discarding a draft is confirmed.
+
+Drafts never change the active saved routine until Save. Committing removes the
+draft; activating or archiving another saved plan does not erase pending edits.
+Relaunch recovery preserves the current saved plan's activation/archive status.
+
+Schema V5 adds routine-detail, draft, reusable-workout, and session-detail tables.
+V1–V4 model definitions remain unchanged and V4→V5 is an additive lightweight
+migration. Legacy set-count plans still resolve to their original sets and rep
+ranges. Supplemental JSON stores independent targets and day notes without
+rewriting old session records. Decoding/storage failures are surfaced rather
+than deleting or replacing the user's database.
+
+## Training
+
+Start Workout snapshots the selected day's actual set targets, notes, exercise
+order, load, duration, and rest. Unknown movements or invalid/empty plans cannot
+silently start a partial session. Each set's rest overrides the exercise default
+when present. Target RPE is separate from actual logged RPE, including after
+relaunch. Pausing, resuming, finishing, summary, and history use the existing
+workout flow. Later edits to the routine cannot change that session snapshot.
+
+Start dates are respected by Home, Gym's daily card, the week rail, and Analytics.
+The existing optional AI insight policy excludes independent set configurations
+until it has an evidence policy that supports them, preventing misleading advice.
+
+## Verification
+
+Regression test source covers individual-set snapshots, legacy fallback, copy
+independence, invalid/timed plans, draft/commit/relaunch, per-set rest and effort,
+history preservation, archive recovery, reusable workouts, and V4→V5 migration.
+UI test source covers custom setup, adding an exercise, closing/relaunching a
+draft, saving, starting the planned session, and finishing it.
+
+Verification in this task is source-only: Swift syntax, isolated type checking
+using temporary macro/storage substitutes, Xcode project/plist validation, and
+diff whitespace checks. No app, simulator, device launch, or test execution was
+performed. Actual migration and interaction tests must run in Xcode on the user’s
+testing setup before those behaviors can be called runtime-verified.

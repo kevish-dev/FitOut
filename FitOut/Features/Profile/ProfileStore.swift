@@ -5,6 +5,7 @@ import Observation
 @MainActor @Observable final class ProfileStore {
     var draft: ProfileData { didSet { if !applying { saveDraft() } } }
     var error: String?
+    var onChange: (() -> Void)?
     private var applying = false
     private let context: ModelContext
     init(container: ModelContainer, legacy: OnboardingSnapshot?) throws {
@@ -35,9 +36,28 @@ import Observation
             try persist(value)
             applying = true; draft = value; applying = false
             error = nil
+            onChange?()
             return true
         } catch { self.error = error.localizedDescription; return false }
     }
+
+    #if DEBUG
+    func restartForTesting() throws {
+        let fresh = ProfileData()
+        do {
+            try persist(fresh)
+            applying = true
+            draft = fresh
+            applying = false
+            error = nil
+            onChange?()
+        } catch {
+            self.error = error.localizedDescription
+            throw error
+        }
+    }
+    #endif
+
     private func persist(_ value: ProfileData) throws {
         do {
             if let record = try context.fetch(FetchDescriptor<FitOutSchemaV2.UserProfile>()).first { record.update(value) }

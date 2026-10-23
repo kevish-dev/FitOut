@@ -11,7 +11,7 @@ struct WorkoutsPanel: View {
         Section("Workouts") {
             if let active = store.active {
                 Button("Resume \(active.title)") { showing = true }.accessibilityIdentifier("resumeWorkout")
-                Text("\(active.completedSets.count) sets saved · \(active.status == .paused ? "Paused" : "In progress")").font(.caption)
+                Text("\(active.completedSets.count) sets saved · \(active.status == .paused ? "Paused" : "In progress")").font(FitTheme.body(12))
             } else {
                 Button("Start quick workout") { if store.start(catalogue: gym.exercises) { showing = true } }.accessibilityIdentifier("startQuickWorkout")
                 if let routine = gym.activeRoutine, let day = RoutineSchedule.day(in: routine, at: .now), day.kind == .workout {
@@ -42,7 +42,7 @@ struct ActiveWorkoutView: View {
             if let session = store.active {
                 List {
                     Section {
-                        Text(session.title).font(.title2.bold())
+                        Text(session.title).font(FitTheme.display(24))
                         Text("\(Int(session.duration(at: now) / 60)) min · \(session.completedSets.count) completed sets")
                         Button(session.status == .paused ? "Resume" : "Pause") { if session.status == .paused { store.resume() } else { store.pause() } }
                         if let deadline = session.restUntil {
@@ -52,7 +52,7 @@ struct ActiveWorkoutView: View {
                         TextField("Workout notes", text: Binding(get: { store.active?.notes ?? "" }, set: { value in store.update { $0.notes = value } }), axis: .vertical)
                     }
                     ForEach(session.entries) { entry in
-                        Section(entry.exercise.name + (entry.skipped ? " · Skipped" : "")) {
+                        Section {
                             if !entry.skipped {
                                 ForEach(entry.sets) { set in
                                     WorkoutSetEditor(value: setBinding(entry.id, set.id), kind: entry.exercise.kind, unit: unit) { store.toggleSet(entryID: entry.id, setID: set.id) }
@@ -66,6 +66,12 @@ struct ActiveWorkoutView: View {
                                 Spacer()
                                 Button("Replace") { replacing = entry.id; selecting = true }
                             }.buttonStyle(.borderless)
+                        } header: {
+                            HStack(spacing: 10) {
+                                ExerciseArtwork(exercise: gym.exercise(entry.exercise.id), size: 40)
+                                Text(entry.exercise.name + (entry.skipped ? " · Skipped" : ""))
+                                    .font(FitTheme.section(14))
+                            }.textCase(nil).padding(.vertical, 4)
                         }
                     }
                     Button("Add exercise") { replacing = nil; selecting = true }.accessibilityIdentifier("workoutAddExercise")
@@ -103,6 +109,12 @@ struct WorkoutSetEditor: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             Picker("Set type", selection: $value.type) { ForEach(SetType.allCases, id: \.self) { Text($0.rawValue).tag($0) } }
+            if let targetRPE = value.targetRPE {
+                Text("Planned effort: \(targetRPE.formatted()) / 10").font(FitTheme.body(12)).foregroundStyle(.secondary)
+            }
+            if let target = value.plannedTarget {
+                Text(targetSummary(target)).font(FitTheme.body(12)).foregroundStyle(.secondary)
+            }
             if kind == .duration {
                 number("Seconds", binding: $value.seconds)
                 number("Distance (m, optional)", binding: $value.distanceMeters)
@@ -118,6 +130,12 @@ struct WorkoutSetEditor: View {
     private func number(_ title: String, binding: Binding<Double>) -> some View {
         LabeledContent(title) { TextField(title, value: binding, format: .number).keyboardType(.decimalPad).multilineTextAlignment(.trailing) }
     }
+    private func targetSummary(_ target: PlannedSet) -> String {
+        if kind == .duration { return "Planned: \(target.seconds.formatted()) seconds" }
+        let reps = target.repMin == target.repMax ? "\(target.repMin)" : "\(target.repMin)–\(target.repMax)"
+        let load = kind == .weighted ? target.loadKG.map { " · \(unit.display($0).formatted()) \(unit.rawValue)" } ?? "" : ""
+        return "Planned: \(reps) reps\(load)"
+    }
 }
 struct WorkoutSummary: View {
     let session: WorkoutSession
@@ -130,20 +148,25 @@ struct WorkoutSummary: View {
                 Text(session.startedAt, format: .dateTime.month().day().hour().minute())
                 Text("\(session.completedExercises) exercises · \(session.completedSets.count) sets · \(Int(session.duration() / 60)) min")
                 Text("Weighted volume: \(unit.display(session.volumeKG).formatted()) \(unit.rawValue)·reps")
-                Text("Working and drop sets only. Bodyweight and duration work are recorded separately.").font(.caption).foregroundStyle(.secondary)
+                Text("Working and drop sets only. Repetition-only and timed exercises are recorded separately.").font(FitTheme.body(12)).foregroundStyle(.secondary)
                 ForEach(Array(Set(WorkoutAnalytics.newRecords(in: session, history: history))).sorted(), id: \.self) { Text("New personal record: " + $0).foregroundStyle(FitTheme.orange) }
                 if !session.notes.isEmpty { Text(session.notes) }
             }
             ForEach(session.entries) { entry in
-                Section(entry.exercise.name) {
+                Section {
                     if entry.skipped { Text("Exercise skipped") }
                     ForEach(entry.sets) { set in
                         if set.completedAt != nil {
                             if entry.exercise.kind == .duration { Text("\(set.seconds.formatted()) sec · \(set.distanceMeters.formatted()) m") }
-                            else { Text("\(set.type.rawValue): \(set.reps) reps" + (entry.exercise.kind == .weighted ? " × \(unit.display(set.loadKG).formatted()) \(unit.rawValue)" : " · bodyweight")) }
+                            else { Text("\(set.type.rawValue): \(set.reps) reps" + (entry.exercise.kind == .weighted ? " × \(unit.display(set.loadKG).formatted()) \(unit.rawValue)" : "")) }
                         }
                     }
                     if !entry.notes.isEmpty { Text(entry.notes) }
+                } header: {
+                    HStack(spacing: 10) {
+                        ExerciseArtwork(exercise: ExerciseCatalogue.byID[entry.exercise.id], size: 40)
+                        Text(entry.exercise.name).font(FitTheme.section(14))
+                    }.textCase(nil).padding(.vertical, 4)
                 }
             }
         }.navigationTitle("Workout summary")
@@ -159,7 +182,7 @@ struct WorkoutHistory: View {
             if let error = store.error { Text(error).foregroundStyle(.red) }
             ForEach(store.history) { session in
                 NavigationLink { WorkoutSummary(session: session, unit: unit, history: store.history) } label: {
-                    VStack(alignment: .leading) { Text(session.title); Text("\(session.startedAt.formatted(date: .abbreviated, time: .shortened)) · \(session.status.rawValue)").font(.caption).foregroundStyle(.secondary) }
+                    VStack(alignment: .leading) { Text(session.title); Text("\(session.startedAt.formatted(date: .abbreviated, time: .shortened)) · \(session.status.rawValue)").font(FitTheme.body(12)).foregroundStyle(.secondary) }
                 }.swipeActions { Button("Delete", role: .destructive) { deleting = session.id } }
             }
         }.navigationTitle("Workout history")

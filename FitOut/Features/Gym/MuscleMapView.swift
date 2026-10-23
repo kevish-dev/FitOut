@@ -6,7 +6,7 @@ struct MuscleMapView: View {
     @State private var back = false
     var body: some View {
         VStack {
-            Picker("Body view", selection: $back) { Text("Front").tag(false); Text("Back").tag(true) }.pickerStyle(.segmented).padding(.horizontal)
+            Picker("Body view", selection: $back) { Text("Front").tag(false); Text("Back").tag(true) }.pickerStyle(.segmented).padding(.horizontal, FitTheme.pageInset)
             MuscleSVG(back: back, selected: selection) { muscle in
                 if selection.contains(muscle) { selection.removeAll { $0 == muscle } } else { selection.append(muscle) }
             }
@@ -19,10 +19,10 @@ struct MuscleMapView: View {
                             .buttonStyle(.bordered).accessibilityIdentifier("muscle-" + muscle.rawValue)
                             .accessibilityAddTraits(selection.contains(muscle) ? .isSelected : [])
                     }
-                }.padding(.horizontal)
+                }.padding(.horizontal, FitTheme.pageInset)
             }
             Text(selection.isEmpty ? "Tap a muscle to select it." : "Selected: " + selection.map(\.title).joined(separator: ", "))
-                .font(.callout).padding().accessibilityIdentifier("selectedMuscles")
+                .font(FitTheme.body(16)).padding(.horizontal, FitTheme.pageInset).padding(.vertical, FitTheme.cardInset).accessibilityIdentifier("selectedMuscles")
         }.navigationTitle("Muscle map")
     }
 }

@@ -26,6 +26,23 @@ final class GymTests: XCTestCase {
         XCTAssertEqual(reopened.activeRoutine?.days[0].exercises.count, 2)
         XCTAssertTrue(reopened.deleteRoutine(copy.id)); XCTAssertEqual(reopened.routines.count, 1)
     }
+    @MainActor func testHomeCardUsesActiveRoutineDay() throws {
+        let store = try GymStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        let monday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 19))!
+        let tuesday = calendar.date(byAdding: .day, value: 1, to: monday)!
+        XCTAssertEqual(HomeStateResolver.workout(store.homeInput(at: monday, calendar: calendar)), .noRoutine)
+
+        XCTAssertTrue(store.save(RoutineTemplate.custom.make()))
+        XCTAssertEqual(HomeStateResolver.workout(store.homeInput(at: monday, calendar: calendar)), .noRoutine)
+
+        var routine = store.activeRoutine!
+        routine.days = RoutineTemplate.fullBody.make().days
+        XCTAssertTrue(store.save(routine))
+        XCTAssertEqual(HomeStateResolver.workout(store.homeInput(at: monday, calendar: calendar)),
+                       .planned(title: "Full body", exerciseCount: 3, minutes: nil))
+        XCTAssertEqual(HomeStateResolver.workout(store.homeInput(at: tuesday, calendar: calendar)), .rest)
+    }
     @MainActor func testExerciseFavoritesCustomValidationAndDependency() throws {
         let store = try GymStore(container: PersistenceFactory.makeContainer(inMemory: true))
         var custom = ExerciseDefinition(name: "Custom press", muscles: [.chest], isCustom: true)

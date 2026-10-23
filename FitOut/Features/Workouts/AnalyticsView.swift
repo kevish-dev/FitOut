@@ -11,6 +11,12 @@ struct AnalyticsView: View {
     @State private var month = Date()
     @State private var exportURL: URL?
     @State private var error: String?
+    init(store: WorkoutStore, gym: GymStore, unit: WeightUnit, initialExerciseID: String = "") {
+        self.store = store
+        self.gym = gym
+        self.unit = unit
+        _exerciseID = State(initialValue: initialExerciseID)
+    }
     private var filtered: [WorkoutSession] { store.history.filter { $0.startedAt >= Calendar.current.startOfDay(for: since) && $0.startedAt < Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: until))! && (exerciseID.isEmpty || $0.entries.contains { $0.exercise.id == exerciseID }) } }
     private var completed: [WorkoutSession] { filtered.filter { $0.status == .completed } }
     private var historyExercises: [ExerciseDefinition] { var seen = Set<String>(); return store.history.flatMap(\.entries).map(\.exercise).filter { seen.insert($0.id).inserted }.sorted { $0.name < $1.name } }
@@ -22,10 +28,10 @@ struct AnalyticsView: View {
                 Picker("Exercise", selection: $exerciseID) { Text("All exercises").tag(""); ForEach(historyExercises) { Text($0.name).tag($0.id) } }
             }
             Section("Consistency") {
-                Text("\(WorkoutAnalytics.weeklyStreak(store.history)) week streak").font(.headline)
-                Text("At least one completed workout per calendar week. The current week has until its end to continue a streak; rest days do not break it.").font(.caption)
+                Text("\(WorkoutAnalytics.weeklyStreak(store.history)) week streak").font(FitTheme.section())
+                Text("At least one completed workout per calendar week. The current week has until its end to continue a streak; rest days do not break it.").font(FitTheme.body(12))
                 Text("\(completed.count) completed · \(filtered.filter { $0.status == .skipped }.count) skipped")
-                if let routine = gym.activeRoutine { Text("Current weekly plan: \(routine.days.filter { $0.kind == .workout }.count) sessions. Plans reflect your current schedule, not historical adherence.").font(.caption) }
+                if let routine = gym.activeRoutine { Text("Current weekly plan: \(routine.days.filter { $0.kind == .workout }.count) sessions. Plans reflect your current schedule, not historical adherence.").font(FitTheme.body(12)) }
             }
             calendarSection
             if completed.isEmpty { ContentUnavailableView("Your trends will appear as you log", systemImage: "chart.xyaxis.line", description: Text("No completed workouts match these filters.")) }
@@ -37,11 +43,11 @@ struct AnalyticsView: View {
                 }
                 if !exerciseID.isEmpty { strengthSection }
                 Section("Primary muscle volume") {
-                    Text("Each set’s volume is split equally across its primary muscles.").font(.caption)
+                    Text("Each set’s volume is split equally across its primary muscles.").font(FitTheme.body(12))
                     ForEach(Muscle.allCases) { muscle in
                         if let volume = WorkoutAnalytics.muscleVolume(completed)[muscle], volume > 0 {
                             LabeledContent(muscle.title, value: "\(unit.display(volume).formatted()) \(unit.rawValue)·reps")
-                            Text("\(completed.filter { $0.entries.contains { $0.exercise.muscles.contains(muscle) && $0.sets.contains { $0.completedAt != nil } } }.count) sessions").font(.caption)
+                            Text("\(completed.filter { $0.entries.contains { $0.exercise.muscles.contains(muscle) && $0.sets.contains { $0.completedAt != nil } } }.count) sessions").font(FitTheme.body(12))
                         }
                     }
                 }
@@ -60,7 +66,7 @@ struct AnalyticsView: View {
             let record = WorkoutAnalytics.records(exerciseID: exerciseID, sessions: completed)
             if let max = record.maxLoadKG { LabeledContent("Max load", value: "\(unit.display(max).formatted()) \(unit.rawValue)") }
             if let estimate = record.estimated1RM { LabeledContent("Estimated 1RM", value: "\(unit.display(estimate).formatted()) \(unit.rawValue)") }
-            Text("Epley estimate for 2–10 reps; one rep uses actual load. Working/drop weighted sets only. Estimates are not prescribed loads.").font(.caption)
+            Text("Epley estimate for 2–10 reps; one rep uses actual load. Working/drop weighted sets only. Estimates are not prescribed loads.").font(FitTheme.body(12))
             ForEach(record.repsAtLoad.keys.sorted(), id: \.self) { load in Text("\(record.repsAtLoad[load] ?? 0) reps at \(unit.display(load).formatted()) \(unit.rawValue)") }
             let points = completed.sorted { $0.startedAt < $1.startedAt }.compactMap { s -> AnalyticsPoint? in guard let value = WorkoutAnalytics.records(exerciseID: exerciseID, sessions: [s]).estimated1RM else { return nil }; return AnalyticsPoint(date: s.startedAt, value: value) }
             if points.count >= 2 { Chart(points) { LineMark(x: .value("Date", $0.date), y: .value("Estimated 1RM", unit.display($0.value))); PointMark(x: .value("Date", $0.date), y: .value("Estimated 1RM", unit.display($0.value))) }.frame(height: 180) }
@@ -78,12 +84,12 @@ struct AnalyticsView: View {
                 ForEach(0..<count, id: \.self) { index in
                     let date = calendar.date(byAdding: .day, value: index, to: start)!
                     let label = WorkoutAnalytics.dayLabel(date, sessions: store.sessions, routine: gym.activeRoutine)
-                    VStack { Text("\(index + 1)"); Text(String(label.prefix(1))).font(.caption2) }
+                    VStack { Text("\(index + 1)"); Text(String(label.prefix(1))).font(FitTheme.medium(11)) }
                         .frame(maxWidth: .infinity).padding(.vertical, 5).background(label == "Completed" ? FitTheme.orange.opacity(0.45) : Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 5))
                         .accessibilityElement(children: .ignore).accessibilityLabel(date.formatted(date: .complete, time: .omitted) + ", " + label)
                 }
             }
-            Text("C completed · S skipped · A abandoned · R rest · P planned · F flexible · I in progress · N no log").font(.caption)
+            Text("C completed · S skipped · A abandoned · R rest · P planned · F flexible · I in progress · N no log").font(FitTheme.body(12))
         }
     }
     private func export(json: Bool) {

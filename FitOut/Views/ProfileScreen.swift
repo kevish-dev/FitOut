@@ -28,16 +28,16 @@ struct ProfileScreen: View {
                 .overlay { if isLoadingPhoto { ProgressView().tint(FitTheme.orange) } }
                 .padding(.bottom, 20 * scale)
             VStack(alignment: .leading, spacing: 8) {
-                Text("Your name").font(FitTheme.label(15))
+                Text("Your name").font(FitTheme.section(16))
                 TextField("Enter your name", text: $profile.name)
-                    .font(.system(size: 16, weight: .medium))
+                    .font(FitTheme.medium(16))
                     .textContentType(.givenName)
                     .textInputAutocapitalization(.words)
                     .autocorrectionDisabled()
                     .submitLabel(.done)
                     .focused($isNameFocused)
                     .onSubmit { isNameFocused = false }
-                    .padding(.horizontal, 15).frame(height: 44)
+                    .padding(.horizontal, FitTheme.cardInset).frame(height: 44)
                     .fitSurface(radius: 11)
                     .accessibilityIdentifier("nameField")
                     .onChange(of: profile.name) { _, value in
@@ -45,13 +45,13 @@ struct ProfileScreen: View {
                     }
                 if showNameError && !profile.isNameValid {
                     Text("Enter your name to continue.")
-                        .font(.caption).foregroundStyle(FitTheme.orange)
+                        .font(FitTheme.medium(12)).foregroundStyle(FitTheme.orange)
                         .accessibilityIdentifier("nameError")
                 }
             }
             .padding(.bottom, 24 * scale)
             VStack(alignment: .leading, spacing: 12) {
-                Text("Choose your avatar").font(.system(size: 16, weight: .semibold))
+                Text("Choose your avatar").font(FitTheme.section(16))
                 HStack(spacing: 0) {
                     Button {
                         photo = nil
@@ -59,7 +59,7 @@ struct ProfileScreen: View {
                         isNameFocused = false
                     } label: {
                         Label("Emoji", systemImage: "face.smiling.fill")
-                            .font(.system(size: 15, weight: .medium))
+                            .font(FitTheme.medium(15))
                             .frame(maxWidth: .infinity).frame(height: 38)
                             .foregroundStyle(!profile.usesPhoto ? FitTheme.orange : .white)
                             .fitSurface(selected: !profile.usesPhoto, radius: 13)
@@ -71,7 +71,7 @@ struct ProfileScreen: View {
                         showPhotoPicker = true
                     } label: {
                         Label("Upload", systemImage: "square.and.arrow.up")
-                            .font(.system(size: 15, weight: .medium))
+                            .font(FitTheme.medium(15))
                             .frame(maxWidth: .infinity).frame(height: 38)
                             .foregroundStyle(profile.usesPhoto ? FitTheme.orange : .white)
                             .fitSurface(selected: profile.usesPhoto, radius: 13)

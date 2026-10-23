@@ -17,8 +17,8 @@ struct HomeWorkoutInput {
 }
 enum HomeStateResolver {
     static func workout(_ input: HomeWorkoutInput) -> TodayWorkoutState {
-        if let c = input.completion { return .completed(title: c.title, sets: c.sets, seconds: c.seconds, volumeKG: c.volumeKG) }
         if !input.hasRoutine { return .noRoutine }
+        if let c = input.completion { return .completed(title: c.title, sets: c.sets, seconds: c.seconds, volumeKG: c.volumeKG) }
         if input.isRestDay { return .rest }
         if let title = input.plannedTitle { return .planned(title: title, exerciseCount: input.exerciseCount, minutes: input.minutes) }
         return .flexible

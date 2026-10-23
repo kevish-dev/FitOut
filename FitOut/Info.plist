@@ -2,6 +2,11 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+    <key>CFBundleURLTypes</key>
+    <array><dict>
+        <key>CFBundleURLName</key><string>com.kevishsewliya.fitout.widgets</string>
+        <key>CFBundleURLSchemes</key><array><string>fitout</string></array>
+    </dict></array>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -24,6 +29,10 @@
 	<string>FitOut reads selected activity, workouts, nutrition and body measurements to show your personal progress.</string>
 	<key>UIAppFonts</key>
 	<array>
+		<string>Inter-Regular.otf</string>
+		<string>Inter-Medium.otf</string>
+		<string>Inter-SemiBold.otf</string>
+		<string>Inter-Bold.otf</string>
 		<string>orbitron-700.ttf</string>
 		<string>orbitron-800.ttf</string>
 		<string>rajdhani-500.ttf</string>

@@ -69,7 +69,7 @@ struct ProfileFlow: View {
                                 }
                             }
                             .frame(maxWidth: 460).frame(maxWidth: .infinity)
-                            .padding(.horizontal, 25).padding(.bottom, 16)
+                            .padding(.horizontal, FitTheme.pageInset).padding(.bottom, FitTheme.sectionSpacing)
                         }
                         .scrollIndicators(.hidden)
                         .scrollDismissesKeyboard(.interactively)
@@ -88,7 +88,7 @@ struct ProfileFlow: View {
                                 NextButton { advance() }
                             }
                         }
-                        .padding(.horizontal, 30).padding(.top, 12).padding(.bottom, 22)
+                        .padding(.horizontal, FitTheme.pageInset).padding(.top, 12).padding(.bottom, 22)
                     }
                 }
             }
@@ -124,7 +124,7 @@ struct ProfileFlow: View {
                 get: { store.draft.targetWeightKG != nil },
                 set: { store.draft.targetWeightKG = $0 ? store.draft.currentWeightKG : nil }))
         }
-        .font(FitTheme.body(18)).padding(16).fitSurface(radius: 14)
+        .font(FitTheme.body(18)).padding(FitTheme.cardInset).fitSurface(radius: 14)
     }
 
     private func goalSelection(scale: CGFloat) -> some View {
@@ -137,7 +137,7 @@ struct ProfileFlow: View {
                     Button { store.draft.primaryGoal = goal } label: {
                         HStack(spacing: 10) {
                             Image(systemName: goal.symbol).font(.system(size: 21 * scale, weight: .semibold))
-                            Text(goal.rawValue).font(.system(size: 13 * scale, weight: .semibold))
+                            Text(goal.rawValue).font(FitTheme.button(13 * scale))
                                 .lineLimit(2).minimumScaleFactor(0.85)
                         }
                         .foregroundStyle(selected ? FitTheme.orange : .white)
@@ -196,7 +196,7 @@ private struct HeightScreen: View {
             unit = value
             UISelectionFeedbackGenerator().selectionChanged()
         } label: {
-            Text(title).font(.system(size: 17, weight: .semibold))
+            Text(title).font(FitTheme.button(17))
                 .foregroundStyle(unit == value ? FitTheme.orange : .white.opacity(0.8))
                 .frame(maxWidth: .infinity).frame(height: 42)
                 .fitSurface(selected: unit == value, radius: 12)
@@ -298,7 +298,7 @@ struct ProfileFields: View {
                 Text("Not specified").tag(Gender?.none)
                 ForEach(Gender.allCases, id: \.self) { Text($0.rawValue).tag(Optional($0)) }
             }
-            Text("Gender is optional profile information. It is not used to infer health conditions.").font(.caption).foregroundStyle(.secondary)
+            Text("Gender is optional profile information. It is not used to infer health conditions.").font(FitTheme.body(12)).foregroundStyle(.secondary)
         }
         Section("Units and measurements") {
             Picker("Weight units", selection: $profile.weightUnit) { ForEach(WeightUnit.allCases, id: \.self) { Text($0.rawValue).tag($0) } }
@@ -313,7 +313,7 @@ struct ProfileFields: View {
             Toggle("Set a target weight (optional)", isOn: Binding(get: { profile.targetWeightKG != nil }, set: { profile.targetWeightKG = $0 ? profile.currentWeightKG : nil }))
             if profile.targetWeightKG != nil {
                 numeric("Target weight (\(profile.weightUnit.rawValue))", value: Binding(get: { profile.weightUnit.display(profile.targetWeightKG ?? profile.currentWeightKG) }, set: { profile.targetWeightKG = profile.weightUnit.kilograms($0) }))
-                Text("A personal reference for tracking your progress; it is not a medical recommendation.").font(.caption).foregroundStyle(.secondary)
+                Text("A personal reference for tracking your progress; it is not a medical recommendation.").font(FitTheme.body(12)).foregroundStyle(.secondary)
             }
         }
         Section("Avatar (optional)") {

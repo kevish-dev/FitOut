@@ -6,7 +6,12 @@ import Observation
     let defaults: UserDefaults
     let workouts: WorkoutStore
     let gym: GymStore
+    let nutrition: NutritionStore
     let health: HealthAccessService
+    let coach: CoachStore
+    let hydration: HydrationStore
+    let widgets: WidgetBridge
+    let hydrationReminders: HydrationReminderStore
     let database: ModelContainer
     let repository: SwiftDataRepository
     let profile: ProfileStore
@@ -15,13 +20,46 @@ import Observation
     init(database: ModelContainer, capabilities: any RuntimeCapabilityProviding = SystemCapabilityProvider(), legacyDefaults: UserDefaults? = nil, defaults: UserDefaults = .standard) throws {
         workouts = try WorkoutStore(container: database)
         gym = try GymStore(container: database)
+        nutrition = try NutritionStore(container: database)
         self.defaults = defaults
         health = HealthAccessService(capability: capabilities, defaults: defaults)
+        coach = CoachStore(capabilities: capabilities)
         self.database = database
         repository = SwiftDataRepository(container: database)
         self.capabilities = capabilities
         if let legacyDefaults { try LegacyOnboardingImporter.importIfNeeded(from: legacyDefaults, into: repository) }
         profile = try ProfileStore(container: database, legacy: repository.loadSnapshot())
+        // UI-test suites and injected test defaults never write production widget data.
+        let shared = defaults === UserDefaults.standard ? try? WidgetSharedStore.live() : nil
+        let production = defaults === UserDefaults.standard
+        let localRoot: URL
+        if production {
+            localRoot = try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true).appendingPathComponent("FitOut/Hydration", isDirectory: true)
+        } else {
+            let key = "hydration.test.storageID"
+            let identifier = defaults.string(forKey: key) ?? UUID().uuidString
+            defaults.set(identifier, forKey: key)
+            localRoot = FileManager.default.temporaryDirectory.appendingPathComponent("FitOutHydrationTests/" + identifier, isDirectory: true)
+        }
+        let fallback = WidgetSharedStore(directory: localRoot)
+        if let shared, production {
+            // Import fallback logs only once per ID if App Groups become available later.
+            let local = try fallback.read()
+            let imported = Set(defaults.stringArray(forKey: "hydration.widgetImportedIDs") ?? [])
+            let pending = local.water.filter { !imported.contains($0.id.uuidString) }
+            if !pending.isEmpty {
+                try shared.update { state in
+                    let known = Set(state.water.map(\.id)); state.water += pending.filter { !known.contains($0.id) }
+                    if state.goals.waterML == nil { state.goals.waterML = local.goals.waterML }
+                    if state.waterDisplayUnit == nil { state.waterDisplayUnit = local.waterDisplayUnit }
+                }
+                defaults.set(Array(imported.union(pending.map { $0.id.uuidString })), forKey: "hydration.widgetImportedIDs")
+                try fallback.update { $0.water = [] }
+            }
+        }
+        hydration = HydrationStore(shared: shared, fallback: fallback)
+        hydrationReminders = HydrationReminderStore(defaults: defaults)
+        widgets = WidgetBridge(shared: shared, gym: gym, workouts: workouts, health: health, profile: profile, hydration: hydration, nutrition: nutrition)
     }
 
     static func live() throws -> AppContainer {

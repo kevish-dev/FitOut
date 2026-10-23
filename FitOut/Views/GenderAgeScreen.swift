@@ -21,7 +21,7 @@ struct GenderAgeScreen: View {
                             Text(gender == .male ? "♂" : "♀")
                                 .font(.system(size: 86 * scale, weight: .regular))
                                 .frame(height: 82 * scale)
-                            Text(gender.rawValue).font(FitTheme.label(17 * scale))
+                            Text(gender.rawValue).font(FitTheme.button(17 * scale))
                         }
                         .foregroundStyle(selected ? FitTheme.orange : .white)
                         .frame(width: 192 * scale, height: 136 * scale)
@@ -32,7 +32,7 @@ struct GenderAgeScreen: View {
                     .accessibilityAddTraits(selected ? .isSelected : [])
                 }
             }
-            Text("Your age").font(FitTheme.label(16 * scale))
+            Text("Your age").font(FitTheme.section(16 * scale))
                 .padding(.top, 18 * scale).padding(.bottom, 12 * scale)
             AgeWheel(age: $profile.age)
                 .frame(width: 146 * scale, height: 136 * scale)

@@ -1,6 +1,9 @@
 import SwiftUI
 
 enum FitTheme {
+    static let pageInset: CGFloat = 20
+    static let sectionSpacing: CGFloat = 16
+    static let cardInset: CGFloat = 16
     static let orange = Color(red: 1, green: 0.27, blue: 0.015)
     static let background = Color(red: 0.018, green: 0.018, blue: 0.018)
     static let border = Color.white.opacity(0.19)
@@ -12,9 +15,17 @@ enum FitTheme {
     static let elevated = Color(red: 34.0 / 255, green: 34.0 / 255, blue: 38.0 / 255)
     static let textSecondary = Color(red: 161.0 / 255, green: 161.0 / 255, blue: 170.0 / 255)
     static let subtleBorder = Color(red: 41.0 / 255, green: 41.0 / 255, blue: 46.0 / 255)
+    // The reference uses broad, geometric headlines and compact, clean UI copy.
+    // Keep the sizes centralized so every screen follows the same hierarchy.
+    static func hero(_ size: CGFloat = 36) -> Font { .custom("Orbitron-ExtraBold", size: size, relativeTo: .largeTitle) }
     static func display(_ size: CGFloat) -> Font { .custom("Orbitron-ExtraBold", size: size, relativeTo: .title) }
     static func label(_ size: CGFloat) -> Font { .custom("Orbitron-Bold", size: size, relativeTo: .headline) }
-    static func body(_ size: CGFloat) -> Font { .custom("Rajdhani-Medium", size: size, relativeTo: .body) }
+    static func metric(_ size: CGFloat) -> Font { .custom("Orbitron-Bold", size: size, relativeTo: .title) }
+    static func section(_ size: CGFloat = 18) -> Font { .custom("Inter-SemiBold", size: size, relativeTo: .headline) }
+    static func button(_ size: CGFloat = 16) -> Font { .custom("Inter-SemiBold", size: size, relativeTo: .body) }
+    static func body(_ size: CGFloat = 16) -> Font { .custom("Inter-Regular", size: size, relativeTo: .body) }
+    static func medium(_ size: CGFloat = 13) -> Font { .custom("Inter-Medium", size: size, relativeTo: .subheadline) }
+    static func strong(_ size: CGFloat = 16) -> Font { .custom("Inter-Bold", size: size, relativeTo: .body) }
 }
 
 struct Surface: ViewModifier {
@@ -43,6 +54,49 @@ extension View {
 
     func fitSurface(selected: Bool = false, radius: CGFloat = 16) -> some View {
         modifier(Surface(selected: selected, radius: radius))
+    }
+}
+
+/// Home and Gym share one viewport, hero clearance, and vertical scroll behavior.
+struct DashboardScroll<Header: View, Content: View, Backdrop: View>: View {
+    private let header: Header
+    private let content: Content
+    private let backdrop: Backdrop
+    private let onRefresh: @MainActor () async -> Void
+
+    init(onRefresh: @escaping @MainActor () async -> Void,
+         @ViewBuilder header: () -> Header,
+         @ViewBuilder content: () -> Content,
+         @ViewBuilder backdrop: () -> Backdrop) {
+        self.onRefresh = onRefresh
+        self.header = header()
+        self.content = content()
+        self.backdrop = backdrop()
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            ScrollView(.vertical) {
+                VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
+                    header
+                        .padding(.leading, FitTheme.pageInset)
+                        .padding(.trailing, FitTheme.pageInset + 68)
+                        .padding(.top, 16)
+                    Color.clear
+                        .frame(height: min(480, max(340, geometry.size.height * 0.56)))
+                        .accessibilityHidden(true)
+                    content
+                }
+                .frame(maxWidth: 560)
+                .frame(maxWidth: .infinity)
+                .padding(.bottom, 32)
+            }
+            .scrollIndicators(.hidden)
+            .scrollBounceBehavior(.basedOnSize, axes: .vertical)
+            .scrollDismissesKeyboard(.interactively)
+            .refreshable { await onRefresh() }
+            .background { backdrop }
+        }
     }
 }
 
@@ -131,7 +185,7 @@ struct NextButton: View {
     var body: some View {
         Button(action: action) {
             HStack(spacing: 14) {
-                Text("Next").font(.system(size: 18, weight: .semibold))
+                Text("Next").font(FitTheme.button(18))
                 Image(systemName: "arrow.right").font(.system(size: 20))
             }
             .frame(width: 132, height: 55)
@@ -167,7 +221,7 @@ struct SlideToFinish: View {
                 Capsule().fill(FitTheme.orange.opacity(0.08))
                 Capsule().stroke(FitTheme.orange.opacity(enabled ? 0.8 : 0.25), lineWidth: 1.5)
                 Text("Slide to Create My Journey")
-                    .font(.system(size: 13, weight: .medium))
+                    .font(FitTheme.medium(13))
                     .foregroundStyle(.white.opacity(0.7))
                     .lineLimit(1).minimumScaleFactor(0.7)
                     .padding(.leading, 64).padding(.trailing, 12)

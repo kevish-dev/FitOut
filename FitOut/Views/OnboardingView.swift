@@ -40,7 +40,7 @@ struct OnboardingView: View {
                             }
                             .frame(maxWidth: 460)
                             .frame(maxWidth: .infinity)
-                            .padding(.horizontal, 25)
+                            .padding(.horizontal, FitTheme.pageInset)
                             .padding(.bottom, 16)
                         }
                         .scrollIndicators(.hidden)
@@ -58,7 +58,7 @@ struct OnboardingView: View {
                                 NextButton { advance() }
                             }
                         }
-                        .padding(.horizontal, 30)
+                        .padding(.horizontal, FitTheme.pageInset)
                         .padding(.top, 12)
                         .padding(.bottom, 22)
                     }
@@ -96,14 +96,14 @@ struct WelcomeScreen: View {
                 LinearGradient(stops: [.init(color: .clear, location: 0.5), .init(color: .black.opacity(0.12), location: 0.7), .init(color: .black.opacity(0.7), location: 1)], startPoint: .top, endPoint: .bottom).ignoresSafeArea()
                 VStack(alignment: .leading, spacing: 14) {
                     Text("STRONGER\nHEALTHIER\nHAPPIER\nYOU")
-                        .font(FitTheme.body(11)).tracking(3.7).lineSpacing(4)
+                        .font(FitTheme.medium(11)).tracking(3.7).lineSpacing(4)
                         .foregroundStyle(.white.opacity(0.8))
                     HStack(spacing: 0) {
                         Rectangle().fill(FitTheme.orange).frame(width: 26)
                         Rectangle().fill(.white.opacity(0.2)).frame(width: 40)
                     }.frame(height: 2.5)
                 }
-                .padding(.leading, width * 0.087)
+                .padding(.leading, FitTheme.pageInset)
                 .padding(.top, geometry.size.height * 0.075)
                 VStack(alignment: .leading, spacing: 12) {
                     VStack(alignment: .leading, spacing: 0) {
@@ -112,7 +112,7 @@ struct WelcomeScreen: View {
                         Text("JOURNEY")
                         Text("STARTS HERE")
                     }
-                    .font(FitTheme.display(width * 0.077))
+                    .font(FitTheme.hero(width * 0.077))
                     .lineSpacing(1)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityElement(children: .combine)
@@ -122,7 +122,7 @@ struct WelcomeScreen: View {
                         .foregroundStyle(.white.opacity(0.7))
                         .lineSpacing(3)
                 }
-                .padding(.horizontal, width * 0.073)
+                .padding(.horizontal, FitTheme.pageInset)
                 .offset(y: geometry.size.height * 0.36)
                 VStack {
                     Spacer()
@@ -168,7 +168,7 @@ struct WelcomeScreen: View {
                     .accessibilityAddTraits(.isButton)
                     .accessibilityAction { start() }
                     .accessibilityIdentifier("getStartedButton")
-                    .padding(.horizontal, width * 0.073)
+                    .padding(.horizontal, FitTheme.pageInset)
                     .padding(.bottom, 25)
                 }
             }

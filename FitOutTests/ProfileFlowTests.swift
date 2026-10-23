@@ -34,6 +34,25 @@ final class ProfileFlowTests: XCTestCase {
         XCTAssertEqual(try ProfileStore(container: container, legacy: nil).draft.heightCM, 180)
         XCTAssertNotNil(reopened.draft.completedAt)
     }
+
+    #if DEBUG
+    @MainActor func testTestingRestartReturnsToFirstOnboardingStepAndKeepsWorkouts() throws {
+        let container = try PersistenceFactory.makeContainer(inMemory: true)
+        let profile = try ProfileStore(container: container, legacy: nil)
+        profile.draft.name = "Alex"
+        profile.draft.primaryGoal = .fitness
+        XCTAssertTrue(profile.complete())
+        let workouts = try WorkoutStore(container: container)
+        XCTAssertTrue(workouts.start(catalogue: []))
+
+        try profile.restartForTesting()
+
+        XCTAssertEqual(profile.draft, ProfileData())
+        XCTAssertEqual(try ProfileStore(container: container, legacy: nil).draft, ProfileData())
+        XCTAssertNotNil(try WorkoutStore(container: container).active)
+    }
+    #endif
+
     @MainActor func testLegacyGoalsRequireExplicitPrimarySelection() throws {
         var old = FitnessProfile(); old.name = "Alex"; old.completedAt = .now
         let store = try ProfileStore(container: PersistenceFactory.makeContainer(inMemory: true), legacy: OnboardingSnapshot(profile: old, step: 4))

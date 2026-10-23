@@ -1,0 +1,3834 @@
+[
+  {
+    "id": "usda-20045",
+    "name": "White rice, cooked",
+    "aliases": "chawal bhaat rice cooked",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 130.0,
+      "sodium": 1.0,
+      "fibre": 0.4,
+      "protein": 2.69,
+      "fat": 0.28,
+      "carbohydrates": 28.17,
+      "sugar": 0.05,
+      "saturatedFat": 0.077
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (158 g)",
+        "baseAmount": 158.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20045. Rice, white, long-grain, regular, enriched, cooked. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Rice, white, long-grain, regular, enriched, cooked"
+  },
+  {
+    "id": "usda-20044",
+    "name": "White rice, raw",
+    "aliases": "dry rice chawal",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 365.0,
+      "sodium": 5.0,
+      "fibre": 1.3,
+      "protein": 7.13,
+      "fat": 0.66,
+      "carbohydrates": 79.95,
+      "sugar": 0.12,
+      "saturatedFat": 0.18
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (185 g)",
+        "baseAmount": 185.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20044. Rice, white, long-grain, regular, raw, enriched. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Rice, white, long-grain, regular, raw, enriched"
+  },
+  {
+    "id": "usda-20037",
+    "name": "Brown rice, cooked",
+    "aliases": "brown chawal",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 123.0,
+      "sodium": 4.0,
+      "fibre": 1.6,
+      "protein": 2.74,
+      "fat": 0.97,
+      "carbohydrates": 25.58,
+      "sugar": 0.24,
+      "saturatedFat": 0.26
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (202 g)",
+        "baseAmount": 202.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20037. Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Rice, brown, long-grain, cooked (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "id": "usda-20036",
+    "name": "Brown rice, raw",
+    "aliases": "dry brown rice",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 367.0,
+      "sodium": 5.0,
+      "fibre": 3.6,
+      "protein": 7.54,
+      "fat": 3.2,
+      "carbohydrates": 76.25,
+      "sugar": 0.66,
+      "saturatedFat": 0.591
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (185 g)",
+        "baseAmount": 185.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20036. Rice, brown, long-grain, raw (Includes foods for USDA's Food Distribution Program). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Rice, brown, long-grain, raw (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "id": "usda-16070",
+    "name": "Lentils, boiled, no salt",
+    "aliases": "masoor dal cooked plain",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 116.0,
+      "sodium": 2.0,
+      "fibre": 7.9,
+      "protein": 9.02,
+      "fat": 0.38,
+      "carbohydrates": 20.13,
+      "sugar": 1.8,
+      "saturatedFat": 0.053
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (198 g)",
+        "baseAmount": 198.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tbsp (12.3 g)",
+        "baseAmount": 12.3
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16070. Lentils, mature seeds, cooked, boiled, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Lentils, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "id": "usda-16102",
+    "name": "Pigeon peas, boiled, no salt",
+    "aliases": "toor arhar dal cooked plain",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 121.0,
+      "sodium": 5.0,
+      "fibre": 6.7,
+      "protein": 6.76,
+      "fat": 0.38,
+      "carbohydrates": 23.25,
+      "saturatedFat": 0.083
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (168 g)",
+        "baseAmount": 168.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16102. Pigeon peas (red gram), mature seeds, cooked, boiled, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Pigeon peas (red gram), mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "id": "usda-16081",
+    "name": "Mung beans, boiled, no salt",
+    "aliases": "moong dal cooked plain",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 105.0,
+      "sodium": 2.0,
+      "fibre": 7.6,
+      "protein": 7.02,
+      "fat": 0.38,
+      "carbohydrates": 19.15,
+      "sugar": 2.0,
+      "saturatedFat": 0.116
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (202 g)",
+        "baseAmount": 202.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16081. Mung beans, mature seeds, cooked, boiled, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Mung beans, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "id": "usda-16084",
+    "name": "Urad beans, boiled, no salt",
+    "aliases": "black gram dal cooked plain",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 105.0,
+      "sodium": 7.0,
+      "fibre": 6.4,
+      "protein": 7.54,
+      "fat": 0.55,
+      "carbohydrates": 18.34,
+      "sugar": 2.01,
+      "saturatedFat": 0.038
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (180 g)",
+        "baseAmount": 180.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 oz dry, yield after cooking (69 g)",
+        "baseAmount": 69.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16084. Mungo beans, mature seeds, cooked, boiled, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Mungo beans, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "id": "usda-16083",
+    "name": "Urad beans, raw",
+    "aliases": "urad black gram dry",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 341.0,
+      "sodium": 38.0,
+      "fibre": 18.3,
+      "protein": 25.21,
+      "fat": 1.64,
+      "carbohydrates": 58.99,
+      "saturatedFat": 0.114
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (207 g)",
+        "baseAmount": 207.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16083. Mungo beans, mature seeds, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Mungo beans, mature seeds, raw"
+  },
+  {
+    "id": "usda-16101",
+    "name": "Pigeon peas, raw",
+    "aliases": "toor arhar dal dry",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 343.0,
+      "sodium": 17.0,
+      "fibre": 15.0,
+      "protein": 21.7,
+      "fat": 1.49,
+      "carbohydrates": 62.78,
+      "saturatedFat": 0.33
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (205 g)",
+        "baseAmount": 205.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16101. Pigeon peas (red gram), mature seeds, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Pigeon peas (red gram), mature seeds, raw"
+  },
+  {
+    "id": "usda-16080",
+    "name": "Mung beans, raw",
+    "aliases": "moong dal dry",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 347.0,
+      "sodium": 15.0,
+      "fibre": 16.3,
+      "protein": 23.86,
+      "fat": 1.15,
+      "carbohydrates": 62.62,
+      "sugar": 6.6,
+      "saturatedFat": 0.348
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (207 g)",
+        "baseAmount": 207.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tbsp (13 g)",
+        "baseAmount": 13.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16080. Mung beans, mature seeds, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Mung beans, mature seeds, raw"
+  },
+  {
+    "id": "usda-16057",
+    "name": "Chickpeas, boiled, no salt",
+    "aliases": "chana chole chickpea cooked",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 164.0,
+      "sodium": 7.0,
+      "fibre": 7.6,
+      "protein": 8.86,
+      "fat": 2.59,
+      "carbohydrates": 27.42,
+      "sugar": 4.8,
+      "saturatedFat": 0.269
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (164 g)",
+        "baseAmount": 164.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16057. Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "id": "usda-16056",
+    "name": "Chickpeas, raw",
+    "aliases": "chana dry",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 378.0,
+      "sodium": 24.0,
+      "fibre": 12.2,
+      "protein": 20.47,
+      "fat": 6.04,
+      "carbohydrates": 62.95,
+      "sugar": 10.7,
+      "saturatedFat": 0.603
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (200 g)",
+        "baseAmount": 200.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tbsp (12.5 g)",
+        "baseAmount": 12.5
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16056. Chickpeas (garbanzo beans, bengal gram), mature seeds, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Chickpeas (garbanzo beans, bengal gram), mature seeds, raw"
+  },
+  {
+    "id": "usda-16033",
+    "name": "Red kidney beans, boiled, no salt",
+    "aliases": "rajma cooked plain",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 127.0,
+      "sodium": 2.0,
+      "fibre": 7.4,
+      "protein": 8.67,
+      "fat": 0.5,
+      "carbohydrates": 22.8,
+      "sugar": 0.32,
+      "saturatedFat": 0.072
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (177 g)",
+        "baseAmount": 177.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tbsp (11 g)",
+        "baseAmount": 11.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16033. Beans, kidney, red, mature seeds, cooked, boiled, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Beans, kidney, red, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "id": "usda-16032",
+    "name": "Red kidney beans, raw",
+    "aliases": "rajma dry",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 337.0,
+      "sodium": 12.0,
+      "fibre": 15.2,
+      "protein": 22.53,
+      "fat": 1.06,
+      "carbohydrates": 61.29,
+      "sugar": 2.1,
+      "saturatedFat": 0.154
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (184 g)",
+        "baseAmount": 184.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tbsp (12.2 g)",
+        "baseAmount": 12.2
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16032. Beans, kidney, red, mature seeds, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Beans, kidney, red, mature seeds, raw"
+  },
+  {
+    "id": "usda-16015",
+    "name": "Black beans, boiled, no salt",
+    "aliases": "black bean cooked",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 132.0,
+      "sodium": 1.0,
+      "fibre": 8.7,
+      "protein": 8.86,
+      "fat": 0.54,
+      "carbohydrates": 23.71,
+      "sugar": 0.32,
+      "saturatedFat": 0.139
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (172 g)",
+        "baseAmount": 172.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16015. Beans, black, mature seeds, cooked, boiled, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Beans, black, mature seeds, cooked, boiled, without salt"
+  },
+  {
+    "id": "usda-20080",
+    "name": "Whole-wheat flour",
+    "aliases": "atta wheat flour",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 340.0,
+      "sodium": 2.0,
+      "fibre": 10.7,
+      "protein": 13.21,
+      "fat": 2.5,
+      "carbohydrates": 71.97,
+      "sugar": 0.41,
+      "saturatedFat": 0.43
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (120 g)",
+        "baseAmount": 120.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20080. Wheat flour, whole-grain (Includes foods for USDA's Food Distribution Program). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Wheat flour, whole-grain (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "id": "usda-20081",
+    "name": "All-purpose flour",
+    "aliases": "maida flour",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 364.0,
+      "sodium": 2.0,
+      "fibre": 2.7,
+      "protein": 10.33,
+      "fat": 0.98,
+      "carbohydrates": 76.31,
+      "sugar": 0.27,
+      "saturatedFat": 0.155
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (125 g)",
+        "baseAmount": 125.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20081. Wheat flour, white, all-purpose, enriched, bleached. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Wheat flour, white, all-purpose, enriched, bleached"
+  },
+  {
+    "id": "usda-16157",
+    "name": "Chickpea flour",
+    "aliases": "besan gram flour",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 387.0,
+      "sodium": 64.0,
+      "fibre": 10.8,
+      "protein": 22.39,
+      "fat": 6.69,
+      "carbohydrates": 57.82,
+      "sugar": 10.85,
+      "saturatedFat": 0.693
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (92 g)",
+        "baseAmount": 92.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16157. Chickpea flour (besan). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Chickpea flour (besan)"
+  },
+  {
+    "id": "usda-20061",
+    "name": "Rice flour",
+    "aliases": "chawal atta",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 366.0,
+      "sodium": 0.0,
+      "fibre": 2.4,
+      "protein": 5.95,
+      "fat": 1.42,
+      "carbohydrates": 80.13,
+      "sugar": 0.12,
+      "saturatedFat": 0.386
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (158 g)",
+        "baseAmount": 158.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20061. Rice flour, white, unenriched. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Rice flour, white, unenriched"
+  },
+  {
+    "id": "usda-20466",
+    "name": "Semolina, dry",
+    "aliases": "sooji suji rava",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 360.0,
+      "sodium": 1.0,
+      "fibre": 3.9,
+      "protein": 12.68,
+      "fat": 1.05,
+      "carbohydrates": 72.83,
+      "saturatedFat": 0.15
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (167 g)",
+        "baseAmount": 167.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20466. Semolina, unenriched. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Semolina, unenriched"
+  },
+  {
+    "id": "usda-08120",
+    "name": "Oats, dry",
+    "aliases": "rolled oatmeal",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 379.0,
+      "sodium": 6.0,
+      "fibre": 10.1,
+      "protein": 13.15,
+      "fat": 6.52,
+      "carbohydrates": 67.7,
+      "sugar": 0.99,
+      "saturatedFat": 1.11
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (81 g)",
+        "baseAmount": 81.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "0.33 cup (27 g)",
+        "baseAmount": 27.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 08120. Cereals, oats, regular and quick, not fortified, dry. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Cereals, oats, regular and quick, not fortified, dry"
+  },
+  {
+    "id": "usda-08121",
+    "name": "Oatmeal, cooked with water",
+    "aliases": "oats porridge no salt",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 71.0,
+      "sodium": 4.0,
+      "fibre": 1.7,
+      "protein": 2.54,
+      "fat": 1.52,
+      "carbohydrates": 12.0,
+      "sugar": 0.27,
+      "saturatedFat": 0.31
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (234 g)",
+        "baseAmount": 234.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tbsp (14.6 g)",
+        "baseAmount": 14.6
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "0.75 cup (175 g)",
+        "baseAmount": 175.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 08121. Cereals, oats, regular and quick, unenriched, cooked with water (includes boiling and microwaving), without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Cereals, oats, regular and quick, unenriched, cooked with water (includes boiling and microwaving), without salt"
+  },
+  {
+    "id": "usda-20137",
+    "name": "Quinoa, cooked",
+    "aliases": "quinoa",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 120.0,
+      "sodium": 7.0,
+      "fibre": 2.8,
+      "protein": 4.4,
+      "fat": 1.92,
+      "carbohydrates": 21.3,
+      "sugar": 0.87,
+      "saturatedFat": 0.231
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (185 g)",
+        "baseAmount": 185.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20137. Quinoa, cooked. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Quinoa, cooked"
+  },
+  {
+    "id": "usda-20035",
+    "name": "Quinoa, dry",
+    "aliases": "uncooked quinoa",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 368.0,
+      "sodium": 5.0,
+      "fibre": 7.0,
+      "protein": 14.12,
+      "fat": 6.07,
+      "carbohydrates": 64.16,
+      "saturatedFat": 0.706
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (170 g)",
+        "baseAmount": 170.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20035. Quinoa, uncooked. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Quinoa, uncooked"
+  },
+  {
+    "id": "usda-20032",
+    "name": "Millet, cooked",
+    "aliases": "bajra millet",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 119.0,
+      "sodium": 2.0,
+      "fibre": 1.3,
+      "protein": 3.51,
+      "fat": 1.0,
+      "carbohydrates": 23.67,
+      "sugar": 0.13,
+      "saturatedFat": 0.172
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (174 g)",
+        "baseAmount": 174.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20032. Millet, cooked. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Millet, cooked"
+  },
+  {
+    "id": "usda-20031",
+    "name": "Millet, raw",
+    "aliases": "bajra dry",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 378.0,
+      "sodium": 5.0,
+      "fibre": 8.5,
+      "protein": 11.02,
+      "fat": 4.22,
+      "carbohydrates": 72.85,
+      "saturatedFat": 0.723
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (200 g)",
+        "baseAmount": 200.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20031. Millet, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Millet, raw"
+  },
+  {
+    "id": "usda-20006",
+    "name": "Pearl barley, cooked",
+    "aliases": "jau barley",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 123.0,
+      "sodium": 3.0,
+      "fibre": 3.8,
+      "protein": 2.26,
+      "fat": 0.44,
+      "carbohydrates": 28.22,
+      "sugar": 0.28,
+      "saturatedFat": 0.093
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (157 g)",
+        "baseAmount": 157.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20006. Barley, pearled, cooked. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Barley, pearled, cooked"
+  },
+  {
+    "id": "usda-20121",
+    "name": "Pasta, cooked, no added salt",
+    "aliases": "pasta",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 158.0,
+      "sodium": 1.0,
+      "fibre": 1.8,
+      "protein": 5.8,
+      "fat": 0.93,
+      "carbohydrates": 30.86,
+      "sugar": 0.56,
+      "saturatedFat": 0.176
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup spaghetti not packed (124 g)",
+        "baseAmount": 124.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup spaghetti packed (151 g)",
+        "baseAmount": 151.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 cup elbows not packed (120 g)",
+        "baseAmount": 120.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 cup elbows packed (132 g)",
+        "baseAmount": 132.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 20121. Pasta, cooked, enriched, without added salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Pasta, cooked, enriched, without added salt"
+  },
+  {
+    "id": "usda-18075",
+    "name": "Whole-wheat bread, commercially prepared",
+    "aliases": "brown bread slice",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 252.0,
+      "sodium": 455.0,
+      "fibre": 6.0,
+      "protein": 12.45,
+      "fat": 3.5,
+      "carbohydrates": 42.71,
+      "sugar": 4.34,
+      "saturatedFat": 0.722
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 slice (32 g)",
+        "baseAmount": 32.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 oz (28.35 g)",
+        "baseAmount": 28.35
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 18075. Bread, whole-wheat, commercially prepared. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Bread, whole-wheat, commercially prepared"
+  },
+  {
+    "id": "usda-18069",
+    "name": "White bread, commercially prepared",
+    "aliases": "bread slice",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 266.0,
+      "sodium": 490.0,
+      "fibre": 2.7,
+      "protein": 8.85,
+      "fat": 3.33,
+      "carbohydrates": 49.42,
+      "sugar": 5.67,
+      "saturatedFat": 0.698
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 slice (29 g)",
+        "baseAmount": 29.0
+      },
+      {
+        "id": "usda-portion-10",
+        "title": "1 slice, very thin (15 g)",
+        "baseAmount": 15.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 oz (28.35 g)",
+        "baseAmount": 28.35
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 cup, crumbs (45 g)",
+        "baseAmount": 45.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 18069. Bread, white, commercially prepared (includes soft bread crumbs). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Bread, white, commercially prepared (includes soft bread crumbs)"
+  },
+  {
+    "id": "usda-28306",
+    "name": "Roti / chapati, commercially prepared",
+    "aliases": "roti chapati phulka",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 297.0,
+      "sodium": 409.0,
+      "fibre": 4.9,
+      "protein": 11.25,
+      "fat": 7.45,
+      "carbohydrates": 46.36,
+      "sugar": 2.72,
+      "saturatedFat": 1.953
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 piece (68 g)",
+        "baseAmount": 68.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 28306. Bread, chapati or roti, plain, commercially prepared. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Bread, chapati or roti, plain, commercially prepared"
+  },
+  {
+    "id": "usda-28307",
+    "name": "Naan, commercially prepared",
+    "aliases": "naan plain",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 291.0,
+      "sodium": 465.0,
+      "fibre": 2.2,
+      "protein": 9.62,
+      "fat": 5.65,
+      "carbohydrates": 50.43,
+      "sugar": 3.55,
+      "saturatedFat": 1.393
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 piece (90 g)",
+        "baseAmount": 90.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 28307. Bread, naan, plain, commercially prepared, refrigerated. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Bread, naan, plain, commercially prepared, refrigerated"
+  },
+  {
+    "id": "usda-28286",
+    "name": "Paratha, commercial frozen whole-wheat",
+    "aliases": "paratha",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 326.0,
+      "sodium": 452.0,
+      "fibre": 9.6,
+      "protein": 6.36,
+      "fat": 13.2,
+      "carbohydrates": 45.35,
+      "sugar": 4.15,
+      "saturatedFat": 5.826
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 piece (79 g)",
+        "baseAmount": 79.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 28286. Bread, paratha, whole wheat, commercially prepared, frozen. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Bread, paratha, whole wheat, commercially prepared, frozen"
+  },
+  {
+    "id": "usda-01129",
+    "name": "Egg, hard-boiled",
+    "aliases": "anda egg boiled",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 155.0,
+      "sodium": 124.0,
+      "fibre": 0.0,
+      "protein": 12.58,
+      "fat": 10.61,
+      "carbohydrates": 1.12,
+      "sugar": 1.12,
+      "saturatedFat": 3.267
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, chopped (136 g)",
+        "baseAmount": 136.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tbsp (8.5 g)",
+        "baseAmount": 8.5
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 large (50 g)",
+        "baseAmount": 50.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01129. Egg, whole, cooked, hard-boiled. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Egg, whole, cooked, hard-boiled"
+  },
+  {
+    "id": "usda-01123",
+    "name": "Egg, raw",
+    "aliases": "anda",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 143.0,
+      "sodium": 142.0,
+      "fibre": 0.0,
+      "protein": 12.56,
+      "fat": 9.51,
+      "carbohydrates": 0.72,
+      "sugar": 0.37,
+      "saturatedFat": 3.126
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 large (50 g)",
+        "baseAmount": 50.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 extra large (56 g)",
+        "baseAmount": 56.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 jumbo (63 g)",
+        "baseAmount": 63.0
+      },
+      {
+        "id": "usda-portion-5",
+        "title": "1 cup (4.86 large eggs) (243 g)",
+        "baseAmount": 243.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01123. Egg, whole, raw, fresh. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Egg, whole, raw, fresh"
+  },
+  {
+    "id": "usda-01128",
+    "name": "Egg, fried",
+    "aliases": "fried anda",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 196.0,
+      "sodium": 207.0,
+      "fibre": 0.0,
+      "protein": 13.61,
+      "fat": 14.84,
+      "carbohydrates": 0.83,
+      "sugar": 0.4,
+      "saturatedFat": 4.323
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 large (46 g)",
+        "baseAmount": 46.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01128. Egg, whole, cooked, fried. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Egg, whole, cooked, fried"
+  },
+  {
+    "id": "usda-01132",
+    "name": "Egg, scrambled",
+    "aliases": "scrambled anda",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 149.0,
+      "sodium": 145.0,
+      "fibre": 0.0,
+      "protein": 9.99,
+      "fat": 10.98,
+      "carbohydrates": 1.61,
+      "sugar": 1.39,
+      "saturatedFat": 3.331
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 large (61 g)",
+        "baseAmount": 61.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tbsp (13.7 g)",
+        "baseAmount": 13.7
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 cup (220 g)",
+        "baseAmount": 220.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01132. Egg, whole, cooked, scrambled. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Egg, whole, cooked, scrambled"
+  },
+  {
+    "id": "usda-05064",
+    "name": "Chicken breast, roasted, meat only",
+    "aliases": "chicken cooked boneless",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 165.0,
+      "sodium": 74.0,
+      "fibre": 0.0,
+      "protein": 31.02,
+      "fat": 3.57,
+      "carbohydrates": 0.0,
+      "sugar": 0.0,
+      "saturatedFat": 1.01
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, chopped or diced (140 g)",
+        "baseAmount": 140.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 unit (yield from 1 lb ready-to-cook chicken) (52 g)",
+        "baseAmount": 52.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "0.50 breast, bone and skin removed (86 g)",
+        "baseAmount": 86.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 05064. Chicken, broilers or fryers, breast, meat only, cooked, roasted. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Chicken, broilers or fryers, breast, meat only, cooked, roasted"
+  },
+  {
+    "id": "usda-05057",
+    "name": "Chicken breast, raw, meat and skin",
+    "aliases": "chicken raw with skin",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 172.0,
+      "sodium": 63.0,
+      "fibre": 0.0,
+      "protein": 20.85,
+      "fat": 9.25,
+      "carbohydrates": 0.0,
+      "sugar": 0.0,
+      "saturatedFat": 2.66
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "0.50 breast, bone removed (yield from 1 lb ready-to-cook chicken) (87 g)",
+        "baseAmount": 87.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "0.50 breast, bone removed (145 g)",
+        "baseAmount": 145.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 05057. Chicken, broilers or fryers, breast, meat and skin, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Chicken, broilers or fryers, breast, meat and skin, raw"
+  },
+  {
+    "id": "usda-15237",
+    "name": "Atlantic salmon, farmed, cooked",
+    "aliases": "salmon fish",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 206.0,
+      "sodium": 61.0,
+      "fibre": 0.0,
+      "protein": 22.1,
+      "fat": 12.35,
+      "carbohydrates": 0.0,
+      "sugar": 0.0,
+      "saturatedFat": 2.397
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "3 oz (85 g)",
+        "baseAmount": 85.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "0.50 fillet (178 g)",
+        "baseAmount": 178.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 15237. Fish, salmon, Atlantic, farmed, cooked, dry heat. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Fish, salmon, Atlantic, farmed, cooked, dry heat"
+  },
+  {
+    "id": "usda-15121",
+    "name": "Tuna, canned in water, drained",
+    "aliases": "tuna fish",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 86.0,
+      "sodium": 247.0,
+      "fibre": 0.0,
+      "protein": 19.44,
+      "fat": 0.96,
+      "carbohydrates": 0.0,
+      "sugar": 0.0,
+      "saturatedFat": 0.211
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 oz (28.35 g)",
+        "baseAmount": 28.35
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "3 oz (85 g)",
+        "baseAmount": 85.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 can (165 g)",
+        "baseAmount": 165.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 cup, solid or chunks (154 g)",
+        "baseAmount": 154.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 15121. Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Fish, tuna, light, canned in water, drained solids (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "id": "usda-16126",
+    "name": "Firm tofu",
+    "aliases": "tofu soy",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 78.0,
+      "sodium": 12.0,
+      "fibre": 0.9,
+      "protein": 9.04,
+      "fat": 4.17,
+      "carbohydrates": 2.85,
+      "sugar": 0.6,
+      "saturatedFat": 0.793
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "0.50 cup (126 g)",
+        "baseAmount": 126.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "0.25 block (81 g)",
+        "baseAmount": 81.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "0.20 block (91 g)",
+        "baseAmount": 91.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16126. Tofu, firm, prepared with calcium sulfate and magnesium chloride (nigari). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Tofu, firm, prepared with calcium sulfate and magnesium chloride (nigari)"
+  },
+  {
+    "id": "usda-01116",
+    "name": "Plain whole-milk yogurt",
+    "aliases": "curd dahi yogurt",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 61.0,
+      "sodium": 46.0,
+      "fibre": 0.0,
+      "protein": 3.47,
+      "fat": 3.25,
+      "carbohydrates": 4.66,
+      "sugar": 4.66,
+      "saturatedFat": 2.096
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 container (6 oz) (170 g)",
+        "baseAmount": 170.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 container (8 oz) (227 g)",
+        "baseAmount": 227.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "0.50 container (4 oz) (113 g)",
+        "baseAmount": 113.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 cup (8 fl oz) (245 g)",
+        "baseAmount": 245.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01116. Yogurt, plain, whole milk. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Yogurt, plain, whole milk"
+  },
+  {
+    "id": "usda-01117",
+    "name": "Plain low-fat yogurt",
+    "aliases": "low fat curd dahi",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 63.0,
+      "sodium": 70.0,
+      "fibre": 0.0,
+      "protein": 5.25,
+      "fat": 1.55,
+      "carbohydrates": 7.04,
+      "sugar": 7.04,
+      "saturatedFat": 1.0
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 container (6 oz) (170 g)",
+        "baseAmount": 170.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 container (8 oz) (227 g)",
+        "baseAmount": 227.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "0.50 container (4 oz) (113 g)",
+        "baseAmount": 113.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 cup (8 fl oz) (245 g)",
+        "baseAmount": 245.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01117. Yogurt, plain, low fat. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Yogurt, plain, low fat"
+  },
+  {
+    "id": "usda-01256",
+    "name": "Plain nonfat Greek yogurt",
+    "aliases": "greek yoghurt",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 59.0,
+      "sodium": 36.0,
+      "fibre": 0.0,
+      "protein": 10.19,
+      "fat": 0.39,
+      "carbohydrates": 3.6,
+      "sugar": 3.24,
+      "saturatedFat": 0.117
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 container (170 g)",
+        "baseAmount": 170.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01256. Yogurt, Greek, plain, nonfat (Includes foods for USDA's Food Distribution Program). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Yogurt, Greek, plain, nonfat (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "id": "usda-01077",
+    "name": "Whole milk, 3.25% fat",
+    "aliases": "doodh milk",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 61.0,
+      "sodium": 43.0,
+      "fibre": 0.0,
+      "protein": 3.15,
+      "fat": 3.25,
+      "carbohydrates": 4.8,
+      "sugar": 5.05,
+      "saturatedFat": 1.865
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (244 g)",
+        "baseAmount": 244.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 fl oz (30.5 g)",
+        "baseAmount": 30.5
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 tbsp (15 g)",
+        "baseAmount": 15.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 quart (976 g)",
+        "baseAmount": 976.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01077. Milk, whole, 3.25% milkfat, with added vitamin D. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Milk, whole, 3.25% milkfat, with added vitamin D"
+  },
+  {
+    "id": "usda-01079",
+    "name": "Milk, 2% fat",
+    "aliases": "low fat milk doodh",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 50.0,
+      "sodium": 47.0,
+      "fibre": 0.0,
+      "protein": 3.3,
+      "fat": 1.98,
+      "carbohydrates": 4.8,
+      "sugar": 5.06,
+      "saturatedFat": 1.257
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (244 g)",
+        "baseAmount": 244.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 fl oz (30.5 g)",
+        "baseAmount": 30.5
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 quart (976 g)",
+        "baseAmount": 976.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01079. Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Milk, reduced fat, fluid, 2% milkfat, with added vitamin A and vitamin D"
+  },
+  {
+    "id": "usda-01085",
+    "name": "Skim milk",
+    "aliases": "skimmed fat free milk doodh",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 34.0,
+      "sodium": 42.0,
+      "fibre": 0.0,
+      "protein": 3.37,
+      "fat": 0.08,
+      "carbohydrates": 4.96,
+      "sugar": 5.09,
+      "saturatedFat": 0.056
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (245 g)",
+        "baseAmount": 245.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 fl oz (30.6 g)",
+        "baseAmount": 30.6
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 quart (980 g)",
+        "baseAmount": 980.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01085. Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Milk, nonfat, fluid, with added vitamin A and vitamin D (fat free or skim)"
+  },
+  {
+    "id": "usda-16120",
+    "name": "Soymilk, original / vanilla, unfortified",
+    "aliases": "soy milk",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 54.0,
+      "sodium": 51.0,
+      "fibre": 0.6,
+      "protein": 3.27,
+      "fat": 1.75,
+      "carbohydrates": 6.28,
+      "sugar": 3.99,
+      "saturatedFat": 0.205
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (243 g)",
+        "baseAmount": 243.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 fl oz (30.6 g)",
+        "baseAmount": 30.6
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16120. Soymilk, original and vanilla, unfortified. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Soymilk, original and vanilla, unfortified"
+  },
+  {
+    "id": "usda-01009",
+    "name": "Cheddar cheese",
+    "aliases": "cheese",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 403.0,
+      "sodium": 653.0,
+      "fibre": 0.0,
+      "protein": 22.87,
+      "fat": 33.31,
+      "carbohydrates": 3.37,
+      "sugar": 0.48,
+      "saturatedFat": 18.867
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, diced (132 g)",
+        "baseAmount": 132.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup, melted (244 g)",
+        "baseAmount": 244.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 cup, shredded (113 g)",
+        "baseAmount": 113.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 oz (28.35 g)",
+        "baseAmount": 28.35
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01009. Cheese, cheddar (Includes foods for USDA's Food Distribution Program). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Cheese, cheddar (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "id": "usda-01012",
+    "name": "Creamed cottage cheese",
+    "aliases": "cottage cheese not paneer",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 98.0,
+      "sodium": 315.0,
+      "fibre": 0.0,
+      "protein": 11.12,
+      "fat": 4.3,
+      "carbohydrates": 3.38,
+      "sugar": 2.67,
+      "saturatedFat": 1.718
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "4 oz (113 g)",
+        "baseAmount": 113.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup, large curd (not packed) (210 g)",
+        "baseAmount": 210.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 cup, small curd (not packed) (225 g)",
+        "baseAmount": 225.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01012. Cheese, cottage, creamed, large or small curd. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Cheese, cottage, creamed, large or small curd"
+  },
+  {
+    "id": "usda-01001",
+    "name": "Salted butter",
+    "aliases": "butter makkhan",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 717.0,
+      "sodium": 643.0,
+      "fibre": 0.0,
+      "protein": 0.85,
+      "fat": 81.11,
+      "carbohydrates": 0.06,
+      "sugar": 0.06,
+      "saturatedFat": 51.368
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 pat (1\" sq, 1/3\" high) (5 g)",
+        "baseAmount": 5.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tbsp (14.2 g)",
+        "baseAmount": 14.2
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 cup (227 g)",
+        "baseAmount": 227.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 stick (113 g)",
+        "baseAmount": 113.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01001. Butter, salted. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Butter, salted"
+  },
+  {
+    "id": "usda-01003",
+    "name": "Anhydrous butter oil",
+    "aliases": "ghee clarified butter",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 876.0,
+      "sodium": 2.0,
+      "fibre": 0.0,
+      "protein": 0.28,
+      "fat": 99.48,
+      "carbohydrates": 0.0,
+      "sugar": 0.0,
+      "saturatedFat": 61.924
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 tbsp (12.8 g)",
+        "baseAmount": 12.8
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup (205 g)",
+        "baseAmount": 205.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 01003. Butter oil, anhydrous. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Butter oil, anhydrous"
+  },
+  {
+    "id": "usda-04053",
+    "name": "Olive oil",
+    "aliases": "cooking oil",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 884.0,
+      "sodium": 2.0,
+      "fibre": 0.0,
+      "protein": 0.0,
+      "fat": 100.0,
+      "carbohydrates": 0.0,
+      "sugar": 0.0,
+      "saturatedFat": 13.808
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 tablespoon (13.5 g)",
+        "baseAmount": 13.5
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup (216 g)",
+        "baseAmount": 216.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 tsp (4.5 g)",
+        "baseAmount": 4.5
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 04053. Oil, olive, salad or cooking. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Oil, olive, salad or cooking"
+  },
+  {
+    "id": "usda-04060",
+    "name": "Sunflower oil",
+    "aliases": "cooking oil",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 884.0,
+      "sodium": 0.0,
+      "fibre": 0.0,
+      "protein": 0.0,
+      "fat": 100.0,
+      "carbohydrates": 0.0,
+      "sugar": 0.0,
+      "saturatedFat": 10.1
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 tbsp (13.6 g)",
+        "baseAmount": 13.6
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup (218 g)",
+        "baseAmount": 218.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 tsp (4.5 g)",
+        "baseAmount": 4.5
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 04060. Oil, sunflower, linoleic (less than 60%). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Oil, sunflower, linoleic (less than 60%)"
+  },
+  {
+    "id": "usda-12061",
+    "name": "Almonds",
+    "aliases": "badam nuts",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 579.0,
+      "sodium": 1.0,
+      "fibre": 12.5,
+      "protein": 21.15,
+      "fat": 49.93,
+      "carbohydrates": 21.55,
+      "sugar": 4.35,
+      "saturatedFat": 3.802
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, whole (143 g)",
+        "baseAmount": 143.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup, sliced (92 g)",
+        "baseAmount": 92.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 cup, slivered (108 g)",
+        "baseAmount": 108.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 cup, ground (95 g)",
+        "baseAmount": 95.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 12061. Nuts, almonds. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Nuts, almonds"
+  },
+  {
+    "id": "usda-12087",
+    "name": "Cashews, raw",
+    "aliases": "kaju nuts",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 553.0,
+      "sodium": 12.0,
+      "fibre": 3.3,
+      "protein": 18.22,
+      "fat": 43.85,
+      "carbohydrates": 30.19,
+      "sugar": 5.91,
+      "saturatedFat": 7.783
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 oz (28.35 g)",
+        "baseAmount": 28.35
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 12087. Nuts, cashew nuts, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Nuts, cashew nuts, raw"
+  },
+  {
+    "id": "usda-12155",
+    "name": "English walnuts",
+    "aliases": "akhrot nuts",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 654.0,
+      "sodium": 2.0,
+      "fibre": 6.7,
+      "protein": 15.23,
+      "fat": 65.21,
+      "carbohydrates": 13.71,
+      "sugar": 2.61,
+      "saturatedFat": 6.126
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, chopped (117 g)",
+        "baseAmount": 117.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup, ground (80 g)",
+        "baseAmount": 80.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 cup, in shell, edible yield (7 nuts) (28 g)",
+        "baseAmount": 28.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 cup shelled (50 halves) (100 g)",
+        "baseAmount": 100.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 12155. Nuts, walnuts, english. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Nuts, walnuts, english"
+  },
+  {
+    "id": "usda-16087",
+    "name": "Peanuts, raw",
+    "aliases": "groundnut moongphali",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 567.0,
+      "sodium": 18.0,
+      "fibre": 8.5,
+      "protein": 25.8,
+      "fat": 49.24,
+      "carbohydrates": 16.13,
+      "sugar": 4.72,
+      "saturatedFat": 6.279
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 oz (28.35 g)",
+        "baseAmount": 28.35
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup (146 g)",
+        "baseAmount": 146.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16087. Peanuts, all types, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Peanuts, all types, raw"
+  },
+  {
+    "id": "usda-16090",
+    "name": "Peanuts, dry roasted, salted",
+    "aliases": "groundnut moongphali roasted",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 587.0,
+      "sodium": 410.0,
+      "fibre": 8.4,
+      "protein": 24.35,
+      "fat": 49.66,
+      "carbohydrates": 21.26,
+      "sugar": 4.9,
+      "saturatedFat": 7.723
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 oz (28.35 g)",
+        "baseAmount": 28.35
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 peanut (1 g)",
+        "baseAmount": 1.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16090. Peanuts, all types, dry-roasted, with salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Peanuts, all types, dry-roasted, with salt"
+  },
+  {
+    "id": "usda-16098",
+    "name": "Peanut butter, smooth, salted",
+    "aliases": "peanut spread",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 598.0,
+      "sodium": 426.0,
+      "fibre": 5.0,
+      "protein": 22.21,
+      "fat": 51.36,
+      "carbohydrates": 22.31,
+      "sugar": 10.49,
+      "saturatedFat": 10.325
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "2 tbsp (32 g)",
+        "baseAmount": 32.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup (258 g)",
+        "baseAmount": 258.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 16098. Peanut butter, smooth style, with salt (Includes foods for USDA's Food Distribution Program). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Peanut butter, smooth style, with salt (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "id": "usda-12006",
+    "name": "Chia seeds, dried",
+    "aliases": "chia",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 486.0,
+      "sodium": 16.0,
+      "fibre": 34.4,
+      "protein": 16.54,
+      "fat": 30.74,
+      "carbohydrates": 42.12,
+      "saturatedFat": 3.33
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 oz (28.35 g)",
+        "baseAmount": 28.35
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 12006. Seeds, chia seeds, dried. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Seeds, chia seeds, dried"
+  },
+  {
+    "id": "usda-12220",
+    "name": "Flaxseed",
+    "aliases": "alsi seeds",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 534.0,
+      "sodium": 30.0,
+      "fibre": 27.3,
+      "protein": 18.29,
+      "fat": 42.16,
+      "carbohydrates": 28.88,
+      "sugar": 1.55,
+      "saturatedFat": 3.663
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 tbsp, whole (10.3 g)",
+        "baseAmount": 10.3
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup, whole (168 g)",
+        "baseAmount": 168.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 tbsp, ground (7 g)",
+        "baseAmount": 7.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 tsp, whole (3.4 g)",
+        "baseAmount": 3.4
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 12220. Seeds, flaxseed. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Seeds, flaxseed"
+  },
+  {
+    "id": "usda-09040",
+    "name": "Banana, raw",
+    "aliases": "kela fruit",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 89.0,
+      "sodium": 1.0,
+      "fibre": 2.6,
+      "protein": 1.09,
+      "fat": 0.33,
+      "carbohydrates": 22.84,
+      "sugar": 12.23,
+      "saturatedFat": 0.112
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, mashed (225 g)",
+        "baseAmount": 225.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup, sliced (150 g)",
+        "baseAmount": 150.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 extra small (less than 6\" long) (81 g)",
+        "baseAmount": 81.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 small (6\" to 6-7/8\" long) (101 g)",
+        "baseAmount": 101.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 09040. Bananas, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Bananas, raw"
+  },
+  {
+    "id": "usda-09003",
+    "name": "Apple, raw, with skin",
+    "aliases": "seb apple",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 52.0,
+      "sodium": 1.0,
+      "fibre": 2.4,
+      "protein": 0.26,
+      "fat": 0.17,
+      "carbohydrates": 13.81,
+      "sugar": 10.39,
+      "saturatedFat": 0.028
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, quartered or chopped (125 g)",
+        "baseAmount": 125.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup slices (109 g)",
+        "baseAmount": 109.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 large (3-1/4\" dia) (223 g)",
+        "baseAmount": 223.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 medium (3\" dia) (182 g)",
+        "baseAmount": 182.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 09003. Apples, raw, with skin (Includes foods for USDA's Food Distribution Program). Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)"
+  },
+  {
+    "id": "usda-09200",
+    "name": "Orange, raw",
+    "aliases": "santra orange",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 47.0,
+      "sodium": 0.0,
+      "fibre": 2.4,
+      "protein": 0.94,
+      "fat": 0.12,
+      "carbohydrates": 11.75,
+      "sugar": 9.35,
+      "saturatedFat": 0.015
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, sections (180 g)",
+        "baseAmount": 180.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 large (3-1/16\" dia) (184 g)",
+        "baseAmount": 184.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 small (2-3/8\" dia) (96 g)",
+        "baseAmount": 96.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 fruit (2-5/8\" dia) (131 g)",
+        "baseAmount": 131.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 09200. Oranges, raw, all commercial varieties. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Oranges, raw, all commercial varieties"
+  },
+  {
+    "id": "usda-09176",
+    "name": "Mango, raw",
+    "aliases": "aam mango",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 60.0,
+      "sodium": 1.0,
+      "fibre": 1.6,
+      "protein": 0.82,
+      "fat": 0.38,
+      "carbohydrates": 14.98,
+      "sugar": 13.66,
+      "saturatedFat": 0.092
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup pieces (165 g)",
+        "baseAmount": 165.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 fruit without refuse (336 g)",
+        "baseAmount": 336.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 09176. Mangos, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Mangos, raw"
+  },
+  {
+    "id": "usda-09226",
+    "name": "Papaya, raw",
+    "aliases": "papita",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 43.0,
+      "sodium": 8.0,
+      "fibre": 1.7,
+      "protein": 0.47,
+      "fat": 0.26,
+      "carbohydrates": 10.82,
+      "sugar": 7.82,
+      "saturatedFat": 0.081
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup 1\" pieces (145 g)",
+        "baseAmount": 145.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup, mashed (230 g)",
+        "baseAmount": 230.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 fruit, small (157 g)",
+        "baseAmount": 157.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 fruit, large (781 g)",
+        "baseAmount": 781.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 09226. Papayas, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Papayas, raw"
+  },
+  {
+    "id": "usda-09139",
+    "name": "Guava, raw",
+    "aliases": "amrood",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 68.0,
+      "sodium": 2.0,
+      "fibre": 5.4,
+      "protein": 2.55,
+      "fat": 0.95,
+      "carbohydrates": 14.32,
+      "sugar": 8.92,
+      "saturatedFat": 0.272
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (165 g)",
+        "baseAmount": 165.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 fruit, without refuse (55 g)",
+        "baseAmount": 55.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 09139. Guavas, common, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Guavas, common, raw"
+  },
+  {
+    "id": "usda-09266",
+    "name": "Pineapple, raw",
+    "aliases": "ananas",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 50.0,
+      "sodium": 1.0,
+      "fibre": 1.4,
+      "protein": 0.54,
+      "fat": 0.12,
+      "carbohydrates": 13.12,
+      "sugar": 9.85,
+      "saturatedFat": 0.009
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, chunks (165 g)",
+        "baseAmount": 165.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 fruit (905 g)",
+        "baseAmount": 905.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 slice (4-2/3\" dia x 3/4\" thick) (166 g)",
+        "baseAmount": 166.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 slice (3-1/2\" dia x 3/4\" thick) (84 g)",
+        "baseAmount": 84.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 09266. Pineapple, raw, all varieties. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Pineapple, raw, all varieties"
+  },
+  {
+    "id": "usda-09326",
+    "name": "Watermelon, raw",
+    "aliases": "tarbooz",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 30.0,
+      "sodium": 1.0,
+      "fibre": 0.4,
+      "protein": 0.61,
+      "fat": 0.15,
+      "carbohydrates": 7.55,
+      "sugar": 6.2,
+      "saturatedFat": 0.016
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, balls (154 g)",
+        "baseAmount": 154.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup, diced (152 g)",
+        "baseAmount": 152.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 melon (15\" long x 7-1/2\" dia) (4518 g)",
+        "baseAmount": 4518.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 wedge (approx 1/16 of melon) (286 g)",
+        "baseAmount": 286.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 09326. Watermelon, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Watermelon, raw"
+  },
+  {
+    "id": "usda-09421",
+    "name": "Medjool dates",
+    "aliases": "khajoor",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 277.0,
+      "sodium": 1.0,
+      "fibre": 6.7,
+      "protein": 1.81,
+      "fat": 0.15,
+      "carbohydrates": 74.97,
+      "sugar": 66.47
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 date, pitted (24 g)",
+        "baseAmount": 24.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 09421. Dates, medjool. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Dates, medjool"
+  },
+  {
+    "id": "usda-11365",
+    "name": "Potato, boiled, no salt",
+    "aliases": "aloo cooked",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 87.0,
+      "sodium": 4.0,
+      "fibre": 1.8,
+      "protein": 1.87,
+      "fat": 0.1,
+      "carbohydrates": 20.13,
+      "sugar": 0.91,
+      "saturatedFat": 0.026
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "0.50 cup (78 g)",
+        "baseAmount": 78.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 potato (2-1/2\" dia, sphere) (136 g)",
+        "baseAmount": 136.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11365. Potatoes, boiled, cooked in skin, flesh, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Potatoes, boiled, cooked in skin, flesh, without salt"
+  },
+  {
+    "id": "usda-11352",
+    "name": "Potato, raw, with skin",
+    "aliases": "aloo raw",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 77.0,
+      "sodium": 6.0,
+      "fibre": 2.1,
+      "protein": 2.05,
+      "fat": 0.09,
+      "carbohydrates": 17.49,
+      "sugar": 0.82,
+      "saturatedFat": 0.025
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "0.50 cup, diced (75 g)",
+        "baseAmount": 75.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 Potato large (3\" to 4-1/4\" dia) (369 g)",
+        "baseAmount": 369.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 Potato medium (2-1/4\" to 3-1/4\" dia) (213 g)",
+        "baseAmount": 213.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 Potato small (1-3/4\" to 2-1/2\" dia) (170 g)",
+        "baseAmount": 170.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11352. Potatoes, flesh and skin, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Potatoes, flesh and skin, raw"
+  },
+  {
+    "id": "usda-11510",
+    "name": "Sweet potato, boiled",
+    "aliases": "shakarkandi",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 76.0,
+      "sodium": 27.0,
+      "fibre": 2.5,
+      "protein": 1.37,
+      "fat": 0.14,
+      "carbohydrates": 17.72,
+      "sugar": 5.74,
+      "saturatedFat": 0.031
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, mashed (328 g)",
+        "baseAmount": 328.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 medium (151 g)",
+        "baseAmount": 151.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11510. Sweet potato, cooked, boiled, without skin. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Sweet potato, cooked, boiled, without skin"
+  },
+  {
+    "id": "usda-11457",
+    "name": "Spinach, raw",
+    "aliases": "palak raw",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 23.0,
+      "sodium": 79.0,
+      "fibre": 2.2,
+      "protein": 2.86,
+      "fat": 0.39,
+      "carbohydrates": 3.63,
+      "sugar": 0.42,
+      "saturatedFat": 0.063
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (30 g)",
+        "baseAmount": 30.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 bunch (340 g)",
+        "baseAmount": 340.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 leaf (10 g)",
+        "baseAmount": 10.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 package (10 oz) (284 g)",
+        "baseAmount": 284.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11457. Spinach, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Spinach, raw"
+  },
+  {
+    "id": "usda-11458",
+    "name": "Spinach, boiled, no salt",
+    "aliases": "palak cooked",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 23.0,
+      "sodium": 70.0,
+      "fibre": 2.4,
+      "protein": 2.97,
+      "fat": 0.26,
+      "carbohydrates": 3.75,
+      "sugar": 0.43,
+      "saturatedFat": 0.043
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (180 g)",
+        "baseAmount": 180.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11458. Spinach, cooked, boiled, drained, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Spinach, cooked, boiled, drained, without salt"
+  },
+  {
+    "id": "usda-11090",
+    "name": "Broccoli, raw",
+    "aliases": "broccoli",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 34.0,
+      "sodium": 33.0,
+      "fibre": 2.6,
+      "protein": 2.82,
+      "fat": 0.37,
+      "carbohydrates": 6.64,
+      "sugar": 1.7,
+      "saturatedFat": 0.114
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup chopped (91 g)",
+        "baseAmount": 91.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 bunch (608 g)",
+        "baseAmount": 608.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 spear (about 5\" long) (31 g)",
+        "baseAmount": 31.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 stalk (151 g)",
+        "baseAmount": 151.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11090. Broccoli, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Broccoli, raw"
+  },
+  {
+    "id": "usda-11091",
+    "name": "Broccoli, boiled, no salt",
+    "aliases": "broccoli cooked",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 35.0,
+      "sodium": 41.0,
+      "fibre": 3.3,
+      "protein": 2.38,
+      "fat": 0.41,
+      "carbohydrates": 7.18,
+      "sugar": 1.39,
+      "saturatedFat": 0.079
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "0.50 cup, chopped (78 g)",
+        "baseAmount": 78.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 stalk, large (11\"-12\" long) (280 g)",
+        "baseAmount": 280.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 stalk, medium (7-1/2\" - 8\" long) (180 g)",
+        "baseAmount": 180.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 stalk, small (5\" long) (140 g)",
+        "baseAmount": 140.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11091. Broccoli, cooked, boiled, drained, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Broccoli, cooked, boiled, drained, without salt"
+  },
+  {
+    "id": "usda-11124",
+    "name": "Carrot, raw",
+    "aliases": "gajar",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 41.0,
+      "sodium": 69.0,
+      "fibre": 2.8,
+      "protein": 0.93,
+      "fat": 0.24,
+      "carbohydrates": 9.58,
+      "sugar": 4.74,
+      "saturatedFat": 0.032
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup chopped (128 g)",
+        "baseAmount": 128.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup grated (110 g)",
+        "baseAmount": 110.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 cup strips or slices (122 g)",
+        "baseAmount": 122.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 large (7-1/4\" to 8-/1/2\" long) (72 g)",
+        "baseAmount": 72.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11124. Carrots, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Carrots, raw"
+  },
+  {
+    "id": "usda-11109",
+    "name": "Cabbage, raw",
+    "aliases": "patta gobi",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 25.0,
+      "sodium": 18.0,
+      "fibre": 2.5,
+      "protein": 1.28,
+      "fat": 0.1,
+      "carbohydrates": 5.8,
+      "sugar": 3.2,
+      "saturatedFat": 0.034
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, chopped (89 g)",
+        "baseAmount": 89.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup, shredded (70 g)",
+        "baseAmount": 70.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 head, large (about 7\" dia) (1248 g)",
+        "baseAmount": 1248.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 leaf, large (33 g)",
+        "baseAmount": 33.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11109. Cabbage, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Cabbage, raw"
+  },
+  {
+    "id": "usda-11205",
+    "name": "Cucumber, raw, with peel",
+    "aliases": "kheera",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 15.0,
+      "sodium": 2.0,
+      "fibre": 0.5,
+      "protein": 0.65,
+      "fat": 0.11,
+      "carbohydrates": 3.63,
+      "sugar": 1.67,
+      "saturatedFat": 0.037
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "0.50 cup slices (52 g)",
+        "baseAmount": 52.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cucumber (8-1/4\") (301 g)",
+        "baseAmount": 301.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11205. Cucumber, with peel, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Cucumber, with peel, raw"
+  },
+  {
+    "id": "usda-11282",
+    "name": "Onion, raw",
+    "aliases": "pyaz",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 40.0,
+      "sodium": 4.0,
+      "fibre": 1.7,
+      "protein": 1.1,
+      "fat": 0.1,
+      "carbohydrates": 9.34,
+      "sugar": 4.24,
+      "saturatedFat": 0.042
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup, chopped (160 g)",
+        "baseAmount": 160.0
+      },
+      {
+        "id": "usda-portion-10",
+        "title": "10 rings (60 g)",
+        "baseAmount": 60.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 cup, sliced (115 g)",
+        "baseAmount": 115.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 tbsp chopped (10 g)",
+        "baseAmount": 10.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11282. Onions, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Onions, raw"
+  },
+  {
+    "id": "usda-11529",
+    "name": "Tomato, raw",
+    "aliases": "tamatar",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 18.0,
+      "sodium": 5.0,
+      "fibre": 1.2,
+      "protein": 0.88,
+      "fat": 0.2,
+      "carbohydrates": 3.89,
+      "sugar": 2.63,
+      "saturatedFat": 0.028
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup cherry tomatoes (149 g)",
+        "baseAmount": 149.0
+      },
+      {
+        "id": "usda-portion-10",
+        "title": "1 slice, thick/large (1/2\" thick) (27 g)",
+        "baseAmount": 27.0
+      },
+      {
+        "id": "usda-portion-11",
+        "title": "1 wedge (1/4 of medium tomato) (31 g)",
+        "baseAmount": 31.0
+      },
+      {
+        "id": "usda-portion-12",
+        "title": "1 slice, thin/small (15 g)",
+        "baseAmount": 15.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11529. Tomatoes, red, ripe, raw, year round average. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Tomatoes, red, ripe, raw, year round average"
+  },
+  {
+    "id": "usda-11305",
+    "name": "Green peas, boiled, no salt",
+    "aliases": "matar cooked",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 84.0,
+      "sodium": 3.0,
+      "fibre": 5.5,
+      "protein": 5.36,
+      "fat": 0.22,
+      "carbohydrates": 15.63,
+      "sugar": 5.93,
+      "saturatedFat": 0.039
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (160 g)",
+        "baseAmount": 160.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11305. Peas, green, cooked, boiled, drained, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Peas, green, cooked, boiled, drained, without salt"
+  },
+  {
+    "id": "usda-11136",
+    "name": "Cauliflower, boiled, no salt",
+    "aliases": "gobi cooked",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 23.0,
+      "sodium": 15.0,
+      "fibre": 2.3,
+      "protein": 1.84,
+      "fat": 0.45,
+      "carbohydrates": 4.11,
+      "sugar": 2.08,
+      "saturatedFat": 0.07
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "0.50 cup (1\" pieces) (62 g)",
+        "baseAmount": 62.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "3 flowerets (54 g)",
+        "baseAmount": 54.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11136. Cauliflower, cooked, boiled, drained, without salt. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Cauliflower, cooked, boiled, drained, without salt"
+  },
+  {
+    "id": "usda-11135",
+    "name": "Cauliflower, raw",
+    "aliases": "gobi raw",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 25.0,
+      "sodium": 30.0,
+      "fibre": 2.0,
+      "protein": 1.92,
+      "fat": 0.28,
+      "carbohydrates": 4.97,
+      "sugar": 1.91,
+      "saturatedFat": 0.13
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup chopped (1/2\" pieces) (107 g)",
+        "baseAmount": 107.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 floweret (13 g)",
+        "baseAmount": 13.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 head large (6-7\" dia.) (840 g)",
+        "baseAmount": 840.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 head medium (5-6\" dia.) (588 g)",
+        "baseAmount": 588.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11135. Cauliflower, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Cauliflower, raw"
+  },
+  {
+    "id": "usda-11043",
+    "name": "Mung bean sprouts, raw",
+    "aliases": "moong sprouts",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 30.0,
+      "sodium": 6.0,
+      "fibre": 1.8,
+      "protein": 3.04,
+      "fat": 0.18,
+      "carbohydrates": 5.94,
+      "sugar": 4.13,
+      "saturatedFat": 0.046
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (104 g)",
+        "baseAmount": 104.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 package (12 oz) (340 g)",
+        "baseAmount": 340.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 11043. Mung beans, mature seeds, sprouted, raw. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Mung beans, mature seeds, sprouted, raw"
+  },
+  {
+    "id": "usda-19335",
+    "name": "White sugar",
+    "aliases": "chini",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 387.0,
+      "sodium": 1.0,
+      "fibre": 0.0,
+      "protein": 0.0,
+      "fat": 0.0,
+      "carbohydrates": 99.98,
+      "sugar": 99.8,
+      "saturatedFat": 0.0
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 serving packet (2.8 g)",
+        "baseAmount": 2.8
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tsp (4.2 g)",
+        "baseAmount": 4.2
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 cup (200 g)",
+        "baseAmount": 200.0
+      },
+      {
+        "id": "usda-portion-4",
+        "title": "1 serving 1 cube (2.3 g)",
+        "baseAmount": 2.3
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 19335. Sugars, granulated. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Sugars, granulated"
+  },
+  {
+    "id": "usda-19296",
+    "name": "Honey",
+    "aliases": "shahad",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 304.0,
+      "sodium": 4.0,
+      "fibre": 0.2,
+      "protein": 0.3,
+      "fat": 0.0,
+      "carbohydrates": 82.4,
+      "sugar": 82.12,
+      "saturatedFat": 0.0
+    },
+    "servings": [
+      {
+        "id": "usda-portion-1",
+        "title": "1 cup (339 g)",
+        "baseAmount": 339.0
+      },
+      {
+        "id": "usda-portion-2",
+        "title": "1 tbsp (21 g)",
+        "baseAmount": 21.0
+      },
+      {
+        "id": "usda-portion-3",
+        "title": "1 packet (0.5 oz) (14 g)",
+        "baseAmount": 14.0
+      }
+    ],
+    "source": "reference",
+    "sourceDetail": "USDA SR Legacy, April 2018. NDB 19296. Honey. Generic reference composition; choose the matching preparation and check current package labels.",
+    "sourceURL": "https://fdc.nal.usda.gov/",
+    "incomplete": [],
+    "estimated": false,
+    "preparation": "Honey"
+  },
+  {
+    "id": "label-amul-paneer",
+    "name": "Amul Fresh Paneer (published reference)",
+    "aliases": "paneer cottage cheese",
+    "brand": "Amul / Dudhsagar Dairy",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 312,
+      "protein": 20,
+      "carbohydrates": 4,
+      "fat": 24,
+      "sugar": 0,
+      "saturatedFat": 14.4,
+      "sodium": 24
+    },
+    "servings": [],
+    "source": "label",
+    "sourceDetail": "Published approximate composition per 100 g from Dudhsagar Dairy, checked 24 Oct 2026. Verify your current pack; this does not describe every paneer.",
+    "sourceURL": "https://dudhsagardairy.coop/dairy/products/amul-fresh-paneer/",
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Brand-specific published paneer composition."
+  },
+  {
+    "id": "estimate-roti",
+    "name": "Homemade roti, no oil (estimate)",
+    "aliases": "phulka chapati",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 226.66666666666666,
+      "protein": 8.806666666666667,
+      "carbohydrates": 47.98,
+      "fat": 1.6666666666666667,
+      "fibre": 7.133333333333334,
+      "sugar": 0.2733333333333333,
+      "saturatedFat": 0.2866666666666667
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 piece (~45 g)",
+        "baseAmount": 45
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "One roti: 30 g atta; finished weight 45 g including water. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "One roti: 30 g atta; finished weight 45 g including water."
+  },
+  {
+    "id": "estimate-paratha",
+    "name": "Plain paratha (estimate)",
+    "aliases": "parantha",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 243.66666666666663,
+      "protein": 6.605,
+      "carbohydrates": 35.985,
+      "fat": 9.583333333333334,
+      "fibre": 5.35,
+      "sugar": 0.205,
+      "saturatedFat": 1.0566666666666666
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 piece (~60 g)",
+        "baseAmount": 60
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "One paratha: 30 g atta and 5 g oil; finished weight 60 g. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "One paratha: 30 g atta and 5 g oil; finished weight 60 g."
+  },
+  {
+    "id": "estimate-idli",
+    "name": "Plain idli (estimate)",
+    "aliases": "idly steamed",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 143.6,
+      "protein": 4.66,
+      "carbohydrates": 29.883999999999997,
+      "fat": 0.362,
+      "fibre": 2.22,
+      "saturatedFat": 0.0654
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 idli (~41.6667 g)",
+        "baseAmount": 41.666666666666664
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "Batch: 75 g raw rice and 25 g dry urad; assumed finished yield 250 g / 6 idlis. Fermentation changes are not modeled. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Batch: 75 g raw rice and 25 g dry urad; assumed finished yield 250 g / 6 idlis. Fermentation changes are not modeled."
+  },
+  {
+    "id": "estimate-dosa",
+    "name": "Plain dosa (estimate)",
+    "aliases": "dosai",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 149.13333333333333,
+      "protein": 3.8833333333333333,
+      "carbohydrates": 24.90333333333333,
+      "fat": 3.635,
+      "fibre": 1.85,
+      "saturatedFat": 0.39116666666666666
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 dosa (~100 g)",
+        "baseAmount": 100
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "Batch: 75 g raw rice, 25 g dry urad and 10 g oil; assumed finished yield 300 g / 3 dosas. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Batch: 75 g raw rice, 25 g dry urad and 10 g oil; assumed finished yield 300 g / 3 dosas."
+  },
+  {
+    "id": "estimate-poha",
+    "name": "Vegetable poha (estimate)",
+    "aliases": "kanda pohe flattened rice",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 152.09375,
+      "protein": 3.3962499999999998,
+      "carbohydrates": 23.6128125,
+      "fat": 4.86875,
+      "fibre": 1.490625,
+      "sugar": 1.44875,
+      "saturatedFat": 0.56696875
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 bowl (~160 g)",
+        "baseAmount": 160
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "Bowl: rice-equivalent composition for 40 g dry flakes, 20 g onion, 20 g peas, 5 g oil and 5 g peanuts; assumed finished yield 160 g. Flake composition is approximated by raw white rice. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Bowl: rice-equivalent composition for 40 g dry flakes, 20 g onion, 20 g peas, 5 g oil and 5 g peanuts; assumed finished yield 160 g. Flake composition is approximated by raw white rice."
+  },
+  {
+    "id": "estimate-upma",
+    "name": "Vegetable upma (estimate)",
+    "aliases": "rava sooji suji",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 112.65,
+      "protein": 3.3215,
+      "carbohydrates": 18.5,
+      "fat": 2.778,
+      "fibre": 1.9200000000000004,
+      "saturatedFat": 0.2954
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 bowl (~200 g)",
+        "baseAmount": 200
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "Bowl: 40 g semolina, 30 g carrot, 20 g peas, 20 g onion and 5 g oil; finished yield 200 g. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Bowl: 40 g semolina, 30 g carrot, 20 g peas, 20 g onion and 5 g oil; finished yield 200 g."
+  },
+  {
+    "id": "estimate-dal",
+    "name": "Plain dal with tadka (estimate)",
+    "aliases": "toor arhar cooked lentil",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 95.71,
+      "protein": 4.537,
+      "carbohydrates": 15.9685,
+      "fat": 1.7719999999999998,
+      "fibre": 4.5600000000000005,
+      "saturatedFat": 0.21035
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 bowl (~200 g)",
+        "baseAmount": 200
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "Bowl: 130 g boiled pigeon peas, 20 g tomato, 10 g onion and 3 g oil; finished yield 200 g. Added salt is not included. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Bowl: 130 g boiled pigeon peas, 20 g tomato, 10 g onion and 3 g oil; finished yield 200 g. Added salt is not included."
+  },
+  {
+    "id": "estimate-rajma",
+    "name": "Rajma masala (estimate)",
+    "aliases": "kidney bean curry",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 108.175,
+      "protein": 5.66075,
+      "carbohydrates": 15.7675,
+      "fat": 2.8525,
+      "fibre": 4.975,
+      "sugar": 1.0185,
+      "saturatedFat": 0.3059
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 bowl (~200 g)",
+        "baseAmount": 200
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "Bowl: 125 g boiled kidney beans, 30 g tomato, 20 g onion and 5 g oil; finished yield 200 g. Added salt is not included. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Bowl: 125 g boiled kidney beans, 30 g tomato, 20 g onion and 5 g oil; finished yield 200 g. Added salt is not included."
+  },
+  {
+    "id": "estimate-chole",
+    "name": "Chole masala (estimate)",
+    "aliases": "chana chickpea curry",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 131.3,
+      "protein": 5.7795,
+      "carbohydrates": 18.655,
+      "fat": 4.1587499999999995,
+      "fibre": 5.1,
+      "sugar": 3.8185000000000002,
+      "saturatedFat": 0.429025
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 bowl (~200 g)",
+        "baseAmount": 200
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "Bowl: 125 g boiled chickpeas, 30 g tomato, 20 g onion and 5 g oil; finished yield 200 g. Added salt is not included. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Bowl: 125 g boiled chickpeas, 30 g tomato, 20 g onion and 5 g oil; finished yield 200 g. Added salt is not included."
+  },
+  {
+    "id": "estimate-khichdi",
+    "name": "Vegetable khichdi (estimate)",
+    "aliases": "khichadi rice dal",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 86.97714285714285,
+      "protein": 3.076857142857143,
+      "carbohydrates": 16.316857142857145,
+      "fat": 1.064,
+      "fibre": 2.2657142857142856,
+      "sugar": 1.9151428571428573,
+      "saturatedFat": 0.13717142857142856
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 bowl (~250 g)",
+        "baseAmount": 250
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "Batch: 40 g raw rice, 20 g dry moong, 50 g carrot, 50 g peas and 3 g oil; assumed finished yield 350 g. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Batch: 40 g raw rice, 20 g dry moong, 50 g carrot, 50 g peas and 3 g oil; assumed finished yield 350 g."
+  },
+  {
+    "id": "estimate-sabzi",
+    "name": "Mixed vegetable sabzi (estimate)",
+    "aliases": "sabji curry",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 58.954545454545446,
+      "protein": 2.265909090909091,
+      "carbohydrates": 7.597727272727273,
+      "fat": 2.581818181818182,
+      "fibre": 2.931818181818181,
+      "sugar": 3.3704545454545456,
+      "saturatedFat": 0.2775
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 bowl (~150 g)",
+        "baseAmount": 150
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "Batch: 100 g boiled cauliflower, 50 g carrot, 50 g peas and 5 g oil; finished yield 220 g. Added salt is not included. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Batch: 100 g boiled cauliflower, 50 g carrot, 50 g peas and 5 g oil; finished yield 220 g. Added salt is not included."
+  },
+  {
+    "id": "estimate-paneer-rice",
+    "name": "Paneer rice bowl (estimate)",
+    "aliases": "paneer chawal",
+    "brand": "",
+    "baseQuantity": 100,
+    "baseUnit": "g",
+    "values": {
+      "calories": 179.35211267605635,
+      "protein": 7.280281690140845,
+      "carbohydrates": 18.346478873239437,
+      "fat": 8.36056338028169,
+      "sugar": 0.695774647887324,
+      "saturatedFat": 4.246478873239437
+    },
+    "servings": [
+      {
+        "id": "dish-serving",
+        "title": "1 bowl (~355 g)",
+        "baseAmount": 355
+      }
+    ],
+    "source": "estimate",
+    "sourceDetail": "Bowl: 200 g cooked white rice, 100 g published-reference Amul paneer, 50 g carrot and 5 g oil. Brand and recipe may vary. Calculated from the named reference ingredients and assumed finished yield. Cooking, water, salt and oil change actual values; correct your portion or save your own recipe.",
+    "sourceURL": null,
+    "incomplete": [],
+    "estimated": true,
+    "preparation": "Bowl: 200 g cooked white rice, 100 g published-reference Amul paneer, 50 g carrot and 5 g oil. Brand and recipe may vary."
+  }
+]

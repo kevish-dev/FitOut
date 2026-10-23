@@ -1,0 +1,142 @@
+exercise_id,exercise_name,asset_name,suggested_filename
+bench,Bench press,exercise-bench,exercise-bench.png
+row,Dumbbell row,exercise-row,exercise-row.png
+squat,Squat,exercise-squat,exercise-squat.png
+rdl,Romanian deadlift,exercise-rdl,exercise-rdl.png
+press,Overhead press,exercise-press,exercise-press.png
+pulldown,Lat pulldown,exercise-pulldown,exercise-pulldown.png
+curl,Biceps curl,exercise-curl,exercise-curl.png
+extension,Triceps pushdown,exercise-extension,exercise-extension.png
+raise,Lateral raise,exercise-raise,exercise-raise.png
+calf,Calf raise,exercise-calf,exercise-calf.png
+pushup,Push-up,exercise-pushup,exercise-pushup.png
+plank,Plank,exercise-plank,exercise-plank.png
+walk,Walking,exercise-walk,exercise-walk.png
+incline-barbell-bench,Incline barbell bench press,exercise-incline-barbell-bench,exercise-incline-barbell-bench.png
+dumbbell-bench,Dumbbell bench press,exercise-dumbbell-bench,exercise-dumbbell-bench.png
+incline-dumbbell-bench,Incline dumbbell bench press,exercise-incline-dumbbell-bench,exercise-incline-dumbbell-bench.png
+decline-bench,Decline bench press,exercise-decline-bench,exercise-decline-bench.png
+dumbbell-floor-press,Dumbbell floor press,exercise-dumbbell-floor-press,exercise-dumbbell-floor-press.png
+machine-chest-press,Machine chest press,exercise-machine-chest-press,exercise-machine-chest-press.png
+dumbbell-fly,Dumbbell chest fly,exercise-dumbbell-fly,exercise-dumbbell-fly.png
+cable-fly,Cable chest fly,exercise-cable-fly,exercise-cable-fly.png
+pec-deck,Pec deck fly,exercise-pec-deck,exercise-pec-deck.png
+chest-dip,Chest dip,exercise-chest-dip,exercise-chest-dip.png
+incline-pushup,Incline push-up,exercise-incline-pushup,exercise-incline-pushup.png
+decline-pushup,Decline push-up,exercise-decline-pushup,exercise-decline-pushup.png
+diamond-pushup,Diamond push-up,exercise-diamond-pushup,exercise-diamond-pushup.png
+barbell-row,Barbell row,exercise-barbell-row,exercise-barbell-row.png
+seated-cable-row,Seated cable row,exercise-seated-cable-row,exercise-seated-cable-row.png
+chest-supported-row,Chest-supported dumbbell row,exercise-chest-supported-row,exercise-chest-supported-row.png
+t-bar-row,T-bar row,exercise-t-bar-row,exercise-t-bar-row.png
+machine-row,Machine row,exercise-machine-row,exercise-machine-row.png
+pullup,Pull-up,exercise-pullup,exercise-pullup.png
+chinup,Chin-up,exercise-chinup,exercise-chinup.png
+assisted-pullup,Assisted pull-up,exercise-assisted-pullup,exercise-assisted-pullup.png
+inverted-row,Inverted row,exercise-inverted-row,exercise-inverted-row.png
+straight-arm-pulldown,Straight-arm pulldown,exercise-straight-arm-pulldown,exercise-straight-arm-pulldown.png
+dumbbell-pullover,Dumbbell pullover,exercise-dumbbell-pullover,exercise-dumbbell-pullover.png
+face-pull,Face pull,exercise-face-pull,exercise-face-pull.png
+dumbbell-shrug,Dumbbell shrug,exercise-dumbbell-shrug,exercise-dumbbell-shrug.png
+barbell-shrug,Barbell shrug,exercise-barbell-shrug,exercise-barbell-shrug.png
+back-extension,Back extension,exercise-back-extension,exercise-back-extension.png
+barbell-overhead-press,Barbell overhead press,exercise-barbell-overhead-press,exercise-barbell-overhead-press.png
+seated-dumbbell-press,Seated dumbbell shoulder press,exercise-seated-dumbbell-press,exercise-seated-dumbbell-press.png
+arnold-press,Arnold press,exercise-arnold-press,exercise-arnold-press.png
+machine-shoulder-press,Machine shoulder press,exercise-machine-shoulder-press,exercise-machine-shoulder-press.png
+cable-lateral-raise,Cable lateral raise,exercise-cable-lateral-raise,exercise-cable-lateral-raise.png
+front-raise,Dumbbell front raise,exercise-front-raise,exercise-front-raise.png
+rear-delt-fly,Dumbbell rear delt fly,exercise-rear-delt-fly,exercise-rear-delt-fly.png
+reverse-pec-deck,Reverse pec deck,exercise-reverse-pec-deck,exercise-reverse-pec-deck.png
+landmine-press,Landmine press,exercise-landmine-press,exercise-landmine-press.png
+pike-pushup,Pike push-up,exercise-pike-pushup,exercise-pike-pushup.png
+barbell-curl,Barbell curl,exercise-barbell-curl,exercise-barbell-curl.png
+ez-bar-curl,EZ-bar curl,exercise-ez-bar-curl,exercise-ez-bar-curl.png
+hammer-curl,Hammer curl,exercise-hammer-curl,exercise-hammer-curl.png
+incline-curl,Incline dumbbell curl,exercise-incline-curl,exercise-incline-curl.png
+preacher-curl,Preacher curl,exercise-preacher-curl,exercise-preacher-curl.png
+concentration-curl,Concentration curl,exercise-concentration-curl,exercise-concentration-curl.png
+cable-curl,Cable curl,exercise-cable-curl,exercise-cable-curl.png
+reverse-curl,Reverse curl,exercise-reverse-curl,exercise-reverse-curl.png
+overhead-triceps-extension,Dumbbell overhead triceps extension,exercise-overhead-triceps-extension,exercise-overhead-triceps-extension.png
+cable-overhead-extension,Cable overhead triceps extension,exercise-cable-overhead-extension,exercise-cable-overhead-extension.png
+skull-crusher,Lying triceps extension,exercise-skull-crusher,exercise-skull-crusher.png
+triceps-kickback,Dumbbell triceps kickback,exercise-triceps-kickback,exercise-triceps-kickback.png
+close-grip-bench,Close-grip bench press,exercise-close-grip-bench,exercise-close-grip-bench.png
+assisted-dip,Assisted dip,exercise-assisted-dip,exercise-assisted-dip.png
+wrist-curl,Wrist curl,exercise-wrist-curl,exercise-wrist-curl.png
+reverse-wrist-curl,Reverse wrist curl,exercise-reverse-wrist-curl,exercise-reverse-wrist-curl.png
+farmer-carry,Farmer carry,exercise-farmer-carry,exercise-farmer-carry.png
+dead-hang,Dead hang,exercise-dead-hang,exercise-dead-hang.png
+front-squat,Front squat,exercise-front-squat,exercise-front-squat.png
+goblet-squat,Goblet squat,exercise-goblet-squat,exercise-goblet-squat.png
+bodyweight-squat,Bodyweight squat,exercise-bodyweight-squat,exercise-bodyweight-squat.png
+sumo-squat,Dumbbell sumo squat,exercise-sumo-squat,exercise-sumo-squat.png
+smith-squat,Smith machine squat,exercise-smith-squat,exercise-smith-squat.png
+hack-squat,Hack squat,exercise-hack-squat,exercise-hack-squat.png
+leg-press,Leg press,exercise-leg-press,exercise-leg-press.png
+leg-extension,Leg extension,exercise-leg-extension,exercise-leg-extension.png
+lunge,Dumbbell lunge,exercise-lunge,exercise-lunge.png
+reverse-lunge,Reverse lunge,exercise-reverse-lunge,exercise-reverse-lunge.png
+walking-lunge,Walking dumbbell lunge,exercise-walking-lunge,exercise-walking-lunge.png
+bulgarian-split-squat,Bulgarian split squat,exercise-bulgarian-split-squat,exercise-bulgarian-split-squat.png
+split-squat,Split squat,exercise-split-squat,exercise-split-squat.png
+step-up,Dumbbell step-up,exercise-step-up,exercise-step-up.png
+lateral-lunge,Lateral lunge,exercise-lateral-lunge,exercise-lateral-lunge.png
+deadlift,Barbell deadlift,exercise-deadlift,exercise-deadlift.png
+sumo-deadlift,Sumo deadlift,exercise-sumo-deadlift,exercise-sumo-deadlift.png
+trap-bar-deadlift,Trap-bar deadlift,exercise-trap-bar-deadlift,exercise-trap-bar-deadlift.png
+dumbbell-rdl,Dumbbell Romanian deadlift,exercise-dumbbell-rdl,exercise-dumbbell-rdl.png
+single-leg-rdl,Single-leg Romanian deadlift,exercise-single-leg-rdl,exercise-single-leg-rdl.png
+lying-leg-curl,Lying leg curl,exercise-lying-leg-curl,exercise-lying-leg-curl.png
+seated-leg-curl,Seated leg curl,exercise-seated-leg-curl,exercise-seated-leg-curl.png
+hip-thrust,Barbell hip thrust,exercise-hip-thrust,exercise-hip-thrust.png
+glute-bridge,Glute bridge,exercise-glute-bridge,exercise-glute-bridge.png
+cable-glute-kickback,Cable glute kickback,exercise-cable-glute-kickback,exercise-cable-glute-kickback.png
+hip-abduction,Machine hip abduction,exercise-hip-abduction,exercise-hip-abduction.png
+seated-calf-raise,Seated calf raise,exercise-seated-calf-raise,exercise-seated-calf-raise.png
+standing-calf-machine,Standing machine calf raise,exercise-standing-calf-machine,exercise-standing-calf-machine.png
+single-leg-calf-raise,Single-leg calf raise,exercise-single-leg-calf-raise,exercise-single-leg-calf-raise.png
+kettlebell-swing,Kettlebell swing,exercise-kettlebell-swing,exercise-kettlebell-swing.png
+crunch,Crunch,exercise-crunch,exercise-crunch.png
+bicycle-crunch,Bicycle crunch,exercise-bicycle-crunch,exercise-bicycle-crunch.png
+reverse-crunch,Reverse crunch,exercise-reverse-crunch,exercise-reverse-crunch.png
+hanging-knee-raise,Hanging knee raise,exercise-hanging-knee-raise,exercise-hanging-knee-raise.png
+lying-leg-raise,Lying leg raise,exercise-lying-leg-raise,exercise-lying-leg-raise.png
+dead-bug,Dead bug,exercise-dead-bug,exercise-dead-bug.png
+bird-dog,Bird dog,exercise-bird-dog,exercise-bird-dog.png
+russian-twist,Russian twist,exercise-russian-twist,exercise-russian-twist.png
+cable-crunch,Cable crunch,exercise-cable-crunch,exercise-cable-crunch.png
+cable-woodchop,Cable woodchop,exercise-cable-woodchop,exercise-cable-woodchop.png
+ab-wheel,Ab wheel rollout,exercise-ab-wheel,exercise-ab-wheel.png
+side-plank,Side plank,exercise-side-plank,exercise-side-plank.png
+hollow-hold,Hollow body hold,exercise-hollow-hold,exercise-hollow-hold.png
+pallof-press,Pallof press,exercise-pallof-press,exercise-pallof-press.png
+mountain-climber,Mountain climber,exercise-mountain-climber,exercise-mountain-climber.png
+superman,Superman hold,exercise-superman,exercise-superman.png
+running,Running,exercise-running,exercise-running.png
+treadmill,Treadmill walk / run,exercise-treadmill,exercise-treadmill.png
+cycling,Cycling,exercise-cycling,exercise-cycling.png
+stationary-bike,Stationary bike,exercise-stationary-bike,exercise-stationary-bike.png
+rowing-erg,Rowing machine,exercise-rowing-erg,exercise-rowing-erg.png
+elliptical,Elliptical trainer,exercise-elliptical,exercise-elliptical.png
+stair-climber,Stair climber,exercise-stair-climber,exercise-stair-climber.png
+jump-rope,Jump rope,exercise-jump-rope,exercise-jump-rope.png
+jumping-jack,Jumping jacks,exercise-jumping-jack,exercise-jumping-jack.png
+burpee,Burpee,exercise-burpee,exercise-burpee.png
+battle-rope,Battle ropes,exercise-battle-rope,exercise-battle-rope.png
+swimming,Swimming,exercise-swimming,exercise-swimming.png
+cat-cow,Cat-cow,exercise-cat-cow,exercise-cat-cow.png
+thoracic-rotation,Side-lying thoracic rotation,exercise-thoracic-rotation,exercise-thoracic-rotation.png
+hip-90-90,90/90 hip switches,exercise-hip-90-90,exercise-hip-90-90.png
+ankle-rock,Knee-to-wall ankle rocks,exercise-ankle-rock,exercise-ankle-rock.png
+band-pull-apart,Band pull-apart,exercise-band-pull-apart,exercise-band-pull-apart.png
+band-row,Resistance band row,exercise-band-row,exercise-band-row.png
+band-chest-press,Resistance band chest press,exercise-band-chest-press,exercise-band-chest-press.png
+hip-flexor-stretch,Kneeling hip flexor stretch,exercise-hip-flexor-stretch,exercise-hip-flexor-stretch.png
+hamstring-stretch,Seated hamstring stretch,exercise-hamstring-stretch,exercise-hamstring-stretch.png
+quad-stretch,Standing quad stretch,exercise-quad-stretch,exercise-quad-stretch.png
+calf-stretch,Standing calf stretch,exercise-calf-stretch,exercise-calf-stretch.png
+glute-stretch,Figure-four glute stretch,exercise-glute-stretch,exercise-glute-stretch.png
+chest-stretch,Doorway chest stretch,exercise-chest-stretch,exercise-chest-stretch.png
+child-pose,Child's pose,exercise-child-pose,exercise-child-pose.png

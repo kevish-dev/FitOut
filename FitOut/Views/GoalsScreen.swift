@@ -16,7 +16,7 @@ struct GoalsScreen: View {
             }
             if profile.goals.isEmpty {
                 Text("Choose at least one goal to continue.")
-                    .font(.system(size: 13))
+                    .font(FitTheme.body(13))
                     .foregroundStyle(FitTheme.orange)
                     .padding(.top, 18)
             }
@@ -33,7 +33,7 @@ struct GoalsScreen: View {
                 Image(systemName: goal.symbol)
                     .font(.system(size: 21 * scale, weight: .semibold))
                 Text(goal.title)
-                    .font(.system(size: 13 * scale, weight: .semibold))
+                    .font(FitTheme.button(13 * scale))
                     .lineLimit(1).minimumScaleFactor(0.75)
                     .layoutPriority(1)
             }
