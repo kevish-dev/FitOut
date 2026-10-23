@@ -25,6 +25,9 @@ struct WorkoutSet: Identifiable, Codable, Equatable {
             && (targetRepMax == nil || (1...100).contains(targetRepMax!))
             && (plannedTarget == nil || plannedTarget!.isValid)
     }
+    func nextWorkingSet() -> WorkoutSet {
+        WorkoutSet(reps: reps, loadKG: loadKG, seconds: seconds, distanceMeters: distanceMeters)
+    }
 }
 struct WorkoutEntry: Identifiable, Codable, Equatable {
     var id = UUID()
@@ -54,5 +57,25 @@ struct WorkoutSession: Identifiable, Codable, Equatable {
         entries.filter { $0.exercise.kind == .weighted }.flatMap(\.sets)
             .filter { $0.completedAt != nil && $0.type != .warmup && $0.isValid }
             .reduce(0) { $0 + $1.loadKG * Double($1.reps) }
+    }
+}
+
+extension WorkoutSession {
+    var remainingSetCount: Int {
+        entries.filter { !$0.skipped }.flatMap(\.sets).filter { $0.completedAt == nil }.count
+    }
+    // Skipped, unlogged sets are not a goal; previously logged sets stay counted.
+    var trackedSetCount: Int { completedSets.count + remainingSetCount }
+    var setProgress: Double { trackedSetCount == 0 ? 0 : Double(completedSets.count) / Double(trackedSetCount) }
+    func restRemaining(at now: Date) -> TimeInterval {
+        guard let restUntil else { return 0 }
+        return max(0, restUntil.timeIntervalSince(status == .paused ? pausedAt ?? now : now))
+    }
+    var currentRestDuration: TimeInterval {
+        let logged = entries.flatMap { entry in entry.sets.compactMap { set -> (Date, Int)? in
+            guard let date = set.completedAt else { return nil }
+            return (date, set.restSeconds ?? entry.restSeconds)
+        } }
+        return Double(logged.max { $0.0 < $1.0 }?.1 ?? 0)
     }
 }

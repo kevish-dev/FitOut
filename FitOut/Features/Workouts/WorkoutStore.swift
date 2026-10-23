@@ -30,7 +30,19 @@ import Observation
         mutation(&session); return save(session)
     }
     func pause(now: Date = .now) { guard active?.status == .inProgress else { return }; update { $0.status = .paused; $0.pausedAt = now } }
-    func resume(now: Date = .now) { guard active?.status == .paused else { return }; update { if let pause = $0.pausedAt { $0.pausedSeconds += max(0, now.timeIntervalSince(pause)) }; $0.pausedAt = nil; $0.status = .inProgress } }
+    func resume(now: Date = .now) {
+        guard active?.status == .paused else { return }
+        update {
+            if let pause = $0.pausedAt {
+                let elapsed = max(0, now.timeIntervalSince(pause))
+                $0.pausedSeconds += elapsed
+                if let deadline = $0.restUntil {
+                    $0.restUntil = deadline > pause ? deadline.addingTimeInterval(elapsed) : nil
+                }
+            }
+            $0.pausedAt = nil; $0.status = .inProgress
+        }
+    }
     @discardableResult func finish(_ status: SessionStatus, now: Date = .now) -> Bool {
         guard [.completed, .skipped, .abandoned].contains(status), let active else { return false }
         if status == .completed && active.completedSets.isEmpty { error = "Complete at least one set, or mark the workout skipped or abandoned."; return false }
@@ -39,7 +51,13 @@ import Observation
             $0.pausedAt = nil; $0.endedAt = now; $0.status = status; $0.restUntil = nil
         }
     }
-    func add(_ exercise: ExerciseDefinition) { update { $0.entries.append(WorkoutEntry(exercise: exercise, sets: [WorkoutSet()])) } }
+    func add(_ exercise: ExerciseDefinition) { add([exercise]) }
+    @discardableResult func add(_ exercises: [ExerciseDefinition]) -> Bool {
+        guard !exercises.isEmpty else { return false }
+        return update { session in
+            session.entries.append(contentsOf: exercises.map { WorkoutEntry(exercise: $0, sets: [WorkoutSet()]) })
+        }
+    }
     func replace(entryID: UUID, with exercise: ExerciseDefinition) {
         guard let entry = active?.entries.first(where: { $0.id == entryID }), !entry.sets.contains(where: { $0.completedAt != nil }) else { error = "This exercise has logged sets. Add the alternative as a new exercise to preserve them."; return }
         update { session in if let i = session.entries.firstIndex(where: { $0.id == entryID }) { session.entries[i] = WorkoutEntry(exercise: exercise, sets: [WorkoutSet()]) } }

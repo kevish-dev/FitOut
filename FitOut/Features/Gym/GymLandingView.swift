@@ -195,19 +195,11 @@ struct GymView: View {
 
     private var quickActions: some View {
         VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
-            HStack {
-                Text("Your training toolkit").font(FitTheme.section(19))
-                Spacer(minLength: 8)
-                Button { startWorkout() } label: {
-                    Image(systemName: workouts.active == nil ? "plus" : "play.fill")
-                        .font(.system(size: 16, weight: .semibold))
-                        .frame(width: 44, height: 44)
-                        .dashboardGlass(in: Circle(), interactive: true)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(workouts.active == nil ? "Start freestyle workout" : "Resume workout")
+            Text("Your training toolkit").font(FitTheme.section(19))
+            Button { startWorkout() } label: { QuickWorkoutLaunchCard(active: workouts.active) }
+                .buttonStyle(RoutineEditorPressStyle())
+                .accessibilityLabel(workouts.active == nil ? "Start quick workout" : "Resume workout")
                 .accessibilityIdentifier("startQuickWorkout")
-            }
             LazyVGrid(columns: [GridItem(.flexible(), spacing: FitTheme.sectionSpacing), GridItem(.flexible(), spacing: FitTheme.sectionSpacing)], spacing: FitTheme.sectionSpacing) {
                 Button { openPlan() } label: { GymShortcut(title: "Weekly plan", detail: "Shape your week", symbol: "calendar") }
                     .accessibilityIdentifier("gymWeeklyPlan")

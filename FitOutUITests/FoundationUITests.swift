@@ -164,7 +164,12 @@ final class FoundationUITests: XCTestCase {
         app.buttons["startQuickWorkout"].tap()
         XCTAssertTrue(app.navigationBars["Workout"].waitForExistence(timeout: 5))
         app.buttons["workoutAddExercise"].tap()
-        app.buttons["Bench press"].tap()
+        let search = app.textFields["exerciseSearch"]
+        XCTAssertTrue(search.waitForExistence(timeout: 3))
+        search.tap(); search.typeText("Bench press")
+        app.buttons["pickExercise-bench"].tap()
+        app.buttons["confirmRoutineExercises"].tap()
+        reveal(app.buttons["completeSet"].firstMatch, in: app)
         app.buttons["completeSet"].firstMatch.tap()
         let saved = NSPredicate(format: "label CONTAINS %@", "completed")
         expectation(for: saved, evaluatedWith: app.buttons["completeSet"].firstMatch)

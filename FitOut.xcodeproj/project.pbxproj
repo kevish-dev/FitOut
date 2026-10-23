@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F15000000000000000000001 /* WorkoutSessionVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15000000000000000000002 /* WorkoutSessionVisuals.swift */; };
+		F15000000000000000000003 /* WorkoutLoggingControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15000000000000000000004 /* WorkoutLoggingControls.swift */; };
 		F14000000000000000000001 /* ExerciseBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14000000000000000000002 /* ExerciseBrowserView.swift */; };
 		F14000000000000000000003 /* ExerciseBrowserFilters.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14000000000000000000004 /* ExerciseBrowserFilters.swift */; };
 		F13000000000000000000001 /* RoutineEditorVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = F13000000000000000000002 /* RoutineEditorVisuals.swift */; };
@@ -136,6 +138,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F15000000000000000000002 /* WorkoutSessionVisuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionVisuals.swift; sourceTree = "<group>"; };
+		F15000000000000000000004 /* WorkoutLoggingControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLoggingControls.swift; sourceTree = "<group>"; };
 		F14000000000000000000002 /* ExerciseBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseBrowserView.swift; sourceTree = "<group>"; };
 		F14000000000000000000004 /* ExerciseBrowserFilters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseBrowserFilters.swift; sourceTree = "<group>"; };
 		F13000000000000000000002 /* RoutineEditorVisuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoutineEditorVisuals.swift; sourceTree = "<group>"; };
@@ -508,6 +512,8 @@
 				F64CF237F05F4B664C4635D0 /* WorkoutDomain.swift */,
 				FBF6F87A7C43F94EB7659B2B /* WorkoutStore.swift */,
 				3A021907062FDBB04C15A0C0 /* WorkoutViews.swift */,
+				F15000000000000000000002 /* WorkoutSessionVisuals.swift */,
+				F15000000000000000000004 /* WorkoutLoggingControls.swift */,
 			);
 			path = Workouts;
 			sourceTree = "<group>";
@@ -769,6 +775,8 @@
 				64BC209FD9A2757292A10F6A /* WorkoutDomain.swift in Sources */,
 				62C7FEB84A2FB545B3C55A3B /* WorkoutStore.swift in Sources */,
 				88BF229BBC6209C3AE009A9D /* WorkoutViews.swift in Sources */,
+				F15000000000000000000001 /* WorkoutSessionVisuals.swift in Sources */,
+				F15000000000000000000003 /* WorkoutLoggingControls.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
