@@ -9,14 +9,17 @@
 /* Begin PBXBuildFile section */
 		06A9BCD86F6C2D129BC73EB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1E3271F3A8C5AB14221648D0 /* Assets.xcassets */; };
 		0E07556CD688B8D6530A9E60 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24F964206E6311DF336277F6 /* OnboardingView.swift */; };
+		11A573DB6810866EECAACD3E /* anatomy-back.svg in Resources */ = {isa = PBXBuildFile; fileRef = 715F3387E890ADC5B895F3A2 /* anatomy-back.svg */; };
 		156E6362BF68F230ADE91059 /* FitnessProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */; };
 		1A2E0672CCC681BB73519871 /* ProfileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4390ECBBEC38020095B4A64 /* ProfileStore.swift */; };
 		1F7DACD3DBA74924AF66B797 /* StorageContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDB9EE50477E60A26DBC1B9E /* StorageContracts.swift */; };
 		2617E173D09B5BCE84BE4BDB /* ProfileScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */; };
+		2EBB211AD9F827804A7908A4 /* MuscleMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3CB14C4F70280EF0115F7335 /* MuscleMapView.swift */; };
 		3451B8AEB0579ADF53DF247A /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1EF1F36E15CD4D7EE06A0D2E /* HomeView.swift */; };
 		37C4694B7C3AEB0D1B942C58 /* ProfileFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72817576713C4A5AA7D1B887 /* ProfileFlowTests.swift */; };
 		3D0FCDDFDDD2FAFEE04DB5D7 /* FitOutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */; };
 		400EA581DAF184E2BB8CADEE /* SwiftDataRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D8E4F8336E4F1028340F5B /* SwiftDataRepository.swift */; };
+		4780351DF731A145A1066E42 /* anatomy-front.svg in Resources */ = {isa = PBXBuildFile; fileRef = 1A4014C1F26D7CC18537D616 /* anatomy-front.svg */; };
 		480D8ECEDE1F6EA2DDBD14DE /* orbitron-LICENSE.txt in Resources */ = {isa = PBXBuildFile; fileRef = BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */; };
 		5B942A6F130D212AA769CB19 /* CapabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E06E72006F94C883E88ADE79 /* CapabilityTests.swift */; };
 		62BE1CCC9FEE0BA00560D2E3 /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A058FE4B0C32CA6DE72AE792 /* PersistenceTests.swift */; };
@@ -42,6 +45,7 @@
 		D324000D4C1EEA9116EF694A /* HomeStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC0A690C035D4AB3D44FC0B4 /* HomeStateTests.swift */; };
 		D54F861D1C9E8CB9948862A3 /* ProfileData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C6C83017864B4399804BEB5 /* ProfileData.swift */; };
 		D5A7963D83294C7FAF61C127 /* CompletionScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 309FF4CAB360D8D7F7C65114 /* CompletionScreen.swift */; };
+		DB9F551EB0EC4E1485F185DA /* GymViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAAC5C11121AB108582FC0DA /* GymViews.swift */; };
 		E6CF4753B7D56EE3FC3BB3F7 /* PersistenceFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 981149BAB7F28B936CA7D8AA /* PersistenceFactory.swift */; };
 		ED2558509B3DB7B76721EC4E /* AppShell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19FBD164460FD92A1C24AAB5 /* AppShell.swift */; };
 		F72580E8DD2271831D3DF578 /* ProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A679CD19EA0DF1595351C3D /* ProfileTests.swift */; };
@@ -71,6 +75,7 @@
 		0A679CD19EA0DF1595351C3D /* ProfileTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileTests.swift; sourceTree = "<group>"; };
 		13D8096CF5ED44F3B8DB0F09 /* rajdhani-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "rajdhani-LICENSE.txt"; sourceTree = "<group>"; };
 		19FBD164460FD92A1C24AAB5 /* AppShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShell.swift; sourceTree = "<group>"; };
+		1A4014C1F26D7CC18537D616 /* anatomy-front.svg */ = {isa = PBXFileReference; path = "anatomy-front.svg"; sourceTree = "<group>"; };
 		1CB30D4C5814397627BDB0B2 /* GymDomain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymDomain.swift; sourceTree = "<group>"; };
 		1D52F2D538BAF90A8EC8C058 /* FoundationUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FoundationUITests.swift; sourceTree = "<group>"; };
 		1E3271F3A8C5AB14221648D0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -81,12 +86,14 @@
 		29EFD3AC08AF754E6FDD614A /* FitnessProfile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitnessProfile.swift; sourceTree = "<group>"; };
 		309FF4CAB360D8D7F7C65114 /* CompletionScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompletionScreen.swift; sourceTree = "<group>"; };
 		3C567C8D61D3B676E423195F /* GymTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymTests.swift; sourceTree = "<group>"; };
+		3CB14C4F70280EF0115F7335 /* MuscleMapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MuscleMapView.swift; sourceTree = "<group>"; };
 		57957907296D2DBDC134F5D0 /* AppContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppContainer.swift; sourceTree = "<group>"; };
 		57BE158ECDB43A8891AB07FC /* CapabilityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CapabilityService.swift; sourceTree = "<group>"; };
 		5AEE9E63110719C6D5B3A80D /* HealthAccessService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HealthAccessService.swift; sourceTree = "<group>"; };
 		5B34B8171F92F92C919FA673 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		5DEF03BD38389CEDA762EF8C /* ProfileFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFlow.swift; sourceTree = "<group>"; };
 		70527C9CBB10BD40886D6C27 /* GenderAgeScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GenderAgeScreen.swift; sourceTree = "<group>"; };
+		715F3387E890ADC5B895F3A2 /* anatomy-back.svg */ = {isa = PBXFileReference; path = "anatomy-back.svg"; sourceTree = "<group>"; };
 		72817576713C4A5AA7D1B887 /* ProfileFlowTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileFlowTests.swift; sourceTree = "<group>"; };
 		79A505A2868DBC24CC79D1F9 /* orbitron-800.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "orbitron-800.ttf"; sourceTree = "<group>"; };
 		7B7F21158E5B770C62F60AEA /* orbitron-700.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "orbitron-700.ttf"; sourceTree = "<group>"; };
@@ -104,6 +111,7 @@
 		BF8DCB93BF778D98E5018278 /* orbitron-LICENSE.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "orbitron-LICENSE.txt"; sourceTree = "<group>"; };
 		C4390ECBBEC38020095B4A64 /* ProfileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileStore.swift; sourceTree = "<group>"; };
 		C7DCFB73E07DA4422CB76E57 /* FitOutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FitOutApp.swift; sourceTree = "<group>"; };
+		CAAC5C11121AB108582FC0DA /* GymViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GymViews.swift; sourceTree = "<group>"; };
 		CD6E5FA04DA0572B0E597354 /* ProfileScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileScreen.swift; sourceTree = "<group>"; };
 		CFD2CE5BC329C64331DF47D3 /* FitOut.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FitOut.entitlements; sourceTree = "<group>"; };
 		D02EE5C7D0EC131F25C78957 /* FitOut.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = FitOut.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -198,6 +206,8 @@
 			children = (
 				1CB30D4C5814397627BDB0B2 /* GymDomain.swift */,
 				F55BFA483B2CF9FCFD3695DD /* GymStore.swift */,
+				CAAC5C11121AB108582FC0DA /* GymViews.swift */,
+				3CB14C4F70280EF0115F7335 /* MuscleMapView.swift */,
 			);
 			path = Gym;
 			sourceTree = "<group>";
@@ -217,9 +227,19 @@
 			children = (
 				1E3271F3A8C5AB14221648D0 /* Assets.xcassets */,
 				59E281FB19C4716B9CD01EE1 /* Fonts */,
+				8A27FCDA32606E59BD2F8022 /* MuscleMap */,
 			);
 			name = Resources;
 			path = FitOut/Resources;
+			sourceTree = "<group>";
+		};
+		8A27FCDA32606E59BD2F8022 /* MuscleMap */ = {
+			isa = PBXGroup;
+			children = (
+				715F3387E890ADC5B895F3A2 /* anatomy-back.svg */,
+				1A4014C1F26D7CC18537D616 /* anatomy-front.svg */,
+			);
+			path = MuscleMap;
 			sourceTree = "<group>";
 		};
 		928C96FE7B071CD275D78C13 /* Storage */ = {
@@ -419,6 +439,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				06A9BCD86F6C2D129BC73EB0 /* Assets.xcassets in Resources */,
+				11A573DB6810866EECAACD3E /* anatomy-back.svg in Resources */,
+				4780351DF731A145A1066E42 /* anatomy-front.svg in Resources */,
 				6CBD24737E9791E340618F8C /* orbitron-700.ttf in Resources */,
 				BE0A9D2A52CF99228401F17C /* orbitron-800.ttf in Resources */,
 				480D8ECEDE1F6EA2DDBD14DE /* orbitron-LICENSE.txt in Resources */,
@@ -468,9 +490,11 @@
 				A7E156778D3E4B51FA4CAF2F /* GoalsScreen.swift in Sources */,
 				70054D781CBBC82B6239D132 /* GymDomain.swift in Sources */,
 				CAB7C317EFC86B93D9EA499A /* GymStore.swift in Sources */,
+				DB9F551EB0EC4E1485F185DA /* GymViews.swift in Sources */,
 				BF7ED8EFBB46FD7861BEF151 /* HealthAccessService.swift in Sources */,
 				FDD3F4CB01C5764E178106B1 /* HomeState.swift in Sources */,
 				3451B8AEB0579ADF53DF247A /* HomeView.swift in Sources */,
+				2EBB211AD9F827804A7908A4 /* MuscleMapView.swift in Sources */,
 				9C036E9CEDA55B18D3D1E99A /* OnboardingStore.swift in Sources */,
 				0E07556CD688B8D6530A9E60 /* OnboardingView.swift in Sources */,
 				E6CF4753B7D56EE3FC3BB3F7 /* PersistenceFactory.swift in Sources */,

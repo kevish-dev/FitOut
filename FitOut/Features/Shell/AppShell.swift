@@ -6,7 +6,7 @@ struct AppShell: View {
     var body: some View {
         TabView(selection: $tab) {
             NavigationStack { HomeView(container: container, tab: $tab) }.tabItem { Label("Home", systemImage: "house") }.tag(0)
-            NavigationStack { ModuleEmpty(title: "Gym", symbol: "dumbbell", detail: "Your routines and workout history will appear here.") }
+            NavigationStack { GymView(store: container.gym) }
                 .tabItem { Label("Gym", systemImage: "dumbbell") }.tag(1)
             NavigationStack { ModuleEmpty(title: "Nutrition", symbol: "fork.knife", detail: "No meals or water have been logged.") }
                 .tabItem { Label("Nutrition", systemImage: "fork.knife") }.tag(2)

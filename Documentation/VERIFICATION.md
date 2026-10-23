@@ -31,3 +31,15 @@ Build succeeded; 26 tests passed, 0 failed/skipped/warnings (05:34 test run). Ho
 `HomeStateResolver` separates dashboard behavior from views. `HealthAccessService` provides the required optional connection action with read-only HealthKit types; actual readings remain Phase 7. Explainer/request flags persist in isolated preference stores for tests. Production currently has no routine/session input until Phases 3/4, and no nutrition totals until Phase 6; those integration acceptance checks remain explicitly pending. Next: routine builder and catalogue, then connect real Home input.
 
 Apple authorization API evidence: https://developer.apple.com/documentation/healthkit/authorizing-access-to-health-data — read permission cannot be inferred from a successful request or an empty query. No permission sheet or physical-device HealthKit access has been automatically approved/tested.
+
+## Phase 3 storage checkpoint
+
+Build succeeded; 29 tests passed, 0 failed/skipped/warnings. Commit `00c253e` adds Schema V3 relationships for routines/days/planned exercises and the local exercise catalogue. Tests cover weekday mapping, day swaps, duplication identity, single active routine, CRUD/reload, custom exercise references and invalid load rejection. Home now reads the actual active routine for the local calendar weekday.
+
+Routine editor/library build then passed 30 tests, including UI creation/reopening of a Full Body routine, library navigation, and front/back muscle-map switching. A direct SVG selection assertion is also being run before the phase closes. Illustrations were reused from the workspace's existing `3D-Modal/Design/anatomy-{front,back}.svg`; they are bundled locally with no network dependency. Selected regions expose aria-pressed and a separate selected-muscle text list.
+
+The additional SVG-only button query failed: WebKit exposed the illustration as generic accessibility content rather than queryable buttons. Native named muscle controls now accompany the SVG and share its selection state, with explicit checkmarks/selected traits. The corrected UI test checks selection through those controls. Direct touch regions retain the SVG message bridge. This fixes an accessibility issue rather than suppressing the failed assertion.
+
+## Phase 3 complete
+
+Final run 05:44:01: build succeeded; 30 tests passed, 0 failed/skipped/warnings. Native muscle selection, selected-label feedback, front/back map navigation, routine creation/editing, persistence and schedule logic pass. Routine-driven Home states are now wired; completed-session Home integration remains Phase 4. No AI/HealthKit dependency exists in Gym. Next: autosaved workout execution and independent historical snapshots.

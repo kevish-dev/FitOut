@@ -37,4 +37,29 @@ final class FoundationUITests: XCTestCase {
         XCTAssertTrue(app.navigationBars["Edit profile"].waitForExistence(timeout: 3))
     }
 
+    @MainActor func testRoutineTemplateCreationAndEditing() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-shell"]
+        app.launch()
+        if app.buttons["dismissHealthExplainer"].waitForExistence(timeout: 10) { app.buttons["dismissHealthExplainer"].tap() }
+        app.tabBars.buttons["Gym"].tap()
+        app.buttons["newRoutine"].tap()
+        app.buttons["Full Body"].tap()
+        XCTAssertTrue(app.navigationBars["Edit routine"].waitForExistence(timeout: 3))
+        app.buttons["saveRoutine"].tap()
+        XCTAssertTrue(app.buttons.containing(NSPredicate(format: "label CONTAINS %@", "Full Body")).firstMatch.waitForExistence(timeout: 3))
+        app.buttons.containing(NSPredicate(format: "label CONTAINS %@", "Full Body")).firstMatch.tap()
+        XCTAssertTrue(app.textFields["routineName"].waitForExistence(timeout: 3))
+        app.buttons["Cancel"].tap()
+        app.buttons["Exercise library"].tap()
+        XCTAssertTrue(app.navigationBars["Exercise library"].waitForExistence(timeout: 3))
+        app.buttons["Filter by muscle"].tap()
+        XCTAssertTrue(app.navigationBars["Muscle map"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["muscle-chest"].waitForExistence(timeout: 5))
+        app.buttons["muscle-chest"].tap()
+        XCTAssertTrue(app.staticTexts["selectedMuscles"].label.contains("Chest"))
+        app.buttons["Back"].tap()
+        app.buttons["Done"].tap()
+    }
+
 }
