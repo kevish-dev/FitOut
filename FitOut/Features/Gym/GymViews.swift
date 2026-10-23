@@ -2,10 +2,15 @@ import SwiftUI
 
 struct GymView: View {
     @Bindable var store: GymStore
+    let workouts: WorkoutStore
+    let unit: WeightUnit
+    let defaults: UserDefaults
+    @State private var showWorkout = false
     @State private var editing: Routine?
     @State private var deleting: Routine?
     var body: some View {
         List {
+            WorkoutsPanel(store: workouts, gym: store, unit: unit, defaults: defaults, showing: $showWorkout)
             NavigationLink("Exercise library") { ExerciseLibrary(store: store) }
             if store.routines.isEmpty {
                 Section { ContentUnavailableView("Plan your workouts", systemImage: "calendar.badge.plus", description: Text("Choose a template or create your own weekly schedule.")) }
@@ -36,6 +41,8 @@ struct GymView: View {
                 Menu { ForEach(RoutineTemplate.allCases) { template in Button(template.rawValue) { editing = template.make() } } }
                 label: { Label("New routine", systemImage: "plus") }.accessibilityIdentifier("newRoutine")
             }
+            .sheet(isPresented: $showWorkout) { NavigationStack { ActiveWorkoutView(store: workouts, gym: store, unit: unit, defaults: defaults) } }
+            .onChange(of: workouts.active?.id, initial: true) { _, new in if new != nil { showWorkout = true } }
             .sheet(item: $editing) { RoutineEditor(store: store, routine: $0) }
             .confirmationDialog("Delete this routine? Completed workouts will be kept.", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } })) {
                 Button("Delete routine", role: .destructive) { if let deleting { store.deleteRoutine(deleting.id) }; deleting = nil }

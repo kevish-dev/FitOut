@@ -43,3 +43,15 @@ The additional SVG-only button query failed: WebKit exposed the illustration as 
 ## Phase 3 complete
 
 Final run 05:44:01: build succeeded; 30 tests passed, 0 failed/skipped/warnings. Native muscle selection, selected-label feedback, front/back map navigation, routine creation/editing, persistence and schedule logic pass. Routine-driven Home states are now wired; completed-session Home integration remains Phase 4. No AI/HealthKit dependency exists in Gym. Next: autosaved workout execution and independent historical snapshots.
+
+## Phase 4 storage checkpoint
+
+Build succeeded; 33 tests passed, 0 failed/skipped/warnings. Commit `f439044` adds Schema V4 session/entry/set relationships. Disk-reopen tests recover completed sets and pause state, exclude paused time, and preserve workout snapshots after deleting the source routine. Invalid numeric input and duplicate active sessions are rejected; volume excludes warm-up/bodyweight/duration/incomplete sets.
+
+The initial session UI test found that a sheet attached to a List Section did not present even though the session was saved. Presentation now belongs to GymView's root. A Settings toolbar transition after relaunch was also made explicit. Both are under regression verification; Phase 4 is not marked complete until the UI recovery test passes.
+
+## Phase 4 complete
+
+The focused final run passed 31 tests (30 unit tests plus the workout UI test), 0 failed/skipped/warnings. The three other UI workflows passed in the immediately preceding full run. Set completion needed an explicit button style inside its multi-control row; the test now also waits for the saved checkmark before termination. It successfully terminates/relaunches, recovers the completed set, and finishes to the summary. Full-suite selection is restored in the committed scheme.
+
+`WorkoutStore` saves every accepted mutation synchronously and rolls back errors. `WorkoutViews` exposes quick/planned sessions, sets, types, load/reps/duration/distance/RPE, notes, pause/resume, replacements, rest deadlines, and completed/skipped/abandoned history. Home uses actual completion data and starts planned sessions without making View Routine start a workout. Snapshot/duration/recovery acceptance criteria pass on simulator. New-PR indicators and historical charts are Phase 5. Background haptic delivery is not promised; the completion cue is emitted when the visible session observes its elapsed deadline.

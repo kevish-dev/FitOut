@@ -4,7 +4,14 @@ struct HomeView: View {
     let container: AppContainer
     @Binding var tab: Int
     @State private var showHealth = false
-    var workout: TodayWorkoutState { HomeStateResolver.workout(container.gym.homeInput()) }
+    @State private var showSettings = false
+    var workout: TodayWorkoutState {
+        var input = container.gym.homeInput()
+        if let completed = container.workouts.history.first(where: { $0.status == .completed && Calendar.current.isDateInToday($0.startedAt) }) {
+            input.completion = (completed.title, completed.completedSets.count, completed.duration(), completed.volumeKG)
+        }
+        return HomeStateResolver.workout(input)
+    }
     var body: some View {
         List {
             Section {
@@ -16,7 +23,12 @@ struct HomeView: View {
                     }
                 }
             }
-            Section("Today’s workout") { WorkoutStateContent(state: workout) { tab = 1 } }
+            Section("Today’s workout") { WorkoutStateContent(state: workout, openGym: { tab = 1 }, startWorkout: {
+                if case .planned = workout, container.workouts.active == nil, let routine = container.gym.activeRoutine, let day = RoutineSchedule.day(in: routine, at: .now) {
+                    container.workouts.start(day: day, routineID: routine.id, catalogue: container.gym.exercises)
+                }
+                tab = 1
+            }) }
             Section("Set up your tracking") {
                 Button("Set Up Workout Routine") { tab = 1 }
                 Button("Nutrition targets (optional)") { tab = 2 }
@@ -34,7 +46,8 @@ struct HomeView: View {
             Section { Button("Try AI Coach") { tab = 4 } }
             NavigationLink("Settings") { FoundationSettings(container: container) }
         }.navigationTitle("Home")
-            .toolbar { NavigationLink { FoundationSettings(container: container) } label: { Image(systemName: "gearshape").accessibilityLabel("Open Settings") } }
+            .toolbar { Button { showSettings = true } label: { Image(systemName: "gearshape").accessibilityLabel("Open Settings") } }
+            .navigationDestination(isPresented: $showSettings) { FoundationSettings(container: container) }
             .task {
                 if !container.defaults.bool(forKey: "health.explainer.seen") { showHealth = true }
             }
@@ -58,6 +71,7 @@ struct HomeView: View {
 struct WorkoutStateContent: View {
     let state: TodayWorkoutState
     let openGym: () -> Void
+    var startWorkout: (() -> Void)? = nil
     var body: some View {
         switch state {
         case .noRoutine:
@@ -74,7 +88,7 @@ struct WorkoutStateContent: View {
             Text(title).font(.headline)
             Text("\(count) exercises")
             if let minutes { Text("Target duration: \(minutes) min") }
-            Button("Start Workout", action: openGym)
+            Button("Start Workout", action: startWorkout ?? openGym)
             Button("View or edit routine", action: openGym)
         case .completed(let title, let sets, let seconds, let volume):
             Label("Completed · \(title)", systemImage: "checkmark.circle")

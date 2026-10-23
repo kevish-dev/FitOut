@@ -33,6 +33,7 @@ final class FoundationUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.navigationBars["Home"].waitForExistence(timeout: 10))
         app.buttons["Open Settings"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
         app.buttons["Edit profile"].tap()
         XCTAssertTrue(app.navigationBars["Edit profile"].waitForExistence(timeout: 3))
     }
@@ -60,6 +61,32 @@ final class FoundationUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["selectedMuscles"].label.contains("Chest"))
         app.buttons["Back"].tap()
         app.buttons["Done"].tap()
+    }
+
+    @MainActor func testWorkoutSetSurvivesTerminationAndFinishes() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-session", UUID().uuidString]
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Gym"].waitForExistence(timeout: 10))
+        app.tabBars.buttons["Gym"].tap()
+        app.buttons["startQuickWorkout"].tap()
+        XCTAssertTrue(app.navigationBars["Workout"].waitForExistence(timeout: 5))
+        app.buttons["workoutAddExercise"].tap()
+        app.buttons["Bench press"].tap()
+        app.buttons["completeSet"].firstMatch.tap()
+        let saved = NSPredicate(format: "label CONTAINS %@", "completed")
+        expectation(for: saved, evaluatedWith: app.buttons["completeSet"].firstMatch)
+        waitForExpectations(timeout: 5)
+        app.terminate()
+        app.launch()
+        app.tabBars.buttons["Gym"].tap()
+        XCTAssertTrue(app.navigationBars["Workout"].waitForExistence(timeout: 5) || app.buttons["resumeWorkout"].exists)
+        if !app.navigationBars["Workout"].exists { app.buttons["resumeWorkout"].tap() }
+        XCTAssertTrue(app.buttons["completeSet"].firstMatch.label.contains("completed"))
+        app.swipeUp()
+        app.buttons["finishWorkout"].tap()
+        app.buttons["Complete workout"].tap()
+        XCTAssertTrue(app.navigationBars["Workout summary"].waitForExistence(timeout: 5))
     }
 
 }
