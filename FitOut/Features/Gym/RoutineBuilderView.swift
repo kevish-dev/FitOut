@@ -17,6 +17,7 @@ struct RoutineEditor: View {
     @State private var pendingCopy: RoutineDay?
     @State private var pendingReuse: RoutineDay?
     @State private var discard = false
+    @State private var keyboardIsVisible = false
     @FocusState private var nameFocused: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -79,10 +80,6 @@ struct RoutineEditor: View {
                         Button("Discard unsaved changes", role: .destructive) { discard = true }
                     } label: { Image(systemName: "ellipsis") }.accessibilityLabel("Routine options")
                 }
-                ToolbarItemGroup(placement: .keyboard) {
-                    Spacer()
-                    Button("Done") { UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) }
-                }
             }
         }
         .tint(FitTheme.dashboardAccent)
@@ -93,6 +90,8 @@ struct RoutineEditor: View {
         .presentationBackground(FitTheme.dashboardBackground)
         .preferredColorScheme(.dark)
         .onAppear(perform: restoreDraft)
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in keyboardIsVisible = true }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardIsVisible = false }
         .task(id: draft) {
             guard loaded, !finished else { return }
             do { try await Task.sleep(for: .milliseconds(450)) } catch { return }
@@ -377,32 +376,59 @@ struct RoutineEditor: View {
 
     private var footer: some View {
         VStack(alignment: .leading, spacing: 10) {
-            if stage == .schedule {
+            if stage == .schedule && !keyboardIsVisible {
                 Text(routine.trainingDays.isEmpty ? "Select at least one training day to continue." : routine.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty ? "Add a routine name to continue." : "\(routine.trainingDays.count) training \(routine.trainingDays.count == 1 ? "day" : "days") selected · Exercises are next")
                     .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
             }
-            HStack(spacing: 12) {
-                if stage != .schedule {
-                    Button { stage = stage == .review ? .workouts : .schedule } label: {
-                        Image(systemName: "arrow.left").frame(width: 50, height: 50).dashboardGlass(in: Circle(), interactive: true)
-                    }.buttonStyle(.plain).accessibilityLabel("Previous step")
-                }
-                Button(action: advance) {
-                    HStack {
-                        Text(stage == .review ? "Save routine" : stage == .schedule ? "Choose exercises" : "Review routine")
-                        Spacer()
-                        Image(systemName: stage == .review ? "checkmark" : "arrow.right")
-                    }.font(FitTheme.button(15)).padding(.horizontal, 18).frame(minHeight: 50)
-                        .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
-                }
-                .buttonStyle(RoutineEditorPressStyle())
-                .disabled(stage == .schedule && !scheduleIsReady)
-                .opacity(stage == .schedule && !scheduleIsReady ? 0.45 : 1)
-                .accessibilityIdentifier(stage == .review ? "saveRoutine" : "routineContinue")
+            if dynamicTypeSize.isAccessibilitySize {
+                VStack(spacing: 10) { footerActions }
+            } else {
+                HStack(alignment: .center, spacing: 12) { footerActions }
             }
         }
+        .frame(maxWidth: 560)
         .padding(.horizontal, FitTheme.pageInset).padding(.vertical, 12)
+        .frame(maxWidth: .infinity)
         .background(.bar)
+    }
+
+    @ViewBuilder private var footerActions: some View {
+        if keyboardIsVisible {
+            Button(action: dismissKeyboard) {
+                Text("Done").font(FitTheme.button(15))
+                    .padding(.horizontal, 16).padding(.vertical, 12)
+                    .frame(minHeight: 54)
+                    .frame(maxWidth: dynamicTypeSize.isAccessibilitySize ? .infinity : nil)
+                    .dashboardGlass(in: RoundedRectangle(cornerRadius: 16), interactive: true)
+            }
+            .buttonStyle(RoutineEditorPressStyle())
+            .accessibilityLabel("Done editing")
+            .accessibilityIdentifier("routineKeyboardDone")
+        } else if stage != .schedule {
+            Button { stage = stage == .review ? .workouts : .schedule } label: {
+                Image(systemName: "arrow.left").frame(width: 54, height: 54).dashboardGlass(in: Circle(), interactive: true)
+            }.buttonStyle(.plain).accessibilityLabel("Previous step")
+        }
+        Button(action: advance) {
+            HStack(spacing: 10) {
+                Text(stage == .review ? "Save routine" : stage == .schedule ? "Choose exercises" : "Review routine")
+                    .fixedSize(horizontal: false, vertical: true)
+                Spacer(minLength: 0)
+                Image(systemName: stage == .review ? "checkmark" : "arrow.right")
+            }
+            .font(FitTheme.button(15)).padding(.horizontal, 16).padding(.vertical, 12)
+            .frame(maxWidth: .infinity, minHeight: 54)
+            .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
+        }
+        .buttonStyle(RoutineEditorPressStyle())
+        .disabled(stage == .schedule && !scheduleIsReady)
+        .opacity(stage == .schedule && !scheduleIsReady ? 0.45 : 1)
+        .accessibilityIdentifier(stage == .review ? "saveRoutine" : "routineContinue")
+    }
+
+    private func dismissKeyboard() {
+        nameFocused = false
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 
     @ViewBuilder private func builderSheet(_ route: RoutineBuilderSheet) -> some View {
@@ -459,6 +485,7 @@ struct RoutineEditor: View {
         if store.saveDraft(draft) { finished = true; dismiss() } else { issue = store.error }
     }
     private func advance() {
+        dismissKeyboard()
         issue = nil
         switch stage {
         case .schedule:

@@ -27,6 +27,11 @@ introduced.
   paths. Reduced Motion removes press scaling and stage/selection animation.
   Accessibility text sizes stack stage controls, daily summaries, metrics, rest
   shortcuts and numeric fields where appropriate.
+- While the keyboard is visible, Done and the primary action share one aligned
+  footer row. There is no separate floating keyboard-toolbar button. Helper
+  text is hidden while typing to leave more room for the focused input; large
+  accessibility sizes stack the actions. The footer shares the content's width
+  limit and page insets. Advancing dismisses the keyboard first.
 
 ## Generated graphic
 
