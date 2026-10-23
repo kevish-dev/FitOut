@@ -4,7 +4,7 @@ struct HomeView: View {
     let container: AppContainer
     @Binding var tab: Int
     @State private var showHealth = false
-    var workout: TodayWorkoutState { HomeStateResolver.workout(HomeWorkoutInput()) }
+    var workout: TodayWorkoutState { HomeStateResolver.workout(container.gym.homeInput()) }
     var body: some View {
         List {
             Section {

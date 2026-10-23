@@ -4,6 +4,7 @@ import Observation
 
 @MainActor final class AppContainer {
     let defaults: UserDefaults
+    let gym: GymStore
     let health: HealthAccessService
     let database: ModelContainer
     let repository: SwiftDataRepository
@@ -11,6 +12,7 @@ import Observation
     let capabilities: any RuntimeCapabilityProviding
 
     init(database: ModelContainer, capabilities: any RuntimeCapabilityProviding = SystemCapabilityProvider(), legacyDefaults: UserDefaults? = nil, defaults: UserDefaults = .standard) throws {
+        gym = try GymStore(container: database)
         self.defaults = defaults
         health = HealthAccessService(capability: capabilities, defaults: defaults)
         self.database = database

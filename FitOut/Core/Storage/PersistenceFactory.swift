@@ -3,7 +3,7 @@ import SwiftData
 
 enum PersistenceFactory {
     static func makeContainer(at storeURL: URL? = nil, inMemory: Bool = false) throws -> ModelContainer {
-        let schema = Schema(versionedSchema: FitOutSchemaV2.self)
+        let schema = Schema(versionedSchema: FitOutSchemaV3.self)
         let configuration: ModelConfiguration
         if inMemory {
             configuration = ModelConfiguration("FitOutTests", schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
