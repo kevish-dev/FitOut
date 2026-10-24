@@ -182,3 +182,18 @@ enum PlannedWorkoutFactory {
         return result
     }
 }
+
+/// Entry intent is independent of whether today is a workout, rest or open day.
+struct RoutineEditorEntry {
+    let stage: RoutineEditorStage
+    let weekday: Int
+    static func resolve(isSaved: Bool, draft: RoutineDraft?, initialWeekday: Int?, initialStage: RoutineEditorStage?,
+                        now: Date = .now, calendar: Calendar = .current) -> RoutineEditorEntry {
+        var stage = draft?.stage ?? (isSaved ? .workouts : .schedule)
+        var weekday = draft?.weekday ?? (isSaved ? RoutineSchedule.weekday(for: now, calendar: calendar) : 0)
+        if let initialWeekday, (0..<7).contains(initialWeekday) { weekday = initialWeekday; stage = .workouts }
+        if let initialStage { stage = initialStage }
+        if !(0..<7).contains(weekday) { weekday = RoutineSchedule.weekday(for: now, calendar: calendar) }
+        return RoutineEditorEntry(stage: stage, weekday: weekday)
+    }
+}

@@ -4,8 +4,7 @@ import Combine
 struct AppShell: View {
     let container: AppContainer
     @Binding var widgetDestination: WidgetDestination?
-    @State private var tab = 0
-    @State private var navigationRevisions: [Int: UUID] = [:]
+    @State private var navigation = AppTabNavigation()
     @State private var menuOpen = false
     @State private var widgetSheet: WidgetDestination?
     @State private var widgetError: String?
@@ -55,7 +54,7 @@ struct AppShell: View {
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardVisible = false }
         .onChange(of: container.presentation.navigationStyle) { _, _ in menuOpen = false }
         .accessibilityAction(.escape) { menuOpen = false }
-        .onChange(of: tab) { _, _ in menuOpen = false }
+        .onChange(of: navigation.selected) { _, _ in menuOpen = false }
         .task { openPendingWidget() }
         .onChange(of: widgetDestination) { _, _ in openPendingWidget() }
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
@@ -103,10 +102,10 @@ struct AppShell: View {
         } else { tabContent }
     }
     private var tabContent: some View {
-        TabView(selection: Binding(get: { tab }, set: select)) {
+        TabView(selection: Binding(get: { navigation.selected }, set: { navigation.select($0, source: .system) })) {
             ForEach(AppSection.allCases) { section in
                 NavigationStack { sectionContent(section) }
-                    .id("\(section.rawValue)-\(navigationRevisions[section.rawValue]?.uuidString ?? "root")")
+                    .id("\(section.rawValue)-\(navigation.revisions[section.rawValue]?.uuidString ?? "root")")
                     .tabItem { Label(section.title, systemImage: section.symbol) }
                     .tag(section.rawValue)
                     .toolbar(container.presentation.navigationStyle == .bottomBar && !keyboardVisible ? .visible : .hidden, for: .tabBar)
@@ -118,7 +117,7 @@ struct AppShell: View {
     }
     @ViewBuilder private func sectionContent(_ section: AppSection) -> some View {
         switch section {
-        case .home: HomeView(container: container, tab: $tab)
+        case .home: HomeView(container: container, tab: $navigation.selected)
         case .gym: GymView(store: container.gym, workouts: container.workouts, unit: container.profile.draft.weightUnit, defaults: container.defaults)
         case .nutrition: NutritionView(container: container)
         case .health: HealthConnectionView(service: container.health)
@@ -131,11 +130,11 @@ struct AppShell: View {
         widgetDestination = nil
         menuOpen = false
         switch destination {
-        case .home: tab = 0
-        case .health: tab = 3
-        case .nutrition: tab = 2
+        case .home: navigation.selected = 0
+        case .health: navigation.selected = 3
+        case .nutrition: navigation.selected = 2
         case .startWorkout:
-            tab = 1
+            navigation.selected = 1
             if container.workouts.active != nil {
                 container.workouts.resume()
                 openWorkout()
@@ -145,10 +144,10 @@ struct AppShell: View {
                 if container.workouts.history.contains(where: { $0.status == .completed && $0.routineID == routine.id && Calendar.current.isDateInToday($0.startedAt) }) { widgetSheet = .history }
                 else if container.workouts.start(day: day, routineID: routine.id, catalogue: container.gym.exercises) { openWorkout() }
                 else { widgetError = container.workouts.error }
-            } else { widgetSheet = .routine }
+            } else { widgetSheet = .workout }
         case .workout:
-            tab = 1
-            if container.workouts.active != nil { openWorkout() }
+            navigation.selected = 1
+            openWorkout()
         default: widgetSheet = destination
         }
     }
@@ -159,20 +158,19 @@ struct AppShell: View {
 
     private func select(_ destination: Int) {
         menuOpen = false
-        if tab == destination { navigationRevisions[destination] = UUID() }
-        else { tab = destination }
+        navigation.select(destination, source: .menu)
     }
 
     private func navigationButton(_ title: String, symbol: String, destination: Int) -> some View {
         Button { select(destination) } label: {
             Image(systemName: symbol).font(.system(size: 22, weight: .regular))
-            .foregroundStyle(tab == destination ? FitTheme.dashboardAccent : FitTheme.textPrimary)
+            .foregroundStyle(navigation.selected == destination ? FitTheme.dashboardAccent : FitTheme.textPrimary)
             .frame(width: 52, height: 52)
-            .dashboardGlass(in: Circle(), highlighted: tab == destination, interactive: true)
+            .dashboardGlass(in: Circle(), highlighted: navigation.selected == destination, interactive: true)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(title)
-        .accessibilityAddTraits(tab == destination ? .isSelected : [])
+        .accessibilityAddTraits(navigation.selected == destination ? .isSelected : [])
         .accessibilityIdentifier("navigate-\(destination)")
     }
 }

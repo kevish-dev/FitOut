@@ -4,6 +4,32 @@ import UIKit
 @testable import FitOut
 
 final class AppPresentationTests: XCTestCase {
+    func testRepeatedNativeTabCallbacksCannotReplaceGymRootDuringSheetPresentation() {
+        var navigation = AppTabNavigation()
+        navigation.select(AppSection.gym.rawValue, source: .system)
+        for _ in 0..<100 { navigation.select(AppSection.gym.rawValue, source: .system) }
+        XCTAssertEqual(navigation.selected, AppSection.gym.rawValue)
+        XCTAssertTrue(navigation.revisions.isEmpty)
+        navigation.select(AppSection.home.rawValue, source: .system)
+        navigation.select(AppSection.gym.rawValue, source: .system)
+        XCTAssertTrue(navigation.revisions.isEmpty)
+    }
+
+    func testExplicitMenuReselectResetsOnlyRequestedRootAndSystemEchoPreservesIt() {
+        var navigation = AppTabNavigation()
+        navigation.select(AppSection.gym.rawValue, source: .menu)
+        XCTAssertTrue(navigation.revisions.isEmpty)
+        navigation.select(AppSection.gym.rawValue, source: .menu)
+        let revision = navigation.revisions[AppSection.gym.rawValue]
+        XCTAssertNotNil(revision)
+        navigation.select(AppSection.gym.rawValue, source: .system)
+        XCTAssertEqual(navigation.revisions[AppSection.gym.rawValue], revision)
+        navigation.select(AppSection.home.rawValue, source: .menu)
+        XCTAssertEqual(navigation.revisions[AppSection.gym.rawValue], revision)
+        navigation.select(99, source: .system)
+        XCTAssertEqual(navigation.selected, AppSection.home.rawValue)
+    }
+
     @MainActor func testNavigationPersistsAndInvalidValuesKeepExistingTopRightDefault() throws {
         let name = "navigation-tests-" + UUID().uuidString
         let defaults = UserDefaults(suiteName: name)!

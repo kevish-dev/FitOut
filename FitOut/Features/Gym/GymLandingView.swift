@@ -1,22 +1,12 @@
 import SwiftUI
 import Combine
 
-private struct GymPlanEdit: Identifiable {
-    let routine: Routine
-    var weekday: Int? = nil
-    var id: UUID { routine.id }
-}
-
 struct GymView: View {
     @Bindable var store: GymStore
     let workouts: WorkoutStore
     let unit: WeightUnit
     let defaults: UserDefaults
-    @State private var showingWorkout = false
-    @State private var editing: GymPlanEdit?
-    @State private var showingTemplates = false
-    @State private var templateWeekday: Int?
-    @State private var summary: WorkoutSession?
+    @State private var navigation = GymNavigation()
     @State private var weekOffset = 0
     @State private var now = Date()
     @Environment(\.scenePhase) private var scenePhase
@@ -46,23 +36,23 @@ struct GymView: View {
         .navigationTitle("Gym")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .navigationBar)
-        .sheet(isPresented: $showingWorkout, onDismiss: { now = .now }) {
-            NavigationStack { QuickWorkoutFlow(store: workouts, gym: store, unit: unit, defaults: defaults) }
-        }
-        .sheet(item: $editing, onDismiss: { now = .now }) { request in
-            RoutineEditor(store: store, routine: request.routine, initialWeekday: request.weekday, unit: unit)
-        }
-        .sheet(item: $summary, onDismiss: { now = .now }) { session in
-            NavigationStack {
-                WorkoutSummary(session: session, unit: unit, history: workouts.history)
-                    .navigationTitle("Workout summary")
-                    .toolbar { Button("Close") { summary = nil } }
+        .sheet(item: Binding(get: { navigation.destination }, set: { value in if value == nil { navigation.dismiss() } }), onDismiss: { now = .now }) { destination in
+            switch destination {
+            case .workout:
+                NavigationStack { QuickWorkoutFlow(store: workouts, gym: store, unit: unit, defaults: defaults) }
+            case let .routine(routine, weekday, stage):
+                RoutineEditor(store: store, routine: routine, initialWeekday: weekday, initialStage: stage, unit: unit)
+            case let .create(weekday, active):
+                RoutineCreationSheet(store: store, unit: unit, initialWeekday: weekday, useAsActive: active)
+            case .summary(let session):
+                NavigationStack {
+                    WorkoutSummary(session: session, unit: unit, history: workouts.history)
+                        .navigationTitle("Workout summary")
+                        .toolbar { Button("Close") { navigation.dismiss() } }
+                }
             }
         }
-        .sheet(isPresented: $showingTemplates, onDismiss: { now = .now }) {
-            RoutineCreationSheet(store: store, unit: unit, initialWeekday: templateWeekday)
-        }
-        .alert("Could not update Gym", isPresented: Binding(get: { workouts.error != nil && !showingWorkout }, set: { if !$0 { workouts.error = nil } })) {
+        .alert("Could not update Gym", isPresented: Binding(get: { workouts.error != nil && navigation.destination == nil }, set: { if !$0 { workouts.error = nil } })) {
             Button("OK", role: .cancel) { workouts.error = nil }
         } message: { Text(workouts.error ?? "") }
         .onAppear { now = .now }
@@ -134,7 +124,7 @@ struct GymView: View {
                 .accessibilityLabel(workouts.active == nil ? "Start quick workout" : "Resume workout")
                 .accessibilityIdentifier("startQuickWorkout")
             LazyVGrid(columns: [GridItem(.flexible(), spacing: FitTheme.sectionSpacing), GridItem(.flexible(), spacing: FitTheme.sectionSpacing)], spacing: FitTheme.sectionSpacing) {
-                Button { openPlan() } label: { GymShortcut(title: "Weekly plan", detail: "Shape your week", symbol: "calendar") }
+                Button { openPlan(weekly: true) } label: { GymShortcut(title: "Weekly plan", detail: "Shape your week", symbol: "calendar") }
                     .accessibilityIdentifier("gymWeeklyPlan")
                 NavigationLink {
                     MyRoutinesView(store: store, unit: unit).toolbar(.visible, for: .navigationBar)
@@ -276,33 +266,35 @@ struct GymView: View {
 
     private func primaryAction() {
         switch today {
-        case .setup, .rest, .unassigned: openPlan()
+        case .setup: openPlan()
+        case .rest, .unassigned: openPlan(weekday: RoutineSchedule.weekday(for: now))
         case .needsExercises(let day): openPlan(weekday: day.weekday)
         case .scheduled(let day): startWorkout(day: day)
-        case .active: showingWorkout = true
-        case .completed(let session): summary = session
+        case .active: navigation.present(.workout)
+        case .completed(let session): navigation.present(.summary(session))
         }
     }
 
-    private func openPlan(weekday: Int? = nil) {
-        if let routine = store.activeRoutine { editing = GymPlanEdit(routine: routine, weekday: weekday) }
-        else if let draft = store.resumableDraft { editing = GymPlanEdit(routine: draft.routine, weekday: weekday) }
-        else { templateWeekday = weekday; showingTemplates = true }
+    private func openPlan(weekday: Int? = nil, weekly: Bool = false) {
+        navigation.present(GymNavigation.plan(active: store.activeRoutine, draft: store.resumableDraft, weekday: weekday, weekly: weekly))
     }
 
     private func openDay(_ day: GymWeekDay) {
         if let session = day.session {
-            if session.isActive { showingWorkout = true }
-            else { summary = session }
+            navigation.present(session.isActive ? .workout : .summary(session))
         } else { openPlan(weekday: day.weekday) }
     }
 
     private func startWorkout(day: RoutineDay? = nil) {
-        if workouts.active != nil || day == nil { showingWorkout = true }
-        else if workouts.start(day: day, routineID: day == nil ? nil : store.activeRoutine?.id, catalogue: store.exercises) {
-            showingWorkout = true
+        guard navigation.destination == nil else { return }
+        if workouts.active != nil || day == nil { navigation.present(.workout); return }
+        guard let day else { return }
+        guard day.kind == .workout, !day.exercises.isEmpty else { openPlan(weekday: day.weekday); return }
+        if workouts.start(day: day, routineID: store.activeRoutine?.id, catalogue: store.exercises) {
+            navigation.present(.workout)
         }
     }
+
 }
 
 /// One photo-led workout preview shared by Home and Gym. All badges come from saved data.

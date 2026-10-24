@@ -1,10 +1,20 @@
 import SwiftUI
 
+private enum RoutineLibraryDestination: Identifiable {
+    case edit(Routine, stage: RoutineEditorStage?)
+    case create
+    var id: String {
+        switch self {
+        case .edit(let routine, let stage): return "edit-\(routine.id)-\(stage?.rawValue ?? "resume")"
+        case .create: return "create"
+        }
+    }
+}
+
 struct MyRoutinesView: View {
     @Bindable var store: GymStore
     var unit: WeightUnit = .kg
-    @State private var editing: Routine?
-    @State private var creating = false
+    @State private var destination: RoutineLibraryDestination?
     @State private var deleting: Routine?
     @State private var archiving: Routine?
     @State private var deletingDraft: RoutineDraft?
@@ -12,13 +22,13 @@ struct MyRoutinesView: View {
     var body: some View {
         List {
             Section {
-                Button { creating = true } label: { Label("New routine", systemImage: "plus") }
+                Button { if destination == nil { destination = .create } } label: { Label("New routine", systemImage: "plus") }
                 .accessibilityIdentifier("newRoutine")
             }
             if !store.drafts.isEmpty {
                 Section("Continue editing") {
                     ForEach(store.drafts) { draft in
-                        Button { editing = draft.routine } label: {
+                        Button { if destination == nil { destination = .edit(draft.routine, stage: nil) } } label: {
                             VStack(alignment: .leading, spacing: 5) {
                                 Text(draft.routine.name.isEmpty ? "Untitled draft" : draft.routine.name).font(FitTheme.section(15))
                                 Text("Draft · \(draft.updatedAt.formatted(date: .abbreviated, time: .shortened))")
@@ -44,8 +54,12 @@ struct MyRoutinesView: View {
             }
         }
         .navigationTitle("My routines")
-        .sheet(item: $editing) { RoutineEditor(store: store, routine: $0, unit: unit) }
-        .sheet(isPresented: $creating) { RoutineCreationSheet(store: store, unit: unit, useAsActive: store.activeRoutine == nil) }
+        .sheet(item: $destination) { route in
+            switch route {
+            case .edit(let routine, let stage): RoutineEditor(store: store, routine: routine, initialStage: stage, unit: unit)
+            case .create: RoutineCreationSheet(store: store, unit: unit, useAsActive: store.activeRoutine == nil)
+            }
+        }
         .confirmationDialog("Delete this routine?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }), titleVisibility: .visible) {
             Button("Delete routine", role: .destructive) { if let deleting { store.deleteRoutine(deleting.id) }; deleting = nil }
         } message: { Text("The routine and its draft will be removed. Workout history stays saved.") }
@@ -58,14 +72,14 @@ struct MyRoutinesView: View {
         .confirmationDialog("Discard this draft?", isPresented: Binding(get: { deletingDraft != nil }, set: { if !$0 { deletingDraft = nil } })) {
             Button("Discard draft", role: .destructive) { if let deletingDraft { store.discardDraft(deletingDraft.id) }; deletingDraft = nil }
         }
-        .alert("Could not update routine", isPresented: Binding(get: { store.error != nil && editing == nil }, set: { if !$0 { store.error = nil } })) {
+        .alert("Could not update routine", isPresented: Binding(get: { store.error != nil && destination == nil }, set: { if !$0 { store.error = nil } })) {
             Button("OK", role: .cancel) { store.error = nil }
         } message: { Text(store.error ?? "") }
     }
 
     private func routineRow(_ routine: Routine) -> some View {
         HStack(alignment: .center, spacing: 12) {
-            Button { editing = routine } label: {
+            Button { if destination == nil { destination = .edit(routine, stage: .schedule) } } label: {
                 VStack(alignment: .leading, spacing: 6) {
                     HStack(spacing: 6) {
                         if routine.isActive { Image(systemName: "checkmark.circle.fill").foregroundStyle(FitTheme.dashboardAccent) }
@@ -76,7 +90,7 @@ struct MyRoutinesView: View {
                 }.frame(maxWidth: .infinity, minHeight: 52, alignment: .leading).contentShape(Rectangle())
             }.buttonStyle(.plain)
             Menu {
-                Button("Edit") { editing = routine }
+                Button("Edit") { if destination == nil { destination = .edit(routine, stage: .schedule) } }
                 if routine.archivedAt != nil {
                     Button("Restore") { var value = routine; value.archivedAt = nil; store.save(value) }
                 } else if !routine.isActive {

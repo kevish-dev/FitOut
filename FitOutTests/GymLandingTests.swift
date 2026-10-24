@@ -92,6 +92,104 @@ final class GymLandingTests: XCTestCase {
         XCTAssertTrue(GymLandingState.completedThisWeek([], now: date(24), calendar: calendar).isEmpty)
     }
 
+    func testWeeklyPlanAlwaysOpensScheduleIncludingEveryRestAndOpenDay() {
+        var routine = RoutineTemplate.fullBody.make()
+        for day in 19...25 {
+            let weekday = RoutineSchedule.weekday(for: date(day), calendar: calendar)
+            for kind in [RoutineDayKind.rest, .flexible] {
+                routine.days[weekday].kind = kind
+                let saved = RoutineDraft(routine: routine, stage: .review, weekday: weekday)
+                guard case let .routine(value, selectedDay, stage) = GymNavigation.plan(active: routine, draft: saved, weekly: true) else {
+                    return XCTFail("Weekly plan must open the existing editor")
+                }
+                XCTAssertEqual(value, routine); XCTAssertNil(selectedDay); XCTAssertEqual(stage, .schedule)
+                let entry = RoutineEditorEntry.resolve(isSaved: true, draft: saved, initialWeekday: selectedDay, initialStage: stage, now: date(day), calendar: calendar)
+                XCTAssertEqual(entry.stage, .schedule)
+                XCTAssertEqual(routine.days[weekday].kind, kind)
+            }
+        }
+    }
+
+    func testExplicitRestDayTapOpensThatDayWhileDraftResumeKeepsItsStage() {
+        let routine = RoutineTemplate.fullBody.make()
+        let draft = RoutineDraft(routine: routine, stage: .review, weekday: 4)
+        guard case let .routine(_, weekday, stage) = GymNavigation.plan(active: routine, draft: draft, weekday: 1) else { return XCTFail("Missing day editor") }
+        let entry = RoutineEditorEntry.resolve(isSaved: true, draft: draft, initialWeekday: weekday, initialStage: stage, now: date(20), calendar: calendar)
+        XCTAssertEqual(entry.weekday, 1); XCTAssertEqual(entry.stage, .workouts)
+        XCTAssertEqual(routine.days[1].kind, .rest)
+        let resumed = RoutineEditorEntry.resolve(isSaved: true, draft: draft, initialWeekday: nil, initialStage: nil, now: date(20), calendar: calendar)
+        XCTAssertEqual(resumed.stage, .review); XCTAssertEqual(resumed.weekday, 4)
+    }
+
+    func testPlanWithoutRoutineUsesCreationAndUnsavedDraftCanResume() {
+        guard case .create(let weekday, let active) = GymNavigation.plan(active: nil, draft: nil, weekday: 6, weekly: true) else { return XCTFail("Expected creation") }
+        XCTAssertEqual(weekday, 6); XCTAssertTrue(active)
+        let draft = RoutineDraft(routine: RoutineTemplate.custom.make(), stage: .schedule, weekday: 0)
+        guard case .routine(let routine, _, _) = GymNavigation.plan(active: nil, draft: draft) else { return XCTFail("Expected draft") }
+        XCTAssertEqual(routine.id, draft.routine.id)
+    }
+
+    func testRapidPlanAndQuickWorkoutTapsCannotPresentCompetingSheets() {
+        let routine = RoutineTemplate.fullBody.make()
+        let plan = GymNavigation.plan(active: routine, draft: nil, weekly: true)
+        var navigation = GymNavigation()
+        for _ in 0..<50 {
+            XCTAssertTrue(navigation.present(plan))
+            let id = navigation.destination?.id
+            XCTAssertFalse(navigation.present(.workout))
+            XCTAssertFalse(navigation.present(plan))
+            XCTAssertEqual(navigation.destination?.id, id)
+            navigation.dismiss()
+            XCTAssertTrue(navigation.present(.workout))
+            XCTAssertFalse(navigation.present(plan))
+            navigation.dismiss()
+            XCTAssertNil(navigation.destination)
+        }
+    }
+
+    func testEditorEntryRejectsInvalidSavedWeekdayWithoutIndexingOutsideWeek() {
+        let draft = RoutineDraft(routine: RoutineTemplate.fullBody.make(), stage: .workouts, weekday: 99)
+        let entry = RoutineEditorEntry.resolve(isSaved: true, draft: draft, initialWeekday: -1, initialStage: nil, now: date(20), calendar: calendar)
+        XCTAssertEqual(entry.weekday, 1); XCTAssertEqual(entry.stage, .workouts)
+    }
+
+    @MainActor func testQuickWorkoutOnRestDayStartsAndFinishesWithoutRewritingWeeklyPlan() throws {
+        let database = try PersistenceFactory.makeContainer(inMemory: true)
+        let gym = try GymStore(container: database), workouts = try WorkoutStore(container: database)
+        var routine = RoutineTemplate.fullBody.make(); routine.isActive = true
+        XCTAssertTrue(gym.save(routine))
+        let saved = try XCTUnwrap(gym.activeRoutine), now = date(20)
+        XCTAssertEqual(GymLandingState.today(routine: saved, sessions: [], now: now, calendar: calendar), .rest)
+        var setup = QuickWorkoutDraft()
+        setup.add([ExerciseCatalogue.all[0]], current: nil, history: [])
+        setup.entries[0].sets = [WorkoutSet(reps: 8, loadKG: 20)]
+        XCTAssertNil(workouts.active) // Opening/configuring still does not start a session.
+        XCTAssertTrue(workouts.startQuickWorkout(setup, unit: .kg, now: now))
+        let running = try XCTUnwrap(workouts.active)
+        XCTAssertNil(running.routineID)
+        XCTAssertEqual(GymLandingState.today(routine: saved, sessions: workouts.sessions, now: now, calendar: calendar), .active(running))
+        XCTAssertTrue(workouts.pause(now: now.addingTimeInterval(5)))
+        let paused = try XCTUnwrap(workouts.active)
+        XCTAssertEqual(GymLandingState.today(routine: saved, sessions: workouts.sessions, now: now.addingTimeInterval(5), calendar: calendar), .active(paused))
+        XCTAssertTrue(workouts.resume(now: now.addingTimeInterval(10)))
+        XCTAssertTrue(workouts.performFocused(.completeSet, sessionID: running.id, now: now.addingTimeInterval(30)))
+        XCTAssertNil(workouts.active)
+        XCTAssertEqual(workouts.history.first?.status, .completed)
+        try gym.reload()
+        XCTAssertEqual(gym.activeRoutine, saved)
+        XCTAssertEqual(gym.activeRoutine?.days[1].kind, .rest)
+        guard case .routine(_, _, .schedule) = GymNavigation.plan(active: gym.activeRoutine, draft: nil, weekly: true) else { return XCTFail("Plan must still open after the quick workout") }
+    }
+
+    @MainActor func testRestAndOpenDaysNeverStartAnEmptyPlannedSession() throws {
+        let workouts = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        for kind in [RoutineDayKind.rest, .flexible] {
+            let day = RoutineDay(weekday: 1, kind: kind)
+            XCTAssertFalse(workouts.start(day: day, catalogue: ExerciseCatalogue.all, now: date(20)))
+            XCTAssertNil(workouts.active); XCTAssertTrue(workouts.sessions.isEmpty)
+        }
+    }
+
     func testCalendarDaysRemainSevenAcrossDaylightSavingChange() {
         var localCalendar = calendar
         localCalendar.timeZone = TimeZone(identifier: "America/New_York")!

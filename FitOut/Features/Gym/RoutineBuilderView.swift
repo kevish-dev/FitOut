@@ -4,6 +4,7 @@ struct RoutineEditor: View {
     let store: GymStore
     @State var routine: Routine
     var initialWeekday: Int? = nil
+    var initialStage: RoutineEditorStage? = nil
     var unit: WeightUnit = .kg
     @State private var stage: RoutineEditorStage = .schedule
     @State private var weekday = 0
@@ -468,14 +469,16 @@ struct RoutineEditor: View {
 
     private func restoreDraft() {
         guard !loaded else { return }
-        if let saved = store.drafts.first(where: { $0.id == routine.id }) {
-            routine = saved.routine; stage = saved.stage; weekday = saved.weekday; restored = true
+        let saved = store.drafts.first(where: { $0.id == routine.id })
+        if let saved {
+            routine = saved.routine; restored = true
             if let committed = store.routines.first(where: { $0.id == routine.id }) {
                 routine.archivedAt = committed.archivedAt; routine.isActive = committed.isActive
             }
         }
-        if let initialWeekday { weekday = initialWeekday; stage = .workouts }
-        else if !restored, store.routines.contains(where: { $0.id == routine.id }) { stage = .workouts; weekday = RoutineSchedule.weekday(for: .now) }
+        let entry = RoutineEditorEntry.resolve(isSaved: store.routines.contains(where: { $0.id == routine.id }), draft: saved,
+            initialWeekday: initialWeekday, initialStage: initialStage)
+        stage = entry.stage; weekday = entry.weekday
         synchronizeOtherDays()
         loaded = true
     }

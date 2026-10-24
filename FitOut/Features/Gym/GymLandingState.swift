@@ -118,3 +118,33 @@ enum GymLandingState {
         return completedSessions(sessions, through: now).filter { $0.startedAt >= start }
     }
 }
+
+/// One presentation slot prevents competing workout/plan/summary sheets.
+enum GymDestination: Identifiable {
+    case workout
+    case routine(Routine, weekday: Int?, stage: RoutineEditorStage?)
+    case create(weekday: Int?, useAsActive: Bool)
+    case summary(WorkoutSession)
+    var id: String {
+        switch self {
+        case .workout: return "workout"
+        case let .routine(routine, weekday, stage): return "routine-\(routine.id)-\(weekday ?? -1)-\(stage?.rawValue ?? "resume")"
+        case let .create(weekday, active): return "create-\(weekday ?? -1)-\(active)"
+        case let .summary(session): return "summary-\(session.id)"
+        }
+    }
+}
+struct GymNavigation {
+    private(set) var destination: GymDestination?
+    @discardableResult mutating func present(_ value: GymDestination) -> Bool {
+        guard destination == nil else { return false }
+        destination = value; return true
+    }
+    mutating func dismiss() { destination = nil }
+    static func plan(active: Routine?, draft: RoutineDraft?, weekday: Int? = nil, weekly: Bool = false) -> GymDestination {
+        if let routine = active ?? draft?.routine {
+            return .routine(routine, weekday: weekday, stage: weekly ? .schedule : nil)
+        }
+        return .create(weekday: weekday, useAsActive: true)
+    }
+}

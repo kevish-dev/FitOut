@@ -106,3 +106,19 @@ struct ProfilePresentationSection: View {
         }.frame(width: 56, height: 68).overlay { RoundedRectangle(cornerRadius: 12).stroke(FitTheme.subtleBorder) }.accessibilityHidden(true)
     }
 }
+
+/// System selection callbacks may repeat during layout/sheet presentation.
+/// Only an explicit corner-menu reselect is allowed to replace a section root.
+struct AppTabNavigation {
+    enum Source { case system, menu }
+    var selected = AppSection.home.rawValue
+    private(set) var revisions: [Int: UUID] = [:]
+    mutating func select(_ destination: Int, source: Source) {
+        guard AppSection(rawValue: destination) != nil else { return }
+        guard destination != selected else {
+            if source == .menu { revisions[destination] = UUID() }
+            return
+        }
+        selected = destination
+    }
+}

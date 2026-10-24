@@ -13,8 +13,10 @@ keeps scrollable content and pinned buttons above the bar. The bar stays expande
 while scrolling and hides while typing; Coach's composer follows the keyboard
 through its own safeAreaInset. Sheets keep their own navigation.
 
-Switching tabs preserves each section's navigation stack. Reselecting a section
-returns to its root. Changing navigation style keeps the selected section and
+Switching tabs preserves each section's navigation stack. System selection
+callbacks are idempotent, so repeated callbacks during sheet/layout updates never
+replace the selected section's root. The native bar retains system reselect
+behavior; an explicit corner-menu reselect returns to that section's root. Changing navigation style keeps the selected section and
 profile editor in place. The top-right menu closes on selection or layout changes;
 its adjacent controls share a GlassEffectContainer on iOS 26+. Pages reserve header
 space only when the corner menu is enabled.
