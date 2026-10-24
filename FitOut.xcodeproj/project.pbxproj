@@ -7,6 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F16000000000000000000014 /* WorkoutTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000001 /* WorkoutTelemetry.swift */; };
+		F16000000000000000000015 /* WorkoutTimingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000002 /* WorkoutTimingViews.swift */; };
+		F16000000000000000000016 /* WorkoutLiveAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000003 /* WorkoutLiveAttributes.swift */; };
+		F16000000000000000000017 /* WorkoutLiveIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000004 /* WorkoutLiveIntents.swift */; };
+		F16000000000000000000018 /* WorkoutLiveCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000005 /* WorkoutLiveCoordinator.swift */; };
+		F16000000000000000000019 /* WorkoutFloatingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000006 /* WorkoutFloatingOverlay.swift */; };
+		F1600000000000000000001A /* WorkoutLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000007 /* WorkoutLiveActivity.swift */; };
+		F16000000000000000000028 /* WorkoutLiveAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000003 /* WorkoutLiveAttributes.swift */; };
+		F16000000000000000000029 /* WorkoutLiveIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000004 /* WorkoutLiveIntents.swift */; };
+
 		F15000000000000000000001 /* WorkoutSessionVisuals.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15000000000000000000002 /* WorkoutSessionVisuals.swift */; };
 		F15000000000000000000003 /* WorkoutLoggingControls.swift in Sources */ = {isa = PBXBuildFile; fileRef = F15000000000000000000004 /* WorkoutLoggingControls.swift */; };
 		F14000000000000000000001 /* ExerciseBrowserView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F14000000000000000000002 /* ExerciseBrowserView.swift */; };
@@ -138,6 +148,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F16000000000000000000001 /* WorkoutTelemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTelemetry.swift; sourceTree = "<group>"; };
+		F16000000000000000000002 /* WorkoutTimingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTimingViews.swift; sourceTree = "<group>"; };
+		F16000000000000000000003 /* WorkoutLiveAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLiveAttributes.swift; sourceTree = "<group>"; };
+		F16000000000000000000004 /* WorkoutLiveIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLiveIntents.swift; sourceTree = "<group>"; };
+		F16000000000000000000005 /* WorkoutLiveCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLiveCoordinator.swift; sourceTree = "<group>"; };
+		F16000000000000000000006 /* WorkoutFloatingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutFloatingOverlay.swift; sourceTree = "<group>"; };
+		F16000000000000000000007 /* WorkoutLiveActivity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLiveActivity.swift; sourceTree = "<group>"; };
+
 		F15000000000000000000002 /* WorkoutSessionVisuals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionVisuals.swift; sourceTree = "<group>"; };
 		F15000000000000000000004 /* WorkoutLoggingControls.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLoggingControls.swift; sourceTree = "<group>"; };
 		F14000000000000000000002 /* ExerciseBrowserView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseBrowserView.swift; sourceTree = "<group>"; };
@@ -507,6 +525,13 @@
 		D7CB24A5F6FD15559F06C45B /* Workouts */ = {
 			isa = PBXGroup;
 			children = (
+				F16000000000000000000001 /* WorkoutTelemetry.swift */,
+				F16000000000000000000002 /* WorkoutTimingViews.swift */,
+				F16000000000000000000003 /* WorkoutLiveAttributes.swift */,
+				F16000000000000000000004 /* WorkoutLiveIntents.swift */,
+				F16000000000000000000005 /* WorkoutLiveCoordinator.swift */,
+				F16000000000000000000006 /* WorkoutFloatingOverlay.swift */,
+
 				576F88756261A41893E58D4F /* AnalyticsView.swift */,
 				A33DD1A98A596C1D0E0B0E77 /* WorkoutAnalytics.swift */,
 				F64CF237F05F4B664C4635D0 /* WorkoutDomain.swift */,
@@ -526,6 +551,7 @@
 				F08000000000000000000005 /* HydrationView.swift */,
 			); path = Widgets; sourceTree = "<group>"; };
 		F0800000000000000000000B /* FitOutWidgets */ = {isa = PBXGroup; children = (
+				F16000000000000000000007 /* WorkoutLiveActivity.swift */,
 				F08000000000000000000006 /* FitOutWidgets.swift */,
 				F08000000000000000000007 /* WidgetViews.swift */,
 				F08000000000000000000008 /* Info.plist */,
@@ -709,6 +735,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F16000000000000000000014 /* WorkoutTelemetry.swift in Sources */,
+				F16000000000000000000015 /* WorkoutTimingViews.swift in Sources */,
+				F16000000000000000000016 /* WorkoutLiveAttributes.swift in Sources */,
+				F16000000000000000000017 /* WorkoutLiveIntents.swift in Sources */,
+				F16000000000000000000018 /* WorkoutLiveCoordinator.swift in Sources */,
+				F16000000000000000000019 /* WorkoutFloatingOverlay.swift in Sources */,
+
 				F10000000000000000000013 /* SchemaV6.swift in Sources */,
 				F10000000000000000000010 /* HydrationReminder.swift in Sources */,
 				F1000000000000000000000E /* NutritionHistoryViews.swift in Sources */,
@@ -781,6 +814,10 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F08000000000000000000011 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (
+				F1600000000000000000001A /* WorkoutLiveActivity.swift in Sources */,
+				F16000000000000000000028 /* WorkoutLiveAttributes.swift in Sources */,
+				F16000000000000000000029 /* WorkoutLiveIntents.swift in Sources */,
+
 				F0800000000000000000001C /* WidgetData.swift in Sources */,
 				F0800000000000000000001D /* WidgetSharedStore.swift in Sources */,
 				F0800000000000000000001E /* WaterWidgetIntents.swift in Sources */,
@@ -1060,6 +1097,7 @@ APPLICATION_EXTENSION_API_ONLY = YES;
                 PRODUCT_NAME = "$(TARGET_NAME)";
                 SDKROOT = iphoneos;
                 SKIP_INSTALL = YES;
+                SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) FITOUT_WIDGET_EXTENSION";
                 SWIFT_VERSION = 6.0;
                 TARGETED_DEVICE_FAMILY = "1,2";
 			}; name = Debug; };
@@ -1078,6 +1116,7 @@ APPLICATION_EXTENSION_API_ONLY = YES;
                 PRODUCT_NAME = "$(TARGET_NAME)";
                 SDKROOT = iphoneos;
                 SKIP_INSTALL = YES;
+                SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) FITOUT_WIDGET_EXTENSION";
                 SWIFT_VERSION = 6.0;
                 TARGETED_DEVICE_FAMILY = "1,2";
 			}; name = Release; };

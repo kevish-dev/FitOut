@@ -226,102 +226,24 @@ struct HomeView: View {
         }
     }
 
-    // MARK: - Hero Workout Card ("Set up your workout routine")
+    // MARK: - Workout preview
     private var heroWorkoutCard: some View {
-        Button(action: openTodayWorkout) {
-            HStack(spacing: 14) {
-                // Circular dumbbell badge with glowing orange border and radial glow
-                ZStack {
-                    Circle()
-                        .fill(
-                            RadialGradient(
-                                colors: [FitTheme.orange.opacity(0.32), FitTheme.orange.opacity(0.06)],
-                                center: .center,
-                                startRadius: 0,
-                                endRadius: 26
-                            )
-                        )
-                        .frame(width: 52, height: 52)
-                        .overlay {
-                            Circle().stroke(FitTheme.orange.opacity(0.75), lineWidth: 1.3)
-                        }
-
-                    Image(systemName: "dumbbell")
-                        .font(.system(size: 20, weight: .semibold))
-                        .foregroundStyle(.white)
-                }
-
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(heroWorkoutTitle)
-                        .font(FitTheme.section(16))
-                        .foregroundStyle(.white)
-                        .lineLimit(2)
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(heroWorkoutSubtitle)
-                        .font(FitTheme.body(13))
-                        .foregroundStyle(FitTheme.textSecondary)
-                        .lineLimit(2)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                // Glowing circular orange CTA button with arrow
-                ZStack {
-                    Circle()
-                        .fill(
-                            LinearGradient(
-                                colors: [Color(red: 0.95, green: 0.22, blue: 0.05), Color(red: 0.78, green: 0.12, blue: 0.0)],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                        .frame(width: 40, height: 40)
-
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundStyle(.white)
+        let state = GymLandingState.today(routine: container.gym.activeRoutine,
+                                          sessions: container.workouts.sessions)
+        return Button {
+            if container.workouts.active != nil { showWorkout = true }
+            else {
+                switch state {
+                case .rest, .unassigned, .completed: tab = 1
+                default: openTodayWorkout()
                 }
             }
-            .padding(FitTheme.cardInset)
-            .dashboardGlass(in: RoundedRectangle(cornerRadius: 24), highlighted: true, interactive: true)
+        } label: {
+            DashboardWorkoutPreview(state: state, routine: container.gym.activeRoutine,
+                                    hasDraft: container.gym.resumableDraft != nil)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(heroWorkoutTitle). \(heroWorkoutSubtitle)")
-    }
-
-    private var heroWorkoutTitle: String {
-        switch workout {
-        case .noRoutine: return "Set up your workout routine"
-        case .rest: return "Rest day"
-        case .flexible: return "Flexible day"
-        case .planned(let title, _, _): return title
-        case .completed(let title, _, _, _): return "\(title) completed"
-        }
-    }
-
-    private var heroWorkoutSubtitle: String {
-        if case .noRoutine = workout {
-            return "Get a personalized plan based on your goals."
-        }
-        if let session = container.workouts.active {
-            if session.routineID == container.gym.activeRoutine?.id,
-               Calendar.current.isDateInToday(session.startedAt) {
-                return "Resume session · \(session.completedSets.count) sets logged"
-            }
-            return "Resume your current session before changing workouts."
-        }
-        switch workout {
-        case .noRoutine:
-            return "Get a personalized plan based on your goals."
-        case .rest:
-            return "Take a breath. Recovery is part of the plan."
-        case .flexible:
-            return "Choose a quick session or enjoy a lighter day."
-        case .planned(_, let count, let minutes):
-            return "\(count) exercises" + (minutes.map { " · \($0) min" } ?? "")
-        case .completed(_, let sets, let seconds, _):
-            return "\(sets) sets · \(Int(seconds / 60)) min logged today"
-        }
+        .buttonStyle(RoutineEditorPressStyle())
+        .accessibilityIdentifier("homeTodayWorkout")
     }
 
     // MARK: - Daily Workout Streak

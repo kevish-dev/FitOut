@@ -15,6 +15,10 @@ struct WorkoutSet: Identifiable, Codable, Equatable {
     var targetRPE: Double?
     var targetRepMax: Int?
     var plannedTarget: PlannedSet?
+    var startedAt: Date?
+    var startedActiveSeconds: TimeInterval?
+    var loggedActiveSeconds: TimeInterval?
+    var timedActiveSeconds: TimeInterval?
     var isValid: Bool {
         (0...1000).contains(reps) && loadKG.isFinite && (0...1000).contains(loadKG)
             && seconds.isFinite && (0...86400).contains(seconds)
@@ -24,6 +28,7 @@ struct WorkoutSet: Identifiable, Codable, Equatable {
             && (targetRPE == nil || (targetRPE!.isFinite && (1...10).contains(targetRPE!)))
             && (targetRepMax == nil || (1...100).contains(targetRepMax!))
             && (plannedTarget == nil || plannedTarget!.isValid)
+            && [startedActiveSeconds, loggedActiveSeconds, timedActiveSeconds].compactMap { $0 }.allSatisfy { $0.isFinite && $0 >= 0 }
     }
     func nextWorkingSet() -> WorkoutSet {
         WorkoutSet(reps: reps, loadKG: loadKG, seconds: seconds, distanceMeters: distanceMeters)
@@ -49,6 +54,7 @@ struct WorkoutSession: Identifiable, Codable, Equatable {
     var restUntil: Date?
     var notes = ""
     var entries: [WorkoutEntry] = []
+    var telemetry: WorkoutTelemetry?
     var isActive: Bool { status == .inProgress || status == .paused }
     var completedSets: [WorkoutSet] { entries.flatMap(\.sets).filter { $0.completedAt != nil } }
     var completedExercises: Int { entries.filter { $0.sets.contains { $0.completedAt != nil } }.count }

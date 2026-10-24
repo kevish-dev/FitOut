@@ -38,7 +38,7 @@ struct AppRoot: View {
         }
     }
     private func open() {
-        do { container = try AppContainer.live(); failure = nil }
+        do { container = try WorkoutRuntime.shared(); failure = nil }
         catch { failure = error.localizedDescription }
     }
 }

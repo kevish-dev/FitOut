@@ -69,6 +69,7 @@ struct AppShell: View {
             if phase == .active { Task { await container.health.refreshOverview() } }
         }
         .task(id: phase) {
+            container.workoutPresentation.sceneChanged(active: phase == .active)
             guard phase == .active else { return }
             container.hydration.refresh()
             container.widgets.publish()
@@ -110,19 +111,23 @@ struct AppShell: View {
             tab = 1
             if container.workouts.active != nil {
                 container.workouts.resume()
-                widgetSheet = .workout
+                openWorkout()
             } else if let routine = container.gym.activeRoutine,
                       routine.hasStarted(at: .now), let day = RoutineSchedule.day(in: routine, at: .now),
                       day.kind == .workout, !day.exercises.isEmpty {
                 if container.workouts.history.contains(where: { $0.status == .completed && $0.routineID == routine.id && Calendar.current.isDateInToday($0.startedAt) }) { widgetSheet = .history }
-                else if container.workouts.start(day: day, routineID: routine.id, catalogue: container.gym.exercises) { widgetSheet = .workout }
+                else if container.workouts.start(day: day, routineID: routine.id, catalogue: container.gym.exercises) { openWorkout() }
                 else { widgetError = container.workouts.error }
             } else { widgetSheet = .routine }
         case .workout:
             tab = 1
-            if container.workouts.active != nil { widgetSheet = .workout }
+            if container.workouts.active != nil { openWorkout() }
         default: widgetSheet = destination
         }
+    }
+
+    private func openWorkout() {
+        if !container.workoutPresentation.openCurrentWorkout() { widgetSheet = .workout }
     }
 
     private func select(_ destination: Int) {

@@ -36,6 +36,7 @@ struct ActiveWorkoutView: View {
     @State private var finished: WorkoutSession?
     @State private var expandedEntry: UUID?
     @State private var keyboardVisible = false
+    @State private var timingDetails = false
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -48,6 +49,18 @@ struct ActiveWorkoutView: View {
                         LazyVStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
                             TimelineView(.periodic(from: .now, by: 1)) { context in
                                 WorkoutSessionHero(session: session, unit: unit, now: context.date)
+                            }
+                            HStack {
+                                Button("Timing & laps", systemImage: "stopwatch") { dismissKeyboard(); timingDetails = true }
+                                Spacer()
+                                Button("Lap \((session.telemetry?.laps.count ?? 0) + 1)", systemImage: "flag") { dismissKeyboard(); store.markLap() }
+                                    .disabled(session.status == .paused).accessibilityIdentifier("recordWorkoutLap")
+                            }.font(FitTheme.medium(13)).frame(minHeight: 44)
+                            if let presentation = WorkoutRuntime.presentation, let message = presentation.liveActivityMessage {
+                                VStack(alignment: .leading, spacing: 8) {
+                                    Text(message).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                                    Button("Show Live Activity") { presentation.showLiveActivity() }.font(FitTheme.medium(12)).frame(minHeight: 44)
+                                }
                             }
                             if session.entries.isEmpty {
                                 WorkoutEmptyState()
@@ -63,8 +76,10 @@ struct ActiveWorkoutView: View {
                                 ForEach(session.entries) { entry in
                                     WorkoutExerciseCard(entry: entry,
                                         expanded: Binding(get: { expandedEntry == entry.id }, set: { dismissKeyboard(); expandedEntry = $0 ? entry.id : nil }),
-                                        unit: unit, canComplete: session.status == .inProgress,
+                                        unit: unit, session: session, canComplete: session.status == .inProgress,
                                         binding: { setBinding(entry.id, $0) }, complete: { toggleSet(entry.id, $0) },
+                                        start: { dismissKeyboard(); store.startSet(entryID: entry.id, setID: $0) },
+                                        stopTimer: { dismissKeyboard(); store.stopSetTimer(entryID: entry.id, setID: $0) },
                                         deleteSet: { deleteSet(entry.id, $0) }, addSet: { addSet(entry.id) },
                                         notes: Binding(get: { store.active?.entries.first { $0.id == entry.id }?.notes ?? "" }, set: { value in changeEntry(entry.id) { $0.notes = value } }),
                                         replace: { dismissKeyboard(); replacing = entry.id; selecting = true },
@@ -109,6 +124,9 @@ struct ActiveWorkoutView: View {
             ToolbarItem(placement: .confirmationAction) { Button("Close") { dismissKeyboard(); dismiss() } }
         }
         .presentationDragIndicator(.visible).presentationCornerRadius(30).preferredColorScheme(.dark)
+        .onAppear { store.editorAppeared() }
+        .onDisappear { store.editorDisappeared() }
+        .sheet(isPresented: $timingDetails) { if let session = store.active { WorkoutTimingDetails(session: session, unit: unit) } }
         .sheet(isPresented: $selecting) {
             NavigationStack {
                 ExerciseBrowser(store: gym, title: replacing == nil ? "Add exercises" : "Replace exercise",
@@ -154,7 +172,7 @@ struct ActiveWorkoutView: View {
             } else {
                 if session.restUntil != nil {
                     TimelineView(.periodic(from: .now, by: 1)) { context in
-                        WorkoutRestCard(session: session, now: context.date) { store.update { $0.restUntil = nil } }
+                        WorkoutRestCard(session: session, now: context.date) { store.endRest() }
                     }
                 }
                 HStack(spacing: 12) {
@@ -227,6 +245,7 @@ struct WorkoutSummary: View {
     let session: WorkoutSession
     let unit: WeightUnit
     var history: [WorkoutSession] = []
+    @State private var showTiming = false
     private var records: [String] { Array(Set(WorkoutAnalytics.newRecords(in: session, history: history))).sorted() }
     var body: some View {
         ScrollView {
@@ -234,6 +253,8 @@ struct WorkoutSummary: View {
                 WorkoutSessionHero(session: session, unit: unit, now: session.endedAt ?? .now)
                 Label(session.startedAt.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
                     .font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
+                Button("Timing, laps & session timeline", systemImage: "stopwatch") { showTiming = true }
+                    .font(FitTheme.button(14)).frame(minHeight: 44)
                 if !records.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
                         Label("New personal records", systemImage: "trophy").font(FitTheme.section(17)).foregroundStyle(FitTheme.dashboardAccent)
@@ -288,6 +309,7 @@ struct WorkoutSummary: View {
         }
         .background(FitTheme.dashboardBackground).foregroundStyle(.white).tint(FitTheme.dashboardAccent)
         .navigationTitle("Workout summary").navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $showTiming) { WorkoutTimingDetails(session: session, unit: unit) }
     }
 }
 

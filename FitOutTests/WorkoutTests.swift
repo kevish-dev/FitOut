@@ -1,6 +1,182 @@
 import XCTest
 @testable import FitOut
 final class WorkoutTests: XCTestCase {
+    @MainActor func testPrecisePausesLapsAndEvidenceSurviveReload() throws {
+        let database = try PersistenceFactory.makeContainer(inMemory: true)
+        let store = try WorkoutStore(container: database)
+        let start = Date(timeIntervalSince1970: 30_000)
+        XCTAssertTrue(store.start(catalogue: [], now: start))
+        store.pause(now: start.addingTimeInterval(10.25))
+        store.resume(now: start.addingTimeInterval(20.75))
+        store.markLap(now: start.addingTimeInterval(30.5))
+        store.markLap(now: start.addingTimeInterval(45.75))
+        let reopened = try WorkoutStore(container: database)
+        let session = try XCTUnwrap(reopened.active)
+        XCTAssertEqual(session.pausedSeconds, 10.5, accuracy: 0.001)
+        let log = try XCTUnwrap(session.telemetry)
+        XCTAssertEqual(log.pauses.count, 1)
+        XCTAssertEqual(log.pauses[0].endedAt, start.addingTimeInterval(20.75))
+        XCTAssertEqual(log.laps.count, 2)
+        XCTAssertEqual(log.laps[0].activeSeconds, 20, accuracy: 0.001)
+        XCTAssertEqual(log.laps[0].wallSeconds, 30.5, accuracy: 0.001)
+        XCTAssertEqual(log.laps[1].activeSeconds, 15.25, accuracy: 0.001)
+        XCTAssertEqual(log.laps[1].elapsedActiveSeconds, 35.25, accuracy: 0.001)
+        reopened.pause(now: start.addingTimeInterval(50))
+        XCTAssertTrue(reopened.finish(.abandoned, now: start.addingTimeInterval(70)))
+        let ended = try XCTUnwrap(reopened.history.first)
+        XCTAssertEqual(ended.duration(), 39.5, accuracy: 0.001)
+        XCTAssertEqual(ended.totalPaused(), 30.5, accuracy: 0.001)
+        XCTAssertEqual(ended.telemetry?.pauses.last?.endedAt, ended.endedAt)
+    }
+
+    @MainActor func testSetClockExcludesPausesAndStopsBeforeLoggingOrUndo() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        let start = Date(timeIntervalSince1970: 40_000)
+        let entry = WorkoutEntry(exercise: try XCTUnwrap(ExerciseCatalogue.all.first { $0.kind == .duration }), sets: [WorkoutSet(seconds: 30)])
+        let setID = entry.sets[0].id
+        XCTAssertTrue(store.start(catalogue: [], now: start))
+        store.update(at: start) { $0.entries = [entry] }
+        store.startSet(entryID: entry.id, setID: setID, now: start.addingTimeInterval(5))
+        store.pause(now: start.addingTimeInterval(15))
+        store.resume(now: start.addingTimeInterval(25))
+        store.stopSetTimer(entryID: entry.id, setID: setID, now: start.addingTimeInterval(35))
+        let stopped = try XCTUnwrap(store.active?.entries[0].sets[0])
+        XCTAssertEqual(stopped.seconds, 20, accuracy: 0.001)
+        XCTAssertEqual(try XCTUnwrap(store.active?.setElapsed(stopped, at: start.addingTimeInterval(100))), 20, accuracy: 0.001)
+        store.toggleSet(entryID: entry.id, setID: setID, now: start.addingTimeInterval(45))
+        let logged = try XCTUnwrap(store.active?.entries[0].sets[0])
+        XCTAssertEqual(logged.seconds, 20, accuracy: 0.001)
+        XCTAssertEqual(logged.loggedActiveSeconds, 35)
+        XCTAssertEqual(logged.timedActiveSeconds, 20)
+        store.toggleSet(entryID: entry.id, setID: setID, now: start.addingTimeInterval(46))
+        let undone = try XCTUnwrap(store.active?.entries[0].sets[0])
+        XCTAssertNil(undone.startedAt); XCTAssertNil(undone.startedActiveSeconds); XCTAssertNil(undone.timedActiveSeconds)
+        XCTAssertEqual(undone.seconds, 20)
+        let undo = try XCTUnwrap(store.active?.telemetry?.events.last { $0.kind == .setUndone })
+        XCTAssertEqual(undo.beforeSet?.completedAt, start.addingTimeInterval(45))
+        XCTAssertEqual(undo.beforeSet?.timedActiveSeconds, 20)
+        let next = logged.nextWorkingSet()
+        XCTAssertNil(next.startedAt); XCTAssertNil(next.startedActiveSeconds); XCTAssertNil(next.loggedActiveSeconds); XCTAssertNil(next.timedActiveSeconds)
+    }
+
+    @MainActor func testRunningDurationUsesMeasuredTimeAndKeepsDeletedSetEvidence() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        let start = Date(timeIntervalSince1970: 50_000)
+        let entry = WorkoutEntry(exercise: try XCTUnwrap(ExerciseCatalogue.all.first { $0.kind == .duration }), sets: [WorkoutSet(seconds: 0)])
+        XCTAssertTrue(store.start(catalogue: [], now: start))
+        store.update(at: start) { $0.entries = [entry] }
+        store.startSet(entryID: entry.id, setID: entry.sets[0].id, now: start.addingTimeInterval(5))
+        store.toggleSet(entryID: entry.id, setID: entry.sets[0].id, now: start.addingTimeInterval(22.25))
+        XCTAssertEqual(store.active?.completedSets.first?.seconds, 17.25)
+        store.update(at: start.addingTimeInterval(23)) { $0.entries[0].sets[0].rpe = 8 }
+        store.update(at: start.addingTimeInterval(24)) { $0.entries[0].sets[0].rpe = 9 }
+        XCTAssertEqual(store.active?.telemetry?.events.filter { $0.kind == .setEdited }.count, 1)
+        store.update(at: start.addingTimeInterval(25)) { $0.entries[0].sets.removeAll() }
+        let deleted = try XCTUnwrap(store.active?.telemetry?.events.last { $0.kind == .setDeleted })
+        XCTAssertEqual(deleted.beforeSet?.seconds, 17.25)
+        XCTAssertEqual(deleted.beforeSet?.rpe, 9)
+        XCTAssertEqual(deleted.exerciseName, entry.exercise.name)
+    }
+
+    @MainActor func testLiveActionsAreIdempotentAndCannotMutateAnotherSession() throws {
+        let database = try PersistenceFactory.makeContainer(inMemory: true)
+        let store = try WorkoutStore(container: database)
+        let start = Date(timeIntervalSince1970: 60_000)
+        XCTAssertTrue(store.start(catalogue: [], now: start))
+        let sessionID = try XCTUnwrap(store.active?.id), commandID = UUID()
+        XCTAssertTrue(store.runQuickAction("lap", sessionID: sessionID, commandID: commandID, now: start.addingTimeInterval(10)))
+        let reopened = try WorkoutStore(container: database)
+        XCTAssertTrue(reopened.runQuickAction("lap", sessionID: sessionID, commandID: commandID, now: start.addingTimeInterval(11)))
+        XCTAssertEqual(reopened.active?.telemetry?.laps.count, 1)
+        XCTAssertEqual(reopened.active?.telemetry?.events.last?.origin, .liveActivity)
+        XCTAssertFalse(reopened.runQuickAction("pause", sessionID: UUID(), commandID: UUID()))
+        XCTAssertEqual(reopened.active?.status, .inProgress)
+        XCTAssertTrue(reopened.finish(.abandoned, now: start.addingTimeInterval(15)))
+        XCTAssertTrue(reopened.start(catalogue: [], now: start.addingTimeInterval(16)))
+        XCTAssertFalse(reopened.runQuickAction("pause", sessionID: sessionID, commandID: UUID()))
+        XCTAssertEqual(reopened.active?.status, .inProgress)
+    }
+
+    @MainActor func testSwitchingSetTimersPreservesMeasurementWithoutLogging() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        let start = Date(timeIntervalSince1970: 65_000)
+        let entry = WorkoutEntry(exercise: try XCTUnwrap(ExerciseCatalogue.all.first { $0.kind == .duration }), sets: [WorkoutSet(), WorkoutSet()])
+        XCTAssertTrue(store.start(catalogue: [], now: start))
+        store.update(at: start) { $0.entries = [entry] }
+        store.startSet(entryID: entry.id, setID: entry.sets[0].id, now: start.addingTimeInterval(5))
+        store.startSet(entryID: entry.id, setID: entry.sets[1].id, now: start.addingTimeInterval(20))
+        let session = try XCTUnwrap(store.active)
+        XCTAssertEqual(session.entries[0].sets[0].timedActiveSeconds, 15)
+        XCTAssertEqual(session.entries[0].sets[0].seconds, 15)
+        XCTAssertNil(session.entries[0].sets[0].completedAt)
+        XCTAssertNil(session.entries[0].sets[1].timedActiveSeconds)
+        XCTAssertEqual(session.focusedWork?.set.id, entry.sets[1].id)
+        XCTAssertEqual(session.telemetry?.events.filter { $0.kind == .setTimerStopped }.count, 1)
+        XCTAssertTrue(store.finish(.abandoned, now: start.addingTimeInterval(30)))
+        XCTAssertEqual(store.history[0].entries[0].sets[1].timedActiveSeconds, 10)
+        XCTAssertTrue(store.history[0].completedSets.isEmpty)
+    }
+
+    func testExpiredRestUsesItsDeadlineInsteadOfReopeningTime() throws {
+        let start = Date(timeIntervalSince1970: 68_000)
+        var before = WorkoutSession(title: "Rest", startedAt: start, restUntil: start.addingTimeInterval(30))
+        before.telemetry = WorkoutTelemetry(recordedSince: start, baselinePausedSeconds: 0)
+        var after = before; after.restUntil = start.addingTimeInterval(100)
+        let result = WorkoutTelemetryRecorder.prepare(after, before: before, at: start.addingTimeInterval(60), origin: .app)
+        let events = try XCTUnwrap(result.telemetry).events.filter { $0.kind == .restChanged }
+        XCTAssertEqual(events.count, 2)
+        XCTAssertEqual(events[0].date, start.addingTimeInterval(30))
+        XCTAssertEqual(events[0].activeSeconds, 30)
+        XCTAssertEqual(events[1].date, start.addingTimeInterval(60))
+        XCTAssertEqual(events[1].afterDeadline, start.addingTimeInterval(100))
+    }
+
+    func testOldSupplementAndSessionDecodeWithoutTimingKeys() throws {
+        let oldSupplement = try JSONDecoder().decode(SessionPlanDetails.self, from: Data("{\"sets\":[]}".utf8))
+        XCTAssertNil(oldSupplement.telemetry)
+        var set = WorkoutSet(startedAt: .now, startedActiveSeconds: 2, loggedActiveSeconds: 12, timedActiveSeconds: 10)
+        var object = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(set)) as? [String: Any])
+        for key in ["startedAt", "startedActiveSeconds", "loggedActiveSeconds", "timedActiveSeconds"] { object.removeValue(forKey: key) }
+        set = try JSONDecoder().decode(WorkoutSet.self, from: JSONSerialization.data(withJSONObject: object))
+        XCTAssertNil(set.startedAt); XCTAssertNil(set.timedActiveSeconds)
+        let old = WorkoutSession(title: "Older session")
+        let decoded = try JSONDecoder().decode(WorkoutSession.self, from: JSONEncoder().encode(old))
+        XCTAssertNil(decoded.telemetry)
+        var restored = decoded
+        restored.telemetry = WorkoutTelemetry(recordedSince: .now, baselinePausedSeconds: 0)
+        restored = oldSupplement.applying(to: restored)
+        XCTAssertNil(restored.telemetry)
+    }
+
+    func testLegacyTrackingDoesNotInventEarlierEvents() {
+        let start = Date(timeIntervalSince1970: 70_000)
+        let old = WorkoutSession(title: "Previously running", startedAt: start, pausedSeconds: 20,
+            entries: [WorkoutEntry(exercise: ExerciseCatalogue.all[0], sets: [WorkoutSet(completedAt: start.addingTimeInterval(10))])])
+        let new = WorkoutTelemetryRecorder.prepare(old, before: old, at: start.addingTimeInterval(100), origin: .app)
+        XCTAssertEqual(new.telemetry?.events.map(\.kind), [.trackingEnabled])
+        XCTAssertEqual(new.telemetry?.recordedSince, start.addingTimeInterval(100))
+        XCTAssertEqual(new.telemetry?.baselinePausedSeconds, 20)
+        XCTAssertEqual(new.completedSets.count, 1)
+    }
+
+    @MainActor func testLiveActivityProjectionHasCorrectClocksAndBoundedPayload() throws {
+        let start = Date(timeIntervalSince1970: 80_000)
+        var session = WorkoutSession(title: String(repeating: "🏋️", count: 500), startedAt: start, pausedSeconds: 10)
+        let set = WorkoutSet(startedAt: start.addingTimeInterval(20), startedActiveSeconds: 15)
+        var entry = WorkoutEntry(exercise: ExerciseCatalogue.all[0], sets: [set])
+        entry.exercise.name = String(repeating: "Lift", count: 1000)
+        session.entries = [entry]
+        let state = WorkoutPresentationCoordinator.content(for: session, unit: .kg, now: start.addingTimeInterval(40))
+        XCTAssertEqual(state.clockStart, start.addingTimeInterval(10))
+        XCTAssertEqual(state.elapsed, 30)
+        XCTAssertEqual(state.setTimerElapsed, 15)
+        XCTAssertEqual(state.setTimerStart, start.addingTimeInterval(25))
+        XCTAssertLessThan(try JSONEncoder().encode(state).count, 4096)
+        session.status = .paused; session.pausedAt = start.addingTimeInterval(40)
+        let paused = WorkoutPresentationCoordinator.content(for: session, unit: .kg, now: start.addingTimeInterval(100))
+        XCTAssertEqual(paused.elapsed, 30); XCTAssertNil(paused.setTimerStart); XCTAssertEqual(paused.setTimerElapsed, 15)
+    }
+
     @MainActor func testBatchAddingPreservesSelectionOrderAndSavesOnce() throws {
         let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
         XCTAssertTrue(store.start(catalogue: ExerciseCatalogue.all))

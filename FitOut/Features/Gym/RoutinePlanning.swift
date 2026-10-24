@@ -104,15 +104,23 @@ struct SessionPlanDetails: Codable {
         var targetRPE: Double?
         var targetRepMax: Int?
         var plannedTarget: PlannedSet?
+        var startedAt: Date?
+        var startedActiveSeconds: TimeInterval?
+        var loggedActiveSeconds: TimeInterval?
+        var timedActiveSeconds: TimeInterval?
     }
     var sets: [UUID: SetDetail]
+    var telemetry: WorkoutTelemetry?
     init(_ session: WorkoutSession) {
         sets = Dictionary(uniqueKeysWithValues: session.entries.flatMap(\.sets).map {
-            ($0.id, SetDetail(restSeconds: $0.restSeconds, targetRPE: $0.targetRPE, targetRepMax: $0.targetRepMax, plannedTarget: $0.plannedTarget))
+            ($0.id, SetDetail(restSeconds: $0.restSeconds, targetRPE: $0.targetRPE, targetRepMax: $0.targetRepMax, plannedTarget: $0.plannedTarget,
+                startedAt: $0.startedAt, startedActiveSeconds: $0.startedActiveSeconds, loggedActiveSeconds: $0.loggedActiveSeconds, timedActiveSeconds: $0.timedActiveSeconds))
         })
+        telemetry = session.telemetry
     }
     func applying(to session: WorkoutSession) -> WorkoutSession {
         var result = session
+        result.telemetry = telemetry
         for entry in result.entries.indices {
             for index in result.entries[entry].sets.indices {
                 let id = result.entries[entry].sets[index].id
@@ -121,6 +129,10 @@ struct SessionPlanDetails: Codable {
                 result.entries[entry].sets[index].targetRPE = detail.targetRPE
                 result.entries[entry].sets[index].targetRepMax = detail.targetRepMax
                 result.entries[entry].sets[index].plannedTarget = detail.plannedTarget
+                result.entries[entry].sets[index].startedAt = detail.startedAt
+                result.entries[entry].sets[index].startedActiveSeconds = detail.startedActiveSeconds
+                result.entries[entry].sets[index].loggedActiveSeconds = detail.loggedActiveSeconds
+                result.entries[entry].sets[index].timedActiveSeconds = detail.timedActiveSeconds
             }
         }
         return result

@@ -22,17 +22,25 @@ targets:
       path: FitOut/Info.plist
       properties:
         CFBundleDisplayName: FitOut
+        NSSupportsLiveActivities: true
+        CFBundleURLTypes:
+          - CFBundleURLName: com.kevishsewliya.fitout.widgets
+            CFBundleURLSchemes: [fitout]
         NSHealthShareUsageDescription: FitOut reads selected activity, workouts, nutrition and body measurements to show your personal progress.
         UILaunchScreen: {}
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
         UIUserInterfaceStyle: Dark
-        UIAppFonts: [orbitron-700.ttf, orbitron-800.ttf, rajdhani-500.ttf, rajdhani-600.ttf]
+        UIAppFonts: [Inter-Regular.otf, Inter-Medium.otf, Inter-SemiBold.otf, Inter-Bold.otf, orbitron-700.ttf, orbitron-800.ttf, rajdhani-500.ttf, rajdhani-600.ttf]
     entitlements:
       path: FitOut/FitOut.entitlements
       properties:
         com.apple.developer.healthkit: true
+        com.apple.security.application-groups: [group.com.kevishsewliya.fitout]
+    dependencies:
+      - target: FitOutWidgets
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.kevishsewliya.fitout
@@ -42,6 +50,40 @@ targets:
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         ASSETCATALOG_COMPILER_GENERATE_ASSET_SYMBOLS: NO
+  FitOutWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: FitOutWidgets
+      - path: FitOut/Widgets/WidgetData.swift
+      - path: FitOut/Widgets/WidgetSharedStore.swift
+      - path: FitOut/Widgets/WaterWidgetIntents.swift
+      - path: FitOut/Features/Workouts/WorkoutLiveAttributes.swift
+      - path: FitOut/Features/Workouts/WorkoutLiveIntents.swift
+      - path: FitOut/Resources/Fonts/Inter-Medium.otf
+        buildPhase: resources
+      - path: FitOut/Resources/Fonts/orbitron-700.ttf
+        buildPhase: resources
+    info:
+      path: FitOutWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: FitOut Widgets
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+        UIAppFonts: [Inter-Medium.otf, orbitron-700.ttf]
+    entitlements:
+      path: FitOutWidgets/FitOutWidgets.entitlements
+      properties:
+        com.apple.security.application-groups: [group.com.kevishsewliya.fitout]
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.kevishsewliya.fitout.widgets
+        APPLICATION_EXTENSION_API_ONLY: YES
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) FITOUT_WIDGET_EXTENSION"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SKIP_INSTALL: YES
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
   FitOutTests:
     type: bundle.unit-test
     platform: iOS

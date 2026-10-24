@@ -107,32 +107,12 @@ struct GymView: View {
     }
 
     private var todayCard: some View {
-        VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
-            HStack(spacing: 8) {
-                Circle().fill(accent).frame(width: 6, height: 6)
-                Text(cardEyebrow).font(FitTheme.medium(11)).tracking(1.5)
-                    .foregroundStyle(accent)
-                Spacer()
-                Image(systemName: cardSymbol).foregroundStyle(accent)
-            }
-            VStack(alignment: .leading, spacing: 10) {
-                Text(cardTitle).font(FitTheme.section(25)).fixedSize(horizontal: false, vertical: true)
-                cardDetail
-            }
+        VStack(spacing: 10) {
             Button(action: primaryAction) {
-                HStack(spacing: 10) {
-                    Image(systemName: primarySymbol)
-                    Text(primaryTitle)
-                    Spacer(minLength: 4)
-                    Image(systemName: "arrow.right")
-                }
-                .font(FitTheme.button(15))
-                .foregroundStyle(.white)
-                .padding(.horizontal, 16)
-                .frame(minHeight: 52)
-                .background(accent, in: RoundedRectangle(cornerRadius: 15))
+                DashboardWorkoutPreview(state: today, routine: store.activeRoutine,
+                                        hasDraft: store.resumableDraft != nil)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(RoutineEditorPressStyle())
             .accessibilityIdentifier(primaryIdentifier)
             if case .scheduled = today {
                 Button { openPlan() } label: {
@@ -143,54 +123,7 @@ struct GymView: View {
                 }.buttonStyle(.plain)
             }
         }
-        .padding(FitTheme.cardInset)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .dashboardGlass(in: RoundedRectangle(cornerRadius: 24), highlighted: true)
         .accessibilityIdentifier("gymTodayCard")
-    }
-
-    @ViewBuilder private var cardDetail: some View {
-        switch today {
-        case .scheduled(let day):
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 16) { workoutFacts(day) }
-                VStack(alignment: .leading, spacing: 8) { workoutFacts(day) }
-            }
-            if !day.muscles.isEmpty {
-                Text(day.muscles.map(\.title).joined(separator: " · "))
-                    .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-            }
-        case .active(let session):
-            supportingText("\(session.completedSets.count) sets saved · \(session.status == .paused ? "Paused" : "In progress")")
-        case .completed(let session):
-            supportingText("\(session.completedSets.count) sets logged · \(Int(session.duration() / 60)) min")
-        case .setup:
-            supportingText(store.resumableDraft == nil
-                ? "Choose your training days, add exercises, and make the plan your own."
-                : "Your unfinished routine is saved. Continue from the day and step you left open.")
-        case .needsExercises:
-            supportingText("Your day is scheduled. Add the exercises you want to train before starting.")
-        case .rest:
-            supportingText("A rest day in \(store.activeRoutine?.name ?? "your routine"). Your next sessions are in the weekly plan.")
-        case .unassigned:
-            if let routine = store.activeRoutine, !routine.hasStarted(at: now), let start = routine.startsOn {
-                supportingText("Your routine starts \(start.formatted(date: .abbreviated, time: .omitted)). You can review the plan or train freestyle below.")
-            } else { supportingText("No workout assigned today. Plan a session or start a freestyle workout below.") }
-        }
-    }
-
-    @ViewBuilder private func workoutFacts(_ day: RoutineDay) -> some View {
-        Label("\(day.exercises.count) exercises", systemImage: "dumbbell")
-            .font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
-        if let minutes = day.durationMinutes {
-            Label("\(minutes) min target", systemImage: "clock")
-                .font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
-        }
-    }
-
-    private func supportingText(_ text: String) -> some View {
-        Text(text).font(FitTheme.body(14)).foregroundStyle(FitTheme.textSecondary)
-            .fixedSize(horizontal: false, vertical: true)
     }
 
     private var quickActions: some View {
@@ -331,51 +264,6 @@ struct GymView: View {
         }.frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var cardEyebrow: String {
-        switch today {
-        case .setup: "YOUR NEXT CHAPTER"
-        case .active: "PICK UP WHERE YOU LEFT OFF"
-        case .completed: "TODAY / COMPLETED"
-        case .rest: "TODAY / REST"
-        case .unassigned: "TODAY / OPEN DAY"
-        case .scheduled, .needsExercises: "TODAY’S WORKOUT"
-        }
-    }
-    private var cardTitle: String {
-        switch today {
-        case .setup: store.resumableDraft == nil ? "Set up your workout routine" : "Finish your workout routine"
-        case .active(let session), .completed(let session): session.title
-        case .scheduled(let day), .needsExercises(let day): day.title
-        case .rest: "Room to recover."
-        case .unassigned: "Make today your own."
-        }
-    }
-    private var cardSymbol: String {
-        switch today {
-        case .completed: "checkmark.circle"
-        case .rest: "moon"
-        case .setup, .unassigned: "calendar.badge.plus"
-        default: "dumbbell"
-        }
-    }
-    private var primaryTitle: String {
-        switch today {
-        case .setup: store.resumableDraft == nil ? "Set up routine" : "Continue routine"
-        case .active: "Resume workout"
-        case .completed: "View workout summary"
-        case .needsExercises: "Add exercises"
-        case .scheduled: "Start workout"
-        case .rest, .unassigned: "View weekly plan"
-        }
-    }
-    private var primarySymbol: String {
-        switch today {
-        case .active, .scheduled: "play.fill"
-        case .completed: "checkmark"
-        case .needsExercises: "plus"
-        default: "calendar"
-        }
-    }
     private var primaryIdentifier: String {
         switch today {
         case .setup: "gymSetupRoutine"
@@ -413,6 +301,143 @@ struct GymView: View {
         if workouts.active != nil { showingWorkout = true }
         else if workouts.start(day: day, routineID: day == nil ? nil : store.activeRoutine?.id, catalogue: store.exercises) {
             showingWorkout = true
+        }
+    }
+}
+
+/// One photo-led workout preview shared by Home and Gym. All badges come from saved data.
+struct DashboardWorkoutPreview: View {
+    let state: GymTodayState
+    let routine: Routine?
+    var hasDraft = false
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 12) { statusBadge; Spacer(minLength: 0); facts }
+                VStack(alignment: .leading, spacing: 10) { statusBadge; facts }
+            }
+            Spacer(minLength: 72)
+            VStack(alignment: .leading, spacing: 9) {
+                Text(title).font(FitTheme.display(23))
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(detail).font(FitTheme.body(13))
+                    .foregroundStyle(.white.opacity(0.82))
+                    .fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 8) {
+                    Text(actionTitle).font(FitTheme.button(13))
+                    Image(systemName: "arrow.up.right").font(.system(size: 12, weight: .semibold))
+                }
+                .padding(.horizontal, 14).frame(minHeight: 44)
+                .dashboardGlass(in: Capsule(), highlighted: true)
+                .padding(.top, 3)
+            }
+        }
+        .padding(FitTheme.cardInset)
+        .frame(maxWidth: .infinity, minHeight: typeSize.isAccessibilitySize ? 340 : 280, alignment: .leading)
+        .background {
+            GeometryReader { geometry in
+                Image("FitnessHero").resizable().scaledToFill()
+                    .frame(width: geometry.size.width, height: geometry.size.height, alignment: .center)
+                    .clipped()
+            }
+            .overlay {
+                LinearGradient(stops: [.init(color: .black.opacity(0.15), location: 0),
+                                       .init(color: .black.opacity(0.12), location: 0.3),
+                                       .init(color: .black.opacity(0.82), location: 0.68),
+                                       .init(color: .black.opacity(0.96), location: 1)],
+                               startPoint: .top, endPoint: .bottom)
+            }
+        }
+        .foregroundStyle(.white)
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .overlay { RoundedRectangle(cornerRadius: 24).strokeBorder(.white.opacity(0.18), lineWidth: 1) }
+        .contentShape(RoundedRectangle(cornerRadius: 24))
+        .accessibilityElement(children: .combine)
+    }
+
+    private var statusBadge: some View {
+        Label(status, systemImage: statusSymbol)
+            .font(FitTheme.medium(12))
+            .padding(.horizontal, 12).padding(.vertical, 9)
+            .background(FitTheme.dashboardAccent, in: Capsule())
+    }
+
+    private var facts: some View {
+        VStack(alignment: .trailing, spacing: 7) {
+            if let count = exerciseCount { fact("\(count) exercises", symbol: "dumbbell") }
+            if let minutes = plannedMinutes { fact("\(minutes) min target", symbol: "clock") }
+        }
+    }
+    private func fact(_ text: String, symbol: String) -> some View {
+        Label(text, systemImage: symbol).font(FitTheme.medium(11))
+            .padding(.horizontal, 11).padding(.vertical, 8)
+            .background(.black.opacity(0.7), in: Capsule())
+    }
+    private var title: String {
+        switch state {
+        case .scheduled(let day), .needsExercises(let day): day.title
+        case .active(let session), .completed(let session): session.title
+        case .setup: hasDraft ? "Finish your routine" : "Build your routine"
+        case .rest: "Room to recover"
+        case .unassigned: "Your next session"
+        }
+    }
+    private var status: String {
+        switch state {
+        case .scheduled, .needsExercises: "Today’s workout"
+        case .active(let session): session.status == .paused ? "Paused" : "In progress"
+        case .completed: "Completed today"
+        case .setup: hasDraft ? "Continue setup" : "Get started"
+        case .rest: "Rest day"
+        case .unassigned: "Weekly plan"
+        }
+    }
+    private var statusSymbol: String {
+        switch state {
+        case .completed: "checkmark"
+        case .active: "play.fill"
+        case .rest: "moon"
+        default: "calendar"
+        }
+    }
+    private var detail: String {
+        switch state {
+        case .scheduled(let day):
+            [routine?.name, RoutineSchedule.weekdays[day.weekday]].compactMap { $0 }.joined(separator: " · ")
+        case .needsExercises: "Add exercises to complete this day’s plan."
+        case .active(let session): "\(session.completedSets.count) sets saved · Continue where you left off."
+        case .completed(let session): "\(session.completedSets.count) sets logged · \(Int(session.duration() / 60)) min trained"
+        case .setup: hasDraft ? "Your draft is saved. Pick up where you left off." : "Choose your training days and the exercises you enjoy."
+        case .rest: "Take time to recover. Your schedule is ready when you are."
+        case .unassigned:
+            if let start = routine?.startsOn, start > Date() {
+                "Your plan starts \(start.formatted(date: .abbreviated, time: .omitted))."
+            } else { "Choose a day in your plan or train freestyle." }
+        }
+    }
+    private var exerciseCount: Int? {
+        switch state {
+        case .scheduled(let day), .needsExercises(let day): day.exercises.count
+        case .active(let session), .completed(let session): session.entries.filter { !$0.skipped }.count
+        default: nil
+        }
+    }
+    private var plannedMinutes: Int? {
+        switch state {
+        case .scheduled(let day), .needsExercises(let day): day.durationMinutes
+        default: nil
+        }
+    }
+    private var actionTitle: String {
+        switch state {
+        case .scheduled: "Start workout"
+        case .needsExercises: "Add exercises"
+        case .active: "Resume workout"
+        case .completed: "View workout"
+        case .setup: hasDraft ? "Continue routine" : "Set up routine"
+        case .rest, .unassigned: "View weekly plan"
         }
     }
 }

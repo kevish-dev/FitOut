@@ -4,9 +4,12 @@ struct WorkoutExerciseCard: View {
     let entry: WorkoutEntry
     @Binding var expanded: Bool
     let unit: WeightUnit
+    let session: WorkoutSession
     let canComplete: Bool
     let binding: (UUID) -> Binding<WorkoutSet>
     let complete: (UUID) -> Void
+    let start: (UUID) -> Void
+    let stopTimer: (UUID) -> Void
     let deleteSet: (UUID) -> Void
     let addSet: () -> Void
     let notes: Binding<String>
@@ -51,7 +54,7 @@ struct WorkoutExerciseCard: View {
                     ExerciseImageButton(exercise: entry.exercise)
                     ForEach(Array(entry.sets.enumerated()), id: \.element.id) { index, set in
                         WorkoutSetEditor(value: binding(set.id), kind: entry.exercise.kind, unit: unit,
-                            number: index + 1, canComplete: canComplete, complete: { complete(set.id) }, delete: { deleteSet(set.id) })
+                            number: index + 1, canComplete: canComplete, session: session, start: { start(set.id) }, stopTimer: { stopTimer(set.id) }, complete: { complete(set.id) }, delete: { deleteSet(set.id) })
                     }
                     Button(action: addSet) {
                         Label("Add set", systemImage: "plus").font(FitTheme.button(13)).frame(maxWidth: .infinity, minHeight: 48)
@@ -75,11 +78,14 @@ struct WorkoutSetEditor: View {
     let unit: WeightUnit
     let number: Int
     let canComplete: Bool
+    let session: WorkoutSession
+    let start: () -> Void
+    let stopTimer: () -> Void
     let complete: () -> Void
     let delete: () -> Void
     @Environment(\.dynamicTypeSize) private var typeSize
     private var isLogged: Bool { value.completedAt != nil }
-    private var canLog: Bool { value.isValid && (kind == .duration ? value.seconds > 0 : value.reps > 0) }
+    private var canLog: Bool { value.isValid && (kind == .duration ? value.seconds > 0 || (value.startedAt != nil && value.timedActiveSeconds == nil) : value.reps > 0) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -89,6 +95,10 @@ struct WorkoutSetEditor: View {
                 Spacer(minLength: 0)
                 Menu {
                     Picker("Set type", selection: $value.type) { ForEach(SetType.allCases, id: \.self) { Text($0.rawValue).tag($0) } }
+                    if !isLogged {
+                        if value.startedAt != nil && value.timedActiveSeconds == nil { Button("Stop set timer", systemImage: "stopwatch", action: stopTimer) }
+                        else { Button(value.startedAt == nil ? "Start set timer" : "Restart set timer", systemImage: "stopwatch", action: start).disabled(!canComplete) }
+                    }
                     Button("Delete set", role: .destructive, action: delete)
                 } label: { Label(value.type.rawValue, systemImage: "chevron.down").font(FitTheme.medium(11)).frame(minHeight: 44) }
                 .accessibilityLabel("Options for set \(number), \(value.type.rawValue)")
@@ -108,6 +118,16 @@ struct WorkoutSetEditor: View {
             if let target = value.plannedTarget {
                 Text(targetSummary(target)).font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
             }
+            if value.startedAt != nil {
+                ViewThatFits(in: .horizontal) {
+                    HStack { WorkoutSetClock(session: session, set: value); Spacer(minLength: 8); timerAction }
+                    VStack(alignment: .leading, spacing: 4) { WorkoutSetClock(session: session, set: value); timerAction }
+                }
+            }
+            else if !isLogged {
+                Button("Start set timer", systemImage: "stopwatch", action: start)
+                    .font(FitTheme.medium(12)).frame(minHeight: 44).disabled(!canComplete)
+            }
             DisclosureGroup("Effort (optional)") {
                 Toggle("Record RPE", isOn: Binding(get: { value.rpe != nil }, set: { value.rpe = $0 ? 7 : nil }))
                 if value.rpe != nil {
@@ -120,9 +140,27 @@ struct WorkoutSetEditor: View {
         .background(FitTheme.dashboardBackground.opacity(0.55), in: RoundedRectangle(cornerRadius: 17))
         .overlay { RoundedRectangle(cornerRadius: 17).strokeBorder(isLogged ? FitTheme.dashboardAccent.opacity(0.3) : .white.opacity(0.06), lineWidth: 1) }
     }
+    @ViewBuilder private var timerAction: some View {
+        if !isLogged {
+            if value.timedActiveSeconds == nil {
+                Button("Stop timer", systemImage: "stop.fill", action: stopTimer).font(FitTheme.medium(12)).frame(minHeight: 44)
+            } else {
+                Button("Restart", systemImage: "arrow.clockwise", action: start).font(FitTheme.medium(12)).frame(minHeight: 44).disabled(!canComplete)
+            }
+        }
+    }
     @ViewBuilder private func setFields(stacked: Bool) -> some View {
         if kind == .duration {
-            WorkoutLogNumberField(title: "Seconds", value: $value.seconds)
+            if value.startedAt != nil && value.timedActiveSeconds == nil && !isLogged {
+                TimelineView(.periodic(from: .now, by: 1)) { context in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("Seconds · live").font(FitTheme.medium(11)).foregroundStyle(FitTheme.textSecondary)
+                        Text(Int(session.setElapsed(value, at: context.date) ?? 0).formatted())
+                            .font(FitTheme.strong(22)).monospacedDigit().frame(maxWidth: .infinity, minHeight: 60)
+                            .background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 13))
+                    }.frame(minWidth: 84, maxWidth: .infinity)
+                }
+            } else { WorkoutLogNumberField(title: "Seconds", value: $value.seconds) }
             WorkoutLogNumberField(title: "Meters (optional)", value: $value.distanceMeters)
         } else {
             if kind == .weighted {
@@ -145,7 +183,7 @@ struct WorkoutSetEditor: View {
         }
         .buttonStyle(RoutineEditorPressStyle()).disabled(!canComplete || (!isLogged && !canLog))
         .accessibilityLabel(isLogged ? "Set completed — undo" : "Complete set")
-        .accessibilityHint(canComplete ? "Saves this set and starts its rest timer" : "Resume the workout to log sets")
+        .accessibilityHint(canComplete ? (isLogged ? "Undoes this set and resets its optional timer" : "Saves this set and starts its rest timer") : "Resume the workout to log sets")
         .accessibilityIdentifier("completeSet")
     }
     private func targetSummary(_ target: PlannedSet) -> String {

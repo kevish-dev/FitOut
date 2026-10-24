@@ -110,5 +110,6 @@ struct FitOutConfiguredWidget: Widget {
         FitOutConfiguredWidget(type: .volume)
         FitOutConfiguredWidget(type: .overview)
         FitOutConfiguredWidget(type: .nutrition)
+        FitOutWorkoutLiveActivity()
     }
 }

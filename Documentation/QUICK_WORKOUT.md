@@ -1,7 +1,7 @@
 # Quick Workout
 
-Gym has an illustrated Quick Workout / Continue session card. Home keeps its
-existing routine-aware workout logic; an open day can still start a quick session.
+Gym has an illustrated Quick Workout / Continue session card. Home and Gym share
+a photo-led, routine-aware workout preview; an open day can still start a quick session.
 The active workout is stored immediately, and closing the sheet keeps it available
 for resuming.
 

@@ -11,6 +11,7 @@ import Observation
     let coach: CoachStore
     let hydration: HydrationStore
     let widgets: WidgetBridge
+    let workoutPresentation: WorkoutPresentationCoordinator
     let hydrationReminders: HydrationReminderStore
     let database: ModelContainer
     let repository: SwiftDataRepository
@@ -60,6 +61,9 @@ import Observation
         hydration = HydrationStore(shared: shared, fallback: fallback)
         hydrationReminders = HydrationReminderStore(defaults: defaults)
         widgets = WidgetBridge(shared: shared, gym: gym, workouts: workouts, health: health, profile: profile, hydration: hydration, nutrition: nutrition)
+        workoutPresentation = WorkoutPresentationCoordinator(store: workouts, gym: gym, profile: profile, defaults: defaults,
+            enabled: production && !database.configurations.allSatisfy(\.isStoredInMemoryOnly))
+        workouts.onChange = { [weak widgets, weak workoutPresentation] in widgets?.publish(); workoutPresentation?.changed() }
     }
 
     static func live() throws -> AppContainer {
