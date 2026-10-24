@@ -91,6 +91,89 @@ final class FocusedWorkoutTests: XCTestCase {
         XCTAssertEqual(store.active?.restUntil, at(55))
     }
 
+    func testStageUsesElapsedTimeAndOnlyTimedExerciseTargetsForArc() throws {
+        var session = fixture()
+        try WorkoutExecutionEngine.apply(.startSet, to: &session, at: at(1))
+        let weighted = WorkoutStageTiming(session: session, entry: session.entries[0], set: session.entries[0].sets[0], now: at(11))
+        XCTAssertEqual(weighted.seconds, 10)
+        XCTAssertEqual(weighted.progress, 0) // A rep-based set has no invented time limit.
+        XCTAssertEqual(weighted.title, "Set time")
+        XCTAssertEqual(weighted.detail, "0/3 sets logged")
+        session.entries[0].exercise.kind = .duration
+        session.entries[0].sets[0].seconds = 20
+        let timed = WorkoutStageTiming(session: session, entry: session.entries[0], set: session.entries[0].sets[0], now: at(11))
+        XCTAssertEqual(timed.progress, 0.5)
+        XCTAssertEqual(timed.detail, "Target · 00:20")
+        session.entries[0].sets[0].seconds = 40
+        XCTAssertEqual(WorkoutStageTiming(session: session, entry: session.entries[0], set: session.entries[0].sets[0], now: at(11)).progress, 0.25)
+        XCTAssertEqual(WorkoutStageTiming(session: session, entry: session.entries[0], set: session.entries[0].sets[0], now: at(100)).progress, 1)
+    }
+
+    @MainActor func testStageRestBudgetIncludesExtensionAndFreezesWhilePaused() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        var value = fixture(); WorkoutExecutionEngine.prepare(&value, at: start)
+        XCTAssertTrue(store.save(value, at: start))
+        store.performFocused(.startSet, sessionID: value.id, now: at(1))
+        store.performFocused(.completeSet, sessionID: value.id, now: at(10))
+        func timing(at seconds: Double) throws -> WorkoutStageTiming {
+            let session = try XCTUnwrap(store.active)
+            let current = try XCTUnwrap(session.executingWork)
+            return WorkoutStageTiming(session: session, entry: current.entry, set: current.set, now: at(seconds))
+        }
+        XCTAssertEqual(try timing(at: 20).seconds, 20)
+        XCTAssertEqual(try timing(at: 20).progress, 20.0 / 30, accuracy: 0.001)
+        store.performFocused(.extendRest, sessionID: value.id, now: at(20))
+        XCTAssertEqual(try timing(at: 20).seconds, 35)
+        XCTAssertEqual(try timing(at: 20).progress, 35.0 / 45, accuracy: 0.001)
+        store.pause(now: at(25))
+        XCTAssertEqual(try timing(at: 100).seconds, 30)
+        XCTAssertEqual(try timing(at: 100).progress, 30.0 / 45, accuracy: 0.001)
+        XCTAssertEqual(try timing(at: 100).title, "Rest paused")
+        XCTAssertTrue(try timing(at: 100).isResting)
+        XCTAssertEqual(try timing(at: 100).detail, "Last set · 00:09")
+    }
+
+    @MainActor func testStageActiveSetClockFreezesWhenPaused() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        var value = fixture(); WorkoutExecutionEngine.prepare(&value, at: start)
+        XCTAssertTrue(store.save(value, at: start))
+        store.performFocused(.startSet, sessionID: value.id, now: at(1)); store.pause(now: at(6))
+        let session = try XCTUnwrap(store.active), current = try XCTUnwrap(store.active?.executingWork)
+        let timing = WorkoutStageTiming(session: session, entry: current.entry, set: current.set, now: at(100))
+        XCTAssertEqual(timing.seconds, 5); XCTAssertEqual(timing.title, "Set paused")
+        XCTAssertFalse(timing.isResting)
+    }
+
+    func testStageDistinguishesSkippedProgressFromLoggedSets() throws {
+        var session = fixture()
+        try WorkoutExecutionEngine.apply(.skipSet, to: &session, at: at(1))
+        let current = try XCTUnwrap(session.executingWork)
+        let timing = WorkoutStageTiming(session: session, entry: current.entry, set: current.set, now: at(100))
+        XCTAssertEqual(timing.title, "Ready to start"); XCTAssertEqual(timing.seconds, 0)
+        XCTAssertEqual(timing.progress, 1.0 / 3, accuracy: 0.001)
+        XCTAssertEqual(timing.detail, "0 logged · 1 skipped")
+        XCTAssertEqual(session.completedSets.count, 0); XCTAssertEqual(session.volumeKG, 0)
+    }
+
+    func testBottomPreviewFollowsNextSetExerciseAndFinalSummaryWithoutAdvancing() throws {
+        var session = fixture(rest: 0); WorkoutExecutionEngine.prepare(&session, at: start)
+        let firstName = session.entries[0].exercise.name, secondName = session.entries[1].exercise.name
+        XCTAssertEqual(WorkoutActionPreview(session: session).detail, firstName + " · Set 1 of 2")
+        try WorkoutExecutionEngine.apply(.startSet, to: &session, at: at(1))
+        let before = session
+        XCTAssertEqual(WorkoutActionPreview(session: session).detail, "Next · " + firstName + " · Set 2 of 2")
+        XCTAssertEqual(session, before)
+        try WorkoutExecutionEngine.apply(.completeSet, to: &session, at: at(2))
+        try WorkoutExecutionEngine.apply(.startSet, to: &session, at: at(3))
+        XCTAssertEqual(WorkoutActionPreview(session: session).detail, "Next · " + secondName + " · Set 1 of 1")
+        try WorkoutExecutionEngine.apply(.skipSet, to: &session, at: at(4))
+        XCTAssertEqual(WorkoutActionPreview(session: session).detail, secondName + " · Set 1 of 1")
+        try WorkoutExecutionEngine.apply(.startSet, to: &session, at: at(5))
+        XCTAssertEqual(WorkoutActionPreview(session: session).detail, "Final set · Workout summary follows")
+        try WorkoutExecutionEngine.apply(.completeSet, to: &session, at: at(6))
+        XCTAssertNil(WorkoutActionPreview(session: session).detail)
+    }
+
     private let start = Date(timeIntervalSince1970: 200_000)
     private func fixture(rest: Int = 30) -> WorkoutSession {
         WorkoutSession(title: "Focused", startedAt: start, entries: [

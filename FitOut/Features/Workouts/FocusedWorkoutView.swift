@@ -31,37 +31,38 @@ struct ActiveWorkoutView: View {
                     if model.phase == .workoutCompleted {
                         WorkoutSummary(session: session, unit: model.unit, history: store.history)
                     } else {
-                        ScrollView {
-                            VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
-                                if let current = model.current {
-                                    progress(session, entry: current.entry, set: current.set)
-                                    exercise(current.entry)
-                                    clockPanel(session, set: current.set)
-                                    if [.ready, .activeSet, .exerciseTransition, .paused].contains(model.phase), current.set.status == .pending {
-                                        inputs(current.entry, set: current.set)
-                                        HStack {
-                                            Button("Skip set", systemImage: "forward.end") { act(.skipSet, expected: current.set.id) }
-                                                .disabled(model.phase == .paused).accessibilityIdentifier("skipWorkoutSet")
-                                            Spacer()
-                                            Button("Add note", systemImage: "note.text.badge.plus") { openNote(current.entry.id, current.set.id) }
-                                        }.font(FitTheme.medium(13)).frame(minHeight: 44)
+                        GeometryReader { viewport in
+                            ScrollView {
+                                VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
+                                    if let current = model.current {
+                                        progress(session, entry: current.entry, set: current.set)
+                                        exercise(current.entry)
+                                        FocusedWorkoutStage(session: session, entry: current.entry, set: current.set, availableHeight: viewport.size.height, now: { model.now }) {
+                                            keyboardDown(); model.togglePause()
+                                        }
+                                        FocusedWorkoutMetrics(session: session, unit: model.unit, now: { model.now })
+                                        if [.ready, .activeSet, .exerciseTransition, .paused].contains(model.phase), current.set.status == .pending {
+                                            inputs(current.entry, set: current.set)
+                                            HStack {
+                                                Button("Skip set", systemImage: "forward.end") { act(.skipSet, expected: current.set.id) }
+                                                    .disabled(model.phase == .paused).accessibilityIdentifier("skipWorkoutSet")
+                                                Spacer()
+                                                Button("Add note", systemImage: "note.text.badge.plus") { openNote(current.entry.id, current.set.id) }
+                                            }.font(FitTheme.medium(13)).frame(minHeight: 44)
+                                        }
+                                    } else {
+                                        WorkoutEmptyState()
+                                        Text(session.entries.isEmpty ? "Choose exercises to begin. Each set saves as soon as you complete or skip it." : "Your sets are recorded. Finish when you're ready.")
+                                            .font(FitTheme.body(14)).foregroundStyle(FitTheme.textSecondary)
                                     }
-                                    if let next = model.next {
-                                        Label("Next · \(next.nameForWorkout)", systemImage: "arrow.right")
-                                            .font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
+                                    if let undo = session.execution?.undo {
+                                        Button("Undo last \(undo.before.status == .pending ? "set action" : "action")", systemImage: "arrow.uturn.backward") { act(.undo) }
+                                            .font(FitTheme.medium(13)).frame(minHeight: 44).accessibilityIdentifier("undoWorkoutSet")
+                                        Text("Undo restores the inputs and resets that set's timer.").font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
                                     }
-                                } else {
-                                    WorkoutEmptyState()
-                                    Text(session.entries.isEmpty ? "Choose exercises to begin. Each set saves as soon as you complete or skip it." : "Your sets are recorded. Finish when you're ready.")
-                                        .font(FitTheme.body(14)).foregroundStyle(FitTheme.textSecondary)
-                                }
-                                if let undo = session.execution?.undo {
-                                    Button("Undo last \(undo.before.status == .pending ? "set action" : "action")", systemImage: "arrow.uturn.backward") { act(.undo) }
-                                        .font(FitTheme.medium(13)).frame(minHeight: 44).accessibilityIdentifier("undoWorkoutSet")
-                                    Text("Undo restores the inputs and resets that set's timer.").font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
-                                }
-                            }.frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity)
-                        }.scrollIndicators(.hidden).scrollDismissesKeyboard(.interactively)
+                                }.frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity)
+                            }.scrollIndicators(.hidden).scrollDismissesKeyboard(.interactively)
+                        }
                     }
                 }.safeAreaInset(edge: .bottom, spacing: 0) { footer(session) }
             } else {
@@ -141,40 +142,17 @@ struct ActiveWorkoutView: View {
         }
     }
     private func exercise(_ entry: WorkoutEntry) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
+        VStack(alignment: .leading, spacing: 8) {
             if model.phase == .exerciseTransition { Text("NEXT EXERCISE").font(FitTheme.medium(10)).tracking(1).foregroundStyle(FitTheme.dashboardAccent) }
             Text(entry.exercise.name).font(FitTheme.display(23)).fixedSize(horizontal: false, vertical: true).accessibilityAddTraits(.isHeader)
-            Label(entry.exercise.equipment == "None" ? "No equipment" : entry.exercise.equipment, systemImage: "dumbbell")
-                .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-            ExerciseImageButton(exercise: entry.exercise, style: .detail).frame(maxHeight: 290)
-            Text("Primary · " + entry.exercise.muscles.map(\.title).joined(separator: ", "))
-                .font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
-            if !entry.exercise.secondary.isEmpty {
-                Text("Secondary · " + entry.exercise.secondary.map(\.title).joined(separator: ", "))
-                    .font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
+            HStack(alignment: .top, spacing: 12) {
+                Text((entry.exercise.equipment == "None" ? "No equipment" : entry.exercise.equipment) + " · " + entry.exercise.muscles.map(\.title).joined(separator: ", "))
+                    .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Button { showTechnique = true } label: {
+                    Image(systemName: "info.circle").font(.system(size: 19)).frame(width: 44, height: 44)
+                }.buttonStyle(.plain).accessibilityLabel("Exercise details and technique")
             }
-            if !entry.exercise.instructions.isEmpty {
-                Button("Technique", systemImage: "info.circle") { showTechnique = true }.font(FitTheme.medium(12)).frame(minHeight: 44)
-            }
-        }
-    }
-    private func clockPanel(_ session: WorkoutSession, set: WorkoutSet) -> some View {
-        TimelineView(.periodic(from: .now, by: 0.5)) { _ in
-            let resting = model.phase == .resting || (model.phase == .paused && session.execution?.resumePhase == .resting)
-            VStack(spacing: 10) {
-                Text(model.phase == .paused ? (resting ? "REST PAUSED" : "SET PAUSED") : resting ? "REST COUNTDOWN" : "ACTIVE SET DURATION")
-                    .font(FitTheme.medium(10)).tracking(1).foregroundStyle(FitTheme.textSecondary)
-                Text(WorkoutDisplay.clock(resting ? ceil(session.restRemaining(at: model.now)) : session.setElapsed(set, at: model.now) ?? 0))
-                    .font(FitTheme.metric(42)).monospacedDigit().minimumScaleFactor(0.6).lineLimit(1)
-                if resting {
-                    Text("Last set duration · " + WorkoutDisplay.clock(session.setElapsed(set, at: model.now) ?? 0)).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-                }
-                if model.phase == .activeSet || model.phase == .resting || model.phase == .paused {
-                    Button(model.phase == .paused ? "Resume workout" : "Pause workout", systemImage: model.phase == .paused ? "play.fill" : "pause.fill") { keyboardDown(); model.togglePause() }
-                        .font(FitTheme.button(13)).frame(minHeight: 44).padding(.horizontal, 16).dashboardGlass(in: Capsule(), interactive: true)
-                        .accessibilityIdentifier("pauseResumeWorkout")
-                }
-            }.frame(maxWidth: .infinity).padding(FitTheme.cardInset).dashboardGlass(in: RoundedRectangle(cornerRadius: 24))
         }
     }
     private func inputs(_ entry: WorkoutEntry, set: WorkoutSet) -> some View {
@@ -241,9 +219,21 @@ struct ActiveWorkoutView: View {
             if model.phase == .resting { Button("+15 seconds rest", systemImage: "plus") { act(.extendRest) }.font(FitTheme.medium(13)).frame(minHeight: 44) }
             if model.phase == .workoutCompleted, session.execution?.undo != nil { Button("Undo last set", systemImage: "arrow.uturn.backward") { act(.undo) }.frame(minHeight: 44) }
             Button { if model.phase == expectedPhase && model.current?.set.id == expectedSet { primaryAction() } } label: {
-                Label(primaryTitle, systemImage: model.phase == .activeSet ? "checkmark" : model.phase == .resting ? "forward.end" : "play.fill")
-                    .font(FitTheme.button(16)).frame(maxWidth: .infinity, minHeight: 58).padding(.horizontal, 14)
-                    .foregroundStyle(.white).background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 18))
+                HStack(spacing: 16) {
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(primaryTitle).font(FitTheme.button(17))
+                        if let detail = WorkoutActionPreview(session: session).detail {
+                            Text(detail).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }.frame(maxWidth: .infinity, alignment: .leading)
+                    Image(systemName: model.phase == .activeSet ? "checkmark" : model.phase == .paused ? "play.fill" : "arrow.right")
+                        .font(.system(size: 20, weight: .semibold)).foregroundStyle(.white)
+                        .frame(width: 54, height: 54).background(FitTheme.dashboardAccent, in: Circle())
+                        .accessibilityHidden(true)
+                }.padding(16).frame(maxWidth: .infinity, minHeight: 86)
+                    .foregroundStyle(FitTheme.textPrimary).background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 26))
+                    .contentShape(RoundedRectangle(cornerRadius: 26))
             }.buttonStyle(RoutineEditorPressStyle()).disabled(model.phase == .activeSet && model.inputError != nil).accessibilityIdentifier(model.phase == .activeSet ? "completeSet" : "focusedWorkoutPrimary")
         }.frame(maxWidth: 560).padding(.horizontal, FitTheme.pageInset).padding(.vertical, 10).frame(maxWidth: .infinity).background(.bar)
     }
@@ -294,12 +284,14 @@ struct ActiveWorkoutView: View {
         NavigationStack {
             ScrollView { VStack(alignment: .leading, spacing: 16) {
                 ExerciseImageButton(exercise: exercise, style: .detail)
-                Text(exercise.name).font(FitTheme.section(20)); Text(exercise.instructions).font(FitTheme.body(15))
+                Text(exercise.name).font(FitTheme.section(20))
+                Label(exercise.equipment == "None" ? "No equipment" : exercise.equipment, systemImage: "dumbbell").font(FitTheme.body(14))
+                Text("Primary · " + exercise.muscles.map(\.title).joined(separator: ", ")).font(FitTheme.body(14))
+                if !exercise.secondary.isEmpty { Text("Secondary · " + exercise.secondary.map(\.title).joined(separator: ", ")).font(FitTheme.body(14)).foregroundStyle(FitTheme.textSecondary) }
+                if !exercise.instructions.isEmpty { Text(exercise.instructions).font(FitTheme.body(15)) }
             }.padding(FitTheme.pageInset) }.background(FitTheme.dashboardBackground)
                 .navigationTitle("Technique").navigationBarTitleDisplayMode(.inline)
                 .toolbar { Button("Done") { showTechnique = false } }
         }
     }
 }
-
-private extension WorkoutEntry { var nameForWorkout: String { exercise.name } }

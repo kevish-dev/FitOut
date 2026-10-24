@@ -12,27 +12,42 @@ is prominent, with equipment and primary/secondary muscles. Technique uses the
 saved exercise definition and supplied image. Images are fitted and zoomable;
 missing artwork is disclosed rather than replaced with a different exercise.
 
-The large labelled clock switches between Active set duration and Rest countdown;
-workout time remains separate in the header. Editable weight, kg/lb units and reps
-use previous performance recall, numeric inputs and +/- controls. Duration
-exercises have a target and optional distance; actual duration comes from the
-running timer. Inputs and validation errors are independent so invalid typed
-values cannot silently complete a set with old saved defaults. Effort and rest
-remain under a disclosure. Apply to remaining sets is explicit and does not edit
-the saved routine. Skip Set and Add Note are native actions; notes attach to the
-set whose identity was captured when the sheet opened.
+The exercise stage follows the reference's hierarchy: fitted exercise artwork,
+a floating native glass pause/resume capsule, and a large semicircular timer with
+an orange status marker. The image stays zoomable; missing artwork has an explicit
+fallback. Stage proportions adapt to available height; larger Dynamic Type allows
+scrolling instead of cropping text or hiding controls. Equipment and primary
+muscles stay beside the exercise name; the information button opens primary and
+secondary muscles, equipment and technique.
 
-The safe-area bottom action is Start set, Complete Set, Skip Rest, Resume workout,
-Start next exercise or Close summary according to state. Rest also offers +15s.
-Options include pause/resume, add exercises/sets, set type, timing/history,
-Live Activity retry, finish early and confirmed discard. Minimize never ends the
-session. Summary includes completed/skipped/unfinished counts, actual duration,
-valid volume and recorded set details; skipped sets have text and an icon.
+The clock switches between Set time and Rest remaining, with explicit paused and
+ready labels. For timed exercises, the arc shows elapsed time against the editable
+target and caps at 100%; passing the target never completes a set automatically.
+Rep-based sets use actual workout set progress because they have no prescribed
+time limit. Completed and skipped counts remain distinct. Rest progress includes
+extensions and excludes paused time. A shared angular path keeps the marker on the
+arc as the view compresses or animates. Reduce Motion disables interpolation.
 
-The references inform the image-led hierarchy and clear timer/action placement.
-Their sample calorie/heart-rate/step readings, copyrighted character art, bright
-lighting and unrelated controls are not copied. Existing subdued assets, fonts,
-theme choice, Reduce Motion, Reduce Transparency and optional haptics are used.
+The compact row under the stage shows sets logged, valid training volume in the
+selected unit, and total workout time. These come from the persisted session;
+there are no sample heart-rate, calorie or step readings. Editable weight, kg/lb
+units and reps remain below, using previous performance recall, numeric inputs and
++/- controls. Duration exercises have a target and optional distance; actual time
+comes from the running timer. Validation prevents bad typed values from silently
+completing a set with saved defaults. Effort/rest use a disclosure; applying inputs
+to remaining sets is explicit. Skip Set, Add Note and Undo remain available.
+
+The safe-area bottom dock previews the next set/exercise beside a circular orange
+action. Its visible title explicitly describes Start set, Complete Set, Skip Rest,
+Resume workout, Start next exercise or Close summary. It never jumps exercises or
+logs a set merely by previewing it. Rest also offers +15s. The dock stays above the
+keyboard, with scrollable inputs above it. Options retain add exercises/sets,
+set type, timing/history, Live Activity retry, finish early and confirmed discard.
+Minimize never ends the session. The existing summary retains all recorded details.
+
+The interface reuses the app's subdued exercise illustrations, theme colors and
+fonts, appearance preference, Reduce Transparency and optional haptics. No new
+photo assets, dependencies or persistence schema changes are needed.
 
 ## State and persistence
 
@@ -76,8 +91,10 @@ all-skipped completion, Undo before/after finish, later timer cancellation,
 on-disk restoration, invalid/empty data, routine snapshot isolation, Live Activity
 projection and obsolete-task cancellation. Unit tests run in an iOS simulator.
 Unsigned generic-iOS build-for-testing compiles app, extension and test targets.
-The final simulator run passed all 155 unit tests with zero failures, including
-15 focused-workout tests and the existing workout, analytics and persistence suites.
+The latest simulator run passed all 167 unit tests with zero failures, including
+20 focused-workout tests. Stage regressions cover target-time vs rep-based arcs,
+rest extensions, frozen paused clocks, skipped-set labels and next-action previews
+through the final summary, alongside existing analytics and persistence suites.
 UI-test source is updated for the focused recovery flow, but interactive UI tests
 are not run. Device visual, gesture, keyboard and Dynamic Island checks remain
 with the project owner.

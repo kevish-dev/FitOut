@@ -44,7 +44,7 @@ struct ExerciseArtwork: View {
 /// Outside selection rows, an image can open a fitted, zoomable reference.
 /// Library/picker thumbnails stay static so tapping a row still selects the exercise.
 struct ExerciseImageButton: View {
-    enum Style { case reference, detail, thumbnail(CGFloat) }
+    enum Style { case reference, detail, thumbnail(CGFloat), workoutStage(CGFloat) }
     let exercise: ExerciseDefinition?
     var style: Style = .reference
     @State private var showingImage = false
@@ -62,6 +62,14 @@ struct ExerciseImageButton: View {
                         Label("Tap to explore the image", systemImage: "arrow.up.left.and.arrow.down.right")
                             .font(FitTheme.medium(12)).padding(.bottom, 4)
                     }
+                case .workoutStage(let height):
+                    Image(uiImage: image).resizable().scaledToFit()
+                        .frame(maxWidth: .infinity).frame(height: height).padding(.horizontal, 12)
+                        .overlay(alignment: .topTrailing) {
+                            Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                .font(.system(size: 12)).frame(width: 44, height: 44)
+                                .dashboardGlass(in: Circle()).padding(10)
+                        }
                 case .thumbnail(let size):
                     ExerciseArtwork(exercise: exercise, size: size)
                 }
@@ -76,6 +84,12 @@ struct ExerciseImageButton: View {
             switch style {
             case .reference: EmptyView()
             case .detail: ExerciseArtwork(exercise: exercise, expanded: true)
+            case .workoutStage(let height):
+                VStack(spacing: 14) {
+                    Image(systemName: exercise?.category.symbol ?? "dumbbell").font(.system(size: 52, weight: .light))
+                        .foregroundStyle(FitTheme.dashboardAccent)
+                    Text("No illustration available").font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                }.frame(maxWidth: .infinity).frame(height: height)
             case .thumbnail(let size): ExerciseArtwork(exercise: exercise, size: size)
             }
         }
