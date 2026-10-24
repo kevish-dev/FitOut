@@ -77,6 +77,9 @@ struct ActiveWorkoutView: View {
                                     WorkoutExerciseCard(entry: entry,
                                         expanded: Binding(get: { expandedEntry == entry.id }, set: { dismissKeyboard(); expandedEntry = $0 ? entry.id : nil }),
                                         unit: unit, session: session, canComplete: session.status == .inProgress,
+                                        reference: { store.reference(entryID: entry.id, setID: $0) },
+                                        reuse: { dismissKeyboard(); store.reusePrevious(entryID: entry.id, setID: $0) },
+                                        repeatInputs: { dismissKeyboard(); store.repeatInputs(entryID: entry.id, setID: $0) },
                                         binding: { setBinding(entry.id, $0) }, complete: { toggleSet(entry.id, $0) },
                                         start: { dismissKeyboard(); store.startSet(entryID: entry.id, setID: $0) },
                                         stopTimer: { dismissKeyboard(); store.stopSetTimer(entryID: entry.id, setID: $0) },
@@ -217,7 +220,7 @@ struct ActiveWorkoutView: View {
     }
     private func addSet(_ entryID: UUID) {
         dismissKeyboard()
-        changeEntry(entryID) { entry in entry.sets.append(entry.sets.last?.nextWorkingSet() ?? WorkoutSet()) }
+        store.appendSet(entryID: entryID)
     }
     private func deleteSet(_ entryID: UUID, _ setID: UUID) {
         let latest = store.active?.completedSets.max { ($0.completedAt ?? .distantPast) < ($1.completedAt ?? .distantPast) }?.id

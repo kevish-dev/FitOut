@@ -19,6 +19,7 @@ struct WorkoutSet: Identifiable, Codable, Equatable {
     var startedActiveSeconds: TimeInterval?
     var loggedActiveSeconds: TimeInterval?
     var timedActiveSeconds: TimeInterval?
+    var editedInputs: Set<WorkoutInputField>?
     var isValid: Bool {
         (0...1000).contains(reps) && loadKG.isFinite && (0...1000).contains(loadKG)
             && seconds.isFinite && (0...86400).contains(seconds)
@@ -55,6 +56,7 @@ struct WorkoutSession: Identifiable, Codable, Equatable {
     var notes = ""
     var entries: [WorkoutEntry] = []
     var telemetry: WorkoutTelemetry?
+    var inputMemoryVersion: Int?
     var isActive: Bool { status == .inProgress || status == .paused }
     var completedSets: [WorkoutSet] { entries.flatMap(\.sets).filter { $0.completedAt != nil } }
     var completedExercises: Int { entries.filter { $0.sets.contains { $0.completedAt != nil } }.count }

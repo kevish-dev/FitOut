@@ -18,9 +18,11 @@ for resuming.
   accessible completion/undo button. Narrow layouts and large text sizes stack
   inputs. Set type, delete and optional effort remain available; session and
   exercise notes use progressive disclosure.
-- Add set copies the previous performed inputs into a new working set. It does
-  not copy completion, recorded effort, prescription targets or a per-set rest
-  override. Logging remains an explicit user action.
+- Add set copies the last working set inputs and rest into a fresh working set.
+  Warm-ups do not supply working-set defaults. Completion, recorded effort,
+  prescription targets and timer evidence stay separate. Logging remains an
+  explicit user action. See [input recall](WORKOUT_INPUT_RECALL.md) for previous-
+  workout defaults, previous-set references and protected manual edits.
 - The rest countdown stays in the bottom dock. Pause freezes both active time and
   remaining rest; resume shifts an unexpired deadline by the paused interval.
   Expired rest is not revived. Deadline and pause state persist using existing

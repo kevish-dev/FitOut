@@ -1,6 +1,207 @@
 import XCTest
+import SwiftData
 @testable import FitOut
 final class WorkoutTests: XCTestCase {
+    @MainActor func testBulkWeightActionKeepsRepsTargetsAndStartedOrLoggedSets() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        let now = Date(timeIntervalSince1970: 150_000)
+        XCTAssertTrue(store.start(catalogue: [], now: now))
+        let entry = WorkoutEntry(exercise: ExerciseCatalogue.all[0], sets: [
+            WorkoutSet(reps: 10, loadKG: 52.5),
+            WorkoutSet(reps: 6, loadKG: 60, plannedTarget: PlannedSet(repMin: 6, repMax: 6, loadKG: 60)),
+            WorkoutSet(type: .warmup, loadKG: 20),
+            WorkoutSet(loadKG: 70, completedAt: now),
+            WorkoutSet(loadKG: 80, startedAt: now, startedActiveSeconds: 0)])
+        store.update(at: now) { $0.entries = [entry] }
+        XCTAssertTrue(store.repeatInputs(entryID: entry.id, setID: entry.sets[0].id))
+        let sets = try XCTUnwrap(store.active?.entries.first?.sets)
+        XCTAssertEqual(sets.map(\.loadKG), [52.5, 52.5, 20, 70, 80])
+        XCTAssertEqual(sets[1].reps, 6); XCTAssertEqual(sets[1].plannedTarget?.loadKG, 60)
+        XCTAssertEqual(sets[1].editedInputs, [.load])
+        XCTAssertNil(sets[1].completedAt); XCTAssertNil(sets[1].rpe)
+    }
+
+    @MainActor func testExistingWorkoutInputsAreProtectedWhenRecallFirstBecomesAvailable() throws {
+        let database = try PersistenceFactory.makeContainer(inMemory: true)
+        let context = ModelContext(database), now = Date(timeIntervalSince1970: 160_000)
+        let old = WorkoutSession(title: "Existing session", startedAt: now,
+            entries: [WorkoutEntry(exercise: ExerciseCatalogue.all[0], sets: [WorkoutSet(loadKG: 40), WorkoutSet(loadKG: 70)])])
+        context.insert(FitOutSchemaV4.SessionRecord(old))
+        context.insert(FitOutSchemaV5.SessionDetails(id: old.id, payload: try JSONEncoder().encode(SessionPlanDetails(old))))
+        try context.save()
+        let store = try WorkoutStore(container: database)
+        XCTAssertEqual(store.active?.inputMemoryVersion, 1)
+        XCTAssertEqual(store.active?.entries[0].sets[1].editedInputs, [.load, .reps, .seconds, .distance])
+        XCTAssertEqual(store.active?.telemetry?.events.map(\.kind), [.trackingEnabled])
+        let entry = try XCTUnwrap(store.active?.entries.first)
+        store.toggleSet(entryID: entry.id, setID: entry.sets[0].id, now: now.addingTimeInterval(10))
+        XCTAssertEqual(store.active?.entries[0].sets[1].loadKG, 70)
+        XCTAssertTrue(store.reusePrevious(entryID: entry.id, setID: entry.sets[1].id))
+        XCTAssertEqual(store.active?.entries[0].sets[1].loadKG, 40)
+        let count = store.active?.telemetry?.events.count
+        XCTAssertEqual(try WorkoutStore(container: database).active?.telemetry?.events.count, count)
+    }
+
+    @MainActor func testAddingWorkingSetAfterWarmupsDoesNotInheritWarmupLoad() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        XCTAssertTrue(store.start(catalogue: []))
+        let entry = WorkoutEntry(exercise: ExerciseCatalogue.all[0], sets: [WorkoutSet(type: .warmup, loadKG: 20)])
+        store.update { $0.entries = [entry] }
+        XCTAssertTrue(store.appendSet(entryID: entry.id))
+        XCTAssertEqual(store.active?.entries[0].sets.last?.type, .working)
+        XCTAssertEqual(store.active?.entries[0].sets.last?.loadKG, 0)
+        XCTAssertNil(store.active?.entries[0].sets.last?.completedAt)
+    }
+
+    @MainActor func testQuickWorkoutsRecallConfirmedInputsAfterReloadWithoutCopyingEvidence() throws {
+        let database = try PersistenceFactory.makeContainer(inMemory: true)
+        let store = try WorkoutStore(container: database)
+        let exercise = ExerciseCatalogue.all[0]
+        let start = Date(timeIntervalSince1970: 90_000)
+        XCTAssertTrue(store.start(catalogue: [], now: start))
+        store.add(exercise)
+        store.update(at: start.addingTimeInterval(1)) {
+            $0.entries[0].sets[0].loadKG = 52.5; $0.entries[0].sets[0].reps = 11
+            $0.entries[0].sets[0].rpe = 9; $0.entries[0].sets[0].restSeconds = 45
+        }
+        let old = try XCTUnwrap(store.active?.entries.first)
+        store.startSet(entryID: old.id, setID: old.sets[0].id, now: start.addingTimeInterval(2))
+        store.toggleSet(entryID: old.id, setID: old.sets[0].id, now: start.addingTimeInterval(15))
+        XCTAssertTrue(store.finish(.completed, now: start.addingTimeInterval(20)))
+        let reopened = try WorkoutStore(container: database)
+        XCTAssertTrue(reopened.start(catalogue: [], now: start.addingTimeInterval(100)))
+        reopened.add(exercise)
+        let entry = try XCTUnwrap(reopened.active?.entries.first)
+        let set = entry.sets[0]
+        XCTAssertEqual(set.loadKG, 52.5); XCTAssertEqual(set.reps, 11)
+        XCTAssertEqual(entry.restSeconds, 45); XCTAssertEqual(set.restSeconds, 45)
+        XCTAssertNil(set.completedAt); XCTAssertNil(set.rpe); XCTAssertNil(set.startedAt)
+        XCTAssertNil(set.timedActiveSeconds); XCTAssertNil(set.loggedActiveSeconds); XCTAssertNil(set.editedInputs)
+        XCTAssertEqual(reopened.reference(entryID: entry.id, setID: set.id)?.date, start.addingTimeInterval(15))
+        XCTAssertTrue(reopened.appendSet(entryID: entry.id))
+        XCTAssertEqual(reopened.active?.entries[0].sets.last?.loadKG, 52.5)
+        XCTAssertEqual(reopened.active?.entries[0].sets.last?.restSeconds, 45)
+        XCTAssertEqual(WeightUnit.lbs.kilograms(WeightUnit.lbs.display(set.loadKG)), 52.5, accuracy: 0.0001)
+        XCTAssertTrue(try WorkoutStore(container: database).active?.completedSets.isEmpty == true)
+    }
+
+    @MainActor func testRoutineDefaultsRecallBySetTypeAndOrdinalButRespectExplicitTargets() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        let exercise = ExerciseCatalogue.all[0], start = Date(timeIntervalSince1970: 100_000)
+        XCTAssertTrue(store.start(catalogue: [], now: start))
+        store.update(at: start.addingTimeInterval(30)) {
+            $0.entries = [WorkoutEntry(exercise: exercise, sets: [
+                WorkoutSet(type: .warmup, reps: 15, loadKG: 20, completedAt: start.addingTimeInterval(5)),
+                WorkoutSet(reps: 11, loadKG: 50, completedAt: start.addingTimeInterval(10)),
+                WorkoutSet(reps: 10, loadKG: 55, completedAt: start.addingTimeInterval(15)),
+                WorkoutSet(reps: 9, loadKG: 60, completedAt: start.addingTimeInterval(20))])]
+        }
+        XCTAssertTrue(store.finish(.completed, now: start.addingTimeInterval(40)))
+        let targets = [PlannedSet(type: .warmup, repMin: 8, repMax: 8),
+                       PlannedSet(repMin: 6, repMax: 8), PlannedSet(repMin: 6, repMax: 8),
+                       PlannedSet(repMin: 4, repMax: 4, loadKG: 0), PlannedSet(loadKG: 75)]
+        let day = RoutineDay(weekday: 2, title: "Routine", kind: .workout,
+            exercises: [PlannedExercise(exerciseID: exercise.id, restSeconds: 120, setTargets: targets)])
+        XCTAssertTrue(store.start(day: day, catalogue: [exercise], now: start.addingTimeInterval(100)))
+        let entry = try XCTUnwrap(store.active?.entries.first)
+        XCTAssertEqual(entry.sets.map(\.loadKG), [20, 50, 55, 0, 75])
+        XCTAssertEqual(entry.sets.map(\.reps), [8, 6, 6, 4, 8])
+        XCTAssertEqual(entry.restSeconds, 120)
+        XCTAssertEqual(entry.sets.map(\.plannedTarget), targets.map(Optional.some))
+        XCTAssertTrue(entry.sets.allSatisfy { $0.completedAt == nil && $0.rpe == nil })
+        store.toggleSet(entryID: entry.id, setID: entry.sets[1].id, now: start.addingTimeInterval(110))
+        XCTAssertEqual(store.active?.entries[0].sets.map(\.loadKG), [20, 50, 55, 0, 75], "An unchanged logged default must not flatten previous per-set loads")
+    }
+
+    @MainActor func testCarryingInputsForwardPreservesPerFieldEditsAcrossReload() throws {
+        let database = try PersistenceFactory.makeContainer(inMemory: true)
+        let store = try WorkoutStore(container: database)
+        let start = Date(timeIntervalSince1970: 110_000)
+        XCTAssertTrue(store.start(catalogue: [], now: start))
+        let entry = WorkoutEntry(exercise: ExerciseCatalogue.all[0], sets: [WorkoutSet(), WorkoutSet(), WorkoutSet()])
+        store.update(at: start) { $0.entries = [entry] }
+        store.update(at: start.addingTimeInterval(1)) { $0.entries[0].sets[0].loadKG = 40; $0.entries[0].sets[0].reps = 10 }
+        store.update(at: start.addingTimeInterval(2)) { $0.entries[0].sets[2].loadKG = 70 }
+        store.update(at: start.addingTimeInterval(3)) { $0.entries[0].sets[2].loadKG = 0 }
+        store.toggleSet(entryID: entry.id, setID: entry.sets[0].id, now: start.addingTimeInterval(5))
+        XCTAssertEqual(store.active?.entries[0].sets.map(\.loadKG), [40, 40, 0])
+        XCTAssertEqual(store.active?.entries[0].sets.map(\.reps), [10, 10, 10])
+        let reopened = try WorkoutStore(container: database)
+        XCTAssertEqual(reopened.active?.entries[0].sets[2].editedInputs, [.load])
+        XCTAssertNil(reopened.active?.entries[0].sets[1].editedInputs)
+        reopened.update(at: start.addingTimeInterval(6)) { $0.entries[0].sets[1].loadKG = 45; $0.entries[0].sets[1].reps = 12 }
+        reopened.toggleSet(entryID: entry.id, setID: entry.sets[1].id, now: start.addingTimeInterval(7))
+        XCTAssertEqual(reopened.active?.entries[0].sets.map(\.loadKG), [40, 45, 0])
+        XCTAssertEqual(reopened.active?.entries[0].sets.map(\.reps), [10, 12, 12])
+        XCTAssertEqual(reopened.active?.completedSets.count, 2)
+        XCTAssertEqual(reopened.reference(entryID: entry.id, setID: entry.sets[2].id)?.set.loadKG, 45)
+        reopened.update(at: start.addingTimeInterval(8)) { $0.entries[0].sets[1].reps = 9 }
+        XCTAssertEqual(reopened.active?.entries[0].sets[2].reps, 12, "Corrections to logged history do not rewrite upcoming inputs")
+    }
+
+    func testRecallFiltersUnloggedInvalidDifferentExercisesAndWarmups() {
+        let exercise = ExerciseCatalogue.all[0], now = Date(timeIntervalSince1970: 120_000)
+        var old = WorkoutSession(title: "History", endedAt: now, status: .abandoned)
+        old.entries = [WorkoutEntry(exercise: exercise, sets: [
+            WorkoutSet(type: .warmup, loadKG: 20, completedAt: now),
+            WorkoutSet(loadKG: 100), WorkoutSet(reps: 0, loadKG: 200, completedAt: now)])]
+        let candidate = WorkoutEntry(exercise: exercise, sets: [WorkoutSet()])
+        XCTAssertNil(WorkoutRecall.reference(for: candidate, setID: candidate.sets[0].id, current: nil, history: [old]))
+        old.entries[0].sets.append(WorkoutSet(reps: 8, loadKG: 60, completedAt: now))
+        XCTAssertEqual(WorkoutRecall.seeded(candidate, current: nil, history: [old]).sets[0].loadKG, 60)
+        old.status = .skipped
+        XCTAssertNil(WorkoutRecall.reference(for: candidate, setID: candidate.sets[0].id, current: nil, history: [old]))
+        old.status = .completed; old.entries[0].exercise.id = "different"
+        XCTAssertNil(WorkoutRecall.reference(for: candidate, setID: candidate.sets[0].id, current: nil, history: [old]))
+        old.entries[0].exercise.id = exercise.id; old.entries[0].exercise.kind = .bodyweight
+        XCTAssertNil(WorkoutRecall.reference(for: candidate, setID: candidate.sets[0].id, current: nil, history: [old]))
+    }
+
+    func testRecallUsesMostRecentPerformanceAndFallsBackToLastMatchingSet() {
+        let exercise = ExerciseCatalogue.all[0], now = Date(timeIntervalSince1970: 130_000)
+        let old = WorkoutSession(title: "Old", startedAt: now, endedAt: now, status: .completed,
+            entries: [WorkoutEntry(exercise: exercise, sets: [WorkoutSet(loadKG: 30, completedAt: now)])])
+        let newer = WorkoutSession(title: "Newer performance", startedAt: now.addingTimeInterval(-100), endedAt: now.addingTimeInterval(10), status: .completed,
+            entries: [WorkoutEntry(exercise: exercise, sets: [WorkoutSet(loadKG: 50, completedAt: now.addingTimeInterval(10))])])
+        let candidate = WorkoutEntry(exercise: exercise, sets: [WorkoutSet(), WorkoutSet(), WorkoutSet()])
+        let seeded = WorkoutRecall.seeded(candidate, current: nil, history: [old, newer])
+        XCTAssertEqual(seeded.sets.map(\.loadKG), [50, 50, 50])
+    }
+
+    @MainActor func testReuseAndReplacementRecallInputsWhileTimersAndCompletionRemainExplicit() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        let exercise = ExerciseCatalogue.all[0], other = ExerciseCatalogue.all[1], now = Date(timeIntervalSince1970: 140_000)
+        XCTAssertTrue(store.start(catalogue: [], now: now))
+        let entry = WorkoutEntry(exercise: exercise, sets: [WorkoutSet(loadKG: 50, completedAt: now), WorkoutSet(loadKG: 75)])
+        store.update(at: now) { $0.entries = [entry] }
+        XCTAssertTrue(store.reusePrevious(entryID: entry.id, setID: entry.sets[1].id))
+        XCTAssertEqual(store.active?.entries[0].sets[1].loadKG, 50)
+        XCTAssertEqual(store.active?.entries[0].sets[1].editedInputs, [.load, .reps])
+        XCTAssertNil(store.active?.entries[0].sets[1].completedAt)
+        XCTAssertFalse(store.reusePrevious(entryID: entry.id, setID: entry.sets[0].id))
+        store.startSet(entryID: entry.id, setID: entry.sets[1].id, now: now.addingTimeInterval(2))
+        XCTAssertFalse(store.reusePrevious(entryID: entry.id, setID: entry.sets[1].id))
+        XCTAssertTrue(store.finish(.completed, now: now.addingTimeInterval(3)))
+        XCTAssertTrue(store.start(catalogue: [], now: now.addingTimeInterval(10)))
+        store.add(other)
+        let replacementID = try XCTUnwrap(store.active?.entries.first?.id)
+        store.replace(entryID: replacementID, with: exercise)
+        XCTAssertEqual(store.active?.entries[0].sets[0].loadKG, 50)
+        XCTAssertNil(store.active?.entries[0].sets[0].completedAt)
+    }
+
+    func testDurationRecallAndStartedTargetsKeepMeasuredValuesSeparate() {
+        let exercise = ExerciseCatalogue.all.first { $0.kind == .duration }!
+        let reference = WorkoutSet(seconds: 45, distanceMeters: 200, rpe: 8, completedAt: .now, timedActiveSeconds: 45)
+        let next = WorkoutRecall.filling(WorkoutSet(), from: reference, kind: .duration)
+        XCTAssertEqual(next.seconds, 45); XCTAssertEqual(next.distanceMeters, 200)
+        XCTAssertNil(next.rpe); XCTAssertNil(next.completedAt); XCTAssertNil(next.timedActiveSeconds)
+        let started = WorkoutSet(seconds: 10, startedAt: .now, startedActiveSeconds: 0)
+        XCTAssertEqual(WorkoutRecall.filling(started, from: reference, kind: exercise.kind), started)
+        let prescribed = WorkoutSet(seconds: 30, plannedTarget: PlannedSet(seconds: 30))
+        XCTAssertEqual(WorkoutRecall.filling(prescribed, from: reference, kind: .duration).seconds, 30)
+    }
+
     @MainActor func testPrecisePausesLapsAndEvidenceSurviveReload() throws {
         let database = try PersistenceFactory.makeContainer(inMemory: true)
         let store = try WorkoutStore(container: database)

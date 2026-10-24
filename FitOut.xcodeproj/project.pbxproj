@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F17000000000000000000001 /* WorkoutRecall.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17000000000000000000002 /* WorkoutRecall.swift */; };
 		F16000000000000000000014 /* WorkoutTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000001 /* WorkoutTelemetry.swift */; };
 		F16000000000000000000015 /* WorkoutTimingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000002 /* WorkoutTimingViews.swift */; };
 		F16000000000000000000016 /* WorkoutLiveAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000003 /* WorkoutLiveAttributes.swift */; };
@@ -148,6 +149,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F17000000000000000000002 /* WorkoutRecall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecall.swift; sourceTree = "<group>"; };
 		F16000000000000000000001 /* WorkoutTelemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTelemetry.swift; sourceTree = "<group>"; };
 		F16000000000000000000002 /* WorkoutTimingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTimingViews.swift; sourceTree = "<group>"; };
 		F16000000000000000000003 /* WorkoutLiveAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutLiveAttributes.swift; sourceTree = "<group>"; };
@@ -525,6 +527,7 @@
 		D7CB24A5F6FD15559F06C45B /* Workouts */ = {
 			isa = PBXGroup;
 			children = (
+				F17000000000000000000002 /* WorkoutRecall.swift */,
 				F16000000000000000000001 /* WorkoutTelemetry.swift */,
 				F16000000000000000000002 /* WorkoutTimingViews.swift */,
 				F16000000000000000000003 /* WorkoutLiveAttributes.swift */,
@@ -735,6 +738,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F17000000000000000000001 /* WorkoutRecall.swift in Sources */,
 				F16000000000000000000014 /* WorkoutTelemetry.swift in Sources */,
 				F16000000000000000000015 /* WorkoutTimingViews.swift in Sources */,
 				F16000000000000000000016 /* WorkoutLiveAttributes.swift in Sources */,

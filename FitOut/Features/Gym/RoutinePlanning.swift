@@ -108,19 +108,23 @@ struct SessionPlanDetails: Codable {
         var startedActiveSeconds: TimeInterval?
         var loggedActiveSeconds: TimeInterval?
         var timedActiveSeconds: TimeInterval?
+        var editedInputs: Set<WorkoutInputField>?
     }
     var sets: [UUID: SetDetail]
     var telemetry: WorkoutTelemetry?
+    var inputMemoryVersion: Int?
     init(_ session: WorkoutSession) {
         sets = Dictionary(uniqueKeysWithValues: session.entries.flatMap(\.sets).map {
             ($0.id, SetDetail(restSeconds: $0.restSeconds, targetRPE: $0.targetRPE, targetRepMax: $0.targetRepMax, plannedTarget: $0.plannedTarget,
-                startedAt: $0.startedAt, startedActiveSeconds: $0.startedActiveSeconds, loggedActiveSeconds: $0.loggedActiveSeconds, timedActiveSeconds: $0.timedActiveSeconds))
+                startedAt: $0.startedAt, startedActiveSeconds: $0.startedActiveSeconds, loggedActiveSeconds: $0.loggedActiveSeconds, timedActiveSeconds: $0.timedActiveSeconds, editedInputs: $0.editedInputs))
         })
         telemetry = session.telemetry
+        inputMemoryVersion = session.inputMemoryVersion
     }
     func applying(to session: WorkoutSession) -> WorkoutSession {
         var result = session
         result.telemetry = telemetry
+        result.inputMemoryVersion = inputMemoryVersion
         for entry in result.entries.indices {
             for index in result.entries[entry].sets.indices {
                 let id = result.entries[entry].sets[index].id
@@ -133,6 +137,7 @@ struct SessionPlanDetails: Codable {
                 result.entries[entry].sets[index].startedActiveSeconds = detail.startedActiveSeconds
                 result.entries[entry].sets[index].loggedActiveSeconds = detail.loggedActiveSeconds
                 result.entries[entry].sets[index].timedActiveSeconds = detail.timedActiveSeconds
+                result.entries[entry].sets[index].editedInputs = detail.editedInputs
             }
         }
         return result

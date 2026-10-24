@@ -6,6 +6,9 @@ struct WorkoutExerciseCard: View {
     let unit: WeightUnit
     let session: WorkoutSession
     let canComplete: Bool
+    let reference: (UUID) -> WorkoutSetReference?
+    let reuse: (UUID) -> Void
+    let repeatInputs: (UUID) -> Void
     let binding: (UUID) -> Binding<WorkoutSet>
     let complete: (UUID) -> Void
     let start: (UUID) -> Void
@@ -54,7 +57,10 @@ struct WorkoutExerciseCard: View {
                     ExerciseImageButton(exercise: entry.exercise)
                     ForEach(Array(entry.sets.enumerated()), id: \.element.id) { index, set in
                         WorkoutSetEditor(value: binding(set.id), kind: entry.exercise.kind, unit: unit,
-                            number: index + 1, canComplete: canComplete, session: session, start: { start(set.id) }, stopTimer: { stopTimer(set.id) }, complete: { complete(set.id) }, delete: { deleteSet(set.id) })
+                            number: index + 1, canComplete: canComplete, session: session,
+                            previous: reference(set.id), reuse: { reuse(set.id) },
+                            repeatInputs: { repeatInputs(set.id) }, canRepeat: entry.sets.dropFirst(index + 1).contains { $0.type == set.type && $0.completedAt == nil && $0.startedAt == nil },
+                            start: { start(set.id) }, stopTimer: { stopTimer(set.id) }, complete: { complete(set.id) }, delete: { deleteSet(set.id) })
                     }
                     Button(action: addSet) {
                         Label("Add set", systemImage: "plus").font(FitTheme.button(13)).frame(maxWidth: .infinity, minHeight: 48)
@@ -79,6 +85,10 @@ struct WorkoutSetEditor: View {
     let number: Int
     let canComplete: Bool
     let session: WorkoutSession
+    let previous: WorkoutSetReference?
+    let reuse: () -> Void
+    let repeatInputs: () -> Void
+    let canRepeat: Bool
     let start: () -> Void
     let stopTimer: () -> Void
     let complete: () -> Void
@@ -95,6 +105,8 @@ struct WorkoutSetEditor: View {
                 Spacer(minLength: 0)
                 Menu {
                     Picker("Set type", selection: $value.type) { ForEach(SetType.allCases, id: \.self) { Text($0.rawValue).tag($0) } }
+                    Button(kind == .weighted ? "Apply weight to remaining sets" : "Repeat inputs to remaining sets", systemImage: "arrow.down.to.line", action: repeatInputs)
+                        .disabled(!canRepeat || !value.isValid || (kind == .duration && (value.seconds <= 0 || (value.startedAt != nil && value.timedActiveSeconds == nil))))
                     if !isLogged {
                         if value.startedAt != nil && value.timedActiveSeconds == nil { Button("Stop set timer", systemImage: "stopwatch", action: stopTimer) }
                         else { Button(value.startedAt == nil ? "Start set timer" : "Restart set timer", systemImage: "stopwatch", action: start).disabled(!canComplete) }
@@ -102,6 +114,12 @@ struct WorkoutSetEditor: View {
                     Button("Delete set", role: .destructive, action: delete)
                 } label: { Label(value.type.rawValue, systemImage: "chevron.down").font(FitTheme.medium(11)).frame(minHeight: 44) }
                 .accessibilityLabel("Options for set \(number), \(value.type.rawValue)")
+            }
+            if let previous {
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .center, spacing: 12) { previousValues(previous); Spacer(minLength: 0); reuseAction }
+                    VStack(alignment: .leading, spacing: 4) { previousValues(previous); reuseAction }
+                }
             }
             if typeSize.isAccessibilitySize {
                 VStack(alignment: .leading, spacing: 10) { setFields(stacked: true) }
@@ -140,6 +158,27 @@ struct WorkoutSetEditor: View {
         .background(FitTheme.dashboardBackground.opacity(0.55), in: RoundedRectangle(cornerRadius: 17))
         .overlay { RoundedRectangle(cornerRadius: 17).strokeBorder(isLogged ? FitTheme.dashboardAccent.opacity(0.3) : .white.opacity(0.06), lineWidth: 1) }
     }
+    private func previousValues(_ source: WorkoutSetReference) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(source.isCurrentWorkout ? "Last set · this workout" : "Last time · " + source.date.formatted(date: .abbreviated, time: .omitted))
+                .font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
+            Text(previousSummary(source.set)).font(FitTheme.medium(13)).monospacedDigit().foregroundStyle(FitTheme.dashboardAccent)
+        }.fixedSize(horizontal: false, vertical: true)
+    }
+    @ViewBuilder private var reuseAction: some View {
+        if !isLogged && value.startedAt == nil {
+            Button("Use previous", systemImage: "arrow.uturn.down", action: reuse)
+                .font(FitTheme.medium(12)).frame(minHeight: 44)
+                .accessibilityHint("Copies previous inputs into this set. Logging is still required.")
+        }
+    }
+    private func previousSummary(_ set: WorkoutSet) -> String {
+        switch kind {
+        case .weighted: "\(unit.display(set.loadKG).formatted(.number.precision(.fractionLength(0...2)))) \(unit.rawValue) × \(set.reps) reps"
+        case .bodyweight: "\(set.reps) reps"
+        case .duration: WorkoutDisplay.clock(set.seconds) + (set.distanceMeters > 0 ? " · \(set.distanceMeters.formatted()) m" : "")
+        }
+    }
     @ViewBuilder private var timerAction: some View {
         if !isLogged {
             if value.timedActiveSeconds == nil {
@@ -160,11 +199,11 @@ struct WorkoutSetEditor: View {
                             .background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 13))
                     }.frame(minWidth: 84, maxWidth: .infinity)
                 }
-            } else { WorkoutLogNumberField(title: "Seconds", value: $value.seconds) }
-            WorkoutLogNumberField(title: "Meters (optional)", value: $value.distanceMeters)
+            } else { WorkoutLogNumberField(title: "Seconds", value: $value.seconds, step: 5, maximum: 86400) }
+            WorkoutLogNumberField(title: "Meters (optional)", value: $value.distanceMeters, step: 50, maximum: 1_000_000)
         } else {
             if kind == .weighted {
-                WorkoutLogNumberField(title: "Load · \(unit.rawValue)", value: Binding(get: { unit.display(value.loadKG) }, set: { value.loadKG = unit.kilograms($0) }))
+                WorkoutLogNumberField(title: "Load · \(unit.rawValue)", value: Binding(get: { unit.display(value.loadKG) }, set: { value.loadKG = unit.kilograms($0) }), step: unit == .kg ? 2.5 : 5, maximum: unit.display(1000))
             }
             WorkoutLogNumberField(title: "Reps", value: Binding(get: { Double(value.reps) }, set: { newValue in
                 if newValue.isFinite, (0...1000).contains(newValue) { value.reps = Int(newValue) }
@@ -198,6 +237,8 @@ private struct WorkoutLogNumberField: View {
     let title: String
     @Binding var value: Double
     var integer = false
+    var step = 1.0
+    var maximum = 1000.0
     @FocusState private var focused: Bool
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
@@ -209,6 +250,23 @@ private struct WorkoutLogNumberField: View {
                 .background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 13))
                 .overlay { RoundedRectangle(cornerRadius: 13).strokeBorder(focused ? FitTheme.dashboardAccent : FitTheme.subtleBorder, lineWidth: 1) }
                 .accessibilityLabel(title)
-        }.frame(minWidth: 84, maxWidth: .infinity)
+            HStack(spacing: 0) {
+                adjustment("minus", delta: -step)
+                Spacer(minLength: 0)
+                adjustment("plus", delta: step)
+            }
+        }.frame(minWidth: 92, maxWidth: .infinity)
+    }
+    private func adjustment(_ symbol: String, delta: Double) -> some View {
+        Button {
+            focused = false
+            guard value.isFinite else { return }
+            value = min(maximum, max(0, ((value + delta) * 100).rounded() / 100))
+        } label: {
+            Image(systemName: symbol).font(.system(size: 12, weight: .semibold)).frame(width: 44, height: 44)
+        }.buttonStyle(.plain).buttonRepeatBehavior(.enabled)
+            .foregroundStyle(FitTheme.textSecondary)
+            .disabled(!value.isFinite || (delta < 0 ? value <= 0 : value >= maximum))
+            .accessibilityLabel("\(delta < 0 ? "Decrease" : "Increase") \(title) by \(step.formatted())")
     }
 }
