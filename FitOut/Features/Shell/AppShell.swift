@@ -60,10 +60,14 @@ struct AppShell: View {
         .onChange(of: widgetDestination) { _, _ in openPendingWidget() }
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
             container.widgets.publish()
+            container.streaks.update(sessions: container.workouts.sessions)
+            container.streakPresentation.refresh()
             if phase == .active { Task { await container.health.refreshOverview() } }
         }
         .task(id: phase) {
             container.workoutPresentation.sceneChanged(active: phase == .active)
+            if phase == .active { container.streaks.update(sessions: container.workouts.sessions) }
+            container.streakPresentation.sceneChanged(active: phase == .active)
             guard phase == .active else { return }
             container.hydration.refresh()
             container.widgets.publish()

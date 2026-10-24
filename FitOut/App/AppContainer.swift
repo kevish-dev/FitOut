@@ -12,6 +12,8 @@ import Observation
     let hydration: HydrationStore
     let widgets: WidgetBridge
     let workoutPresentation: WorkoutPresentationCoordinator
+    let streaks: WorkoutStreakStore
+    let streakPresentation: WorkoutStreakPresenter
     let hydrationReminders: HydrationReminderStore
     let database: ModelContainer
     let repository: SwiftDataRepository
@@ -65,7 +67,14 @@ import Observation
         widgets = WidgetBridge(shared: shared, gym: gym, workouts: workouts, health: health, profile: profile, hydration: hydration, nutrition: nutrition)
         workoutPresentation = WorkoutPresentationCoordinator(store: workouts, gym: gym, profile: profile, defaults: defaults,
             enabled: production && !database.configurations.allSatisfy(\.isStoredInMemoryOnly))
-        workouts.onChange = { [weak widgets, weak workoutPresentation] in widgets?.publish(); workoutPresentation?.changed() }
+        streaks = WorkoutStreakStore(defaults: defaults, sessions: workouts.sessions)
+        streakPresentation = WorkoutStreakPresenter(store: streaks, enabled: production && !database.configurations.allSatisfy(\.isStoredInMemoryOnly),
+            preferences: { [weak repository] in (try? repository?.loadPreferences()) ?? AppPreferences() })
+        workouts.onChange = { [weak widgets, weak workoutPresentation, weak streaks, weak streakPresentation, weak workouts] in
+            widgets?.publish(); workoutPresentation?.changed()
+            if let workouts { streaks?.update(sessions: workouts.sessions) }
+            streakPresentation?.refresh()
+        }
         workouts.onEditorVisibilityChange = { [weak workoutPresentation] in workoutPresentation?.overlayChanged() }
         presentation.onChange = { [weak presentation, weak workoutPresentation] in workoutPresentation?.appearanceChanged(presentation?.appearance.colorScheme) }
         workoutPresentation.appearanceChanged(presentation.appearance.colorScheme)

@@ -85,7 +85,7 @@ enum WorkoutAnalytics {
         let completedDays = Set(sessions.compactMap { session -> Date? in
             guard session.status == .completed else { return nil }
             let completedAt = session.endedAt ?? session.startedAt
-            guard completedAt <= now else { return nil }
+            guard session.startedAt <= completedAt, completedAt <= now else { return nil }
             return calendar.startOfDay(for: completedAt)
         })
 

@@ -31,6 +31,7 @@ struct HomeView: View {
             .compactMap { name, series in series.errorMessage.map { "\(name): \($0)" } }
     }
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var homeInsight: HomeWorkoutInsight?
     #if DEBUG
     @State private var showingRestartConfirmation = false
@@ -270,6 +271,8 @@ struct HomeView: View {
                         HStack(alignment: .firstTextBaseline, spacing: 3) {
                             Text("\(streak.consecutiveDays)")
                                 .font(FitTheme.metric(streak.consecutiveDays >= 100 ? 24 : streak.consecutiveDays >= 10 ? 29 : narrow ? 31 : compact ? 36 : 39))
+                                .contentTransition(.numericText())
+                                .animation(reduceMotion ? nil : .spring(response: 0.5, dampingFraction: 0.85), value: streak.consecutiveDays)
                                 .foregroundStyle(FitTheme.textPrimary)
                             Text(streak.consecutiveDays == 1 ? "Day" : "Days")
                                 .font(FitTheme.strong(narrow ? 10 : compact ? 12 : 13))
