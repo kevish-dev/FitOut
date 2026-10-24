@@ -23,6 +23,13 @@ struct HomeView: View {
                               steps: health.steps, activeCalories: health.activeCalories, sleepHours: health.sleepHours)
     }
     private var isLoadingHealth: Bool { container.health.isRefreshing }
+    private var displayedHealthReadings: [HealthMetricSeries] {
+        [healthOverview.waterMilliliters, healthOverview.steps, healthOverview.activeCalories]
+    }
+    private var displayedHealthErrors: [String] {
+        [("Water", healthOverview.waterMilliliters), ("Steps", healthOverview.steps), ("Active calories", healthOverview.activeCalories)]
+            .compactMap { name, series in series.errorMessage.map { "\(name): \($0)" } }
+    }
     @Environment(\.scenePhase) private var scenePhase
     @State private var homeInsight: HomeWorkoutInsight?
     #if DEBUG
@@ -612,10 +619,10 @@ struct HomeView: View {
         VStack(alignment: .leading, spacing: 16) {
             HStack(alignment: .bottom) {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("TODAY / HEALTH")
+                    Text("HEALTH / TRAINING")
                         .font(FitTheme.medium(11)).tracking(1.8)
                         .foregroundStyle(accent)
-                    Text("Daily overview")
+                    Text("Activity overview")
                         .font(FitTheme.section(20))
                 }
                 Spacer()
@@ -637,10 +644,13 @@ struct HomeView: View {
                 }.buttonStyle(.plain).accessibilityHint("Opens water logging")
                 HealthOverviewTile(kind: .steps, series: healthOverview.steps, isLoading: isLoadingHealth)
                 HealthOverviewTile(kind: .calories, series: healthOverview.activeCalories, isLoading: isLoadingHealth)
-                HealthOverviewTile(kind: .sleep, series: healthOverview.sleepHours, isLoading: isLoadingHealth)
+                TimelineView(.periodic(from: .now, by: 60)) { context in
+                    HealthOverviewTile(kind: .workoutTime,
+                        series: HomeStateResolver.weeklyWorkoutTime(container.workouts.sessions, now: context.date), isLoading: false)
+                }.accessibilityIdentifier("homeWeeklyWorkoutTime")
             }
 
-            if !container.health.hasRequested && !healthOverview.hasAnyReading {
+            if !container.health.hasRequested && !displayedHealthReadings.contains(where: { $0.total != nil }) {
                 Button { tab = 3 } label: {
                     Label("Connect Apple Health to see your daily readings", systemImage: "heart.text.square")
                         .font(FitTheme.medium(12))
@@ -648,7 +658,7 @@ struct HomeView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .buttonStyle(.plain)
-            } else if !isLoadingHealth && healthOverview.queryErrors.isEmpty && (healthOverview.steps.total == nil || healthOverview.activeCalories.total == nil) {
+            } else if !isLoadingHealth && displayedHealthErrors.isEmpty && (healthOverview.steps.total == nil || healthOverview.activeCalories.total == nil) {
                 Text("Missing activity readings? Review FitOut’s Steps and Active Energy access in Apple Health. Calories here means active energy burned, not food intake.")
                     .font(FitTheme.body(12))
                     .foregroundStyle(FitTheme.textSecondary)
@@ -658,7 +668,7 @@ struct HomeView: View {
                     .foregroundStyle(FitTheme.textSecondary)
             }
             if !isLoadingHealth {
-                ForEach(healthOverview.queryErrors, id: \.self) { message in
+                ForEach(displayedHealthErrors, id: \.self) { message in
                     Text(message).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
                 }
             }
@@ -746,14 +756,14 @@ private struct WeeklyVolumeBars: View {
 }
 
 private enum HomeMetricKind: Equatable {
-    case water, steps, calories, sleep
+    case water, steps, calories, workoutTime
 
     var title: String {
         switch self {
         case .water: "Water intake"
         case .steps: "Steps"
         case .calories: "Active calories"
-        case .sleep: "Sleep"
+        case .workoutTime: "Workout time"
         }
     }
 
@@ -762,7 +772,7 @@ private enum HomeMetricKind: Equatable {
         case .water: "LOGGED TODAY"
         case .steps: "WALKED TODAY"
         case .calories: "BURNED TODAY"
-        case .sleep: "LAST NIGHT"
+        case .workoutTime: "THIS WEEK"
         }
     }
 
@@ -771,7 +781,7 @@ private enum HomeMetricKind: Equatable {
         case .water: "drop.fill"
         case .steps: "figure.walk"
         case .calories: "flame.fill"
-        case .sleep: "moon.stars.fill"
+        case .workoutTime: "timer"
         }
     }
 
@@ -780,7 +790,7 @@ private enum HomeMetricKind: Equatable {
         case .water: Color(red: 0.37, green: 0.72, blue: 0.91)
         case .steps: FitTheme.dashboardAccent
         case .calories: Color(red: 1, green: 0.63, blue: 0.29)
-        case .sleep: Color(red: 0.70, green: 0.63, blue: 0.95)
+        case .workoutTime: Color(red: 0.72, green: 0.75, blue: 0.77)
         }
     }
 
@@ -793,9 +803,9 @@ private enum HomeMetricKind: Equatable {
             return (Int(total.rounded()).formatted(), "steps")
         case .calories:
             return (Int(total.rounded()).formatted(), "kcal")
-        case .sleep:
-            let minutes = Int((total * 60).rounded())
-            return ("\(minutes / 60)h \(minutes % 60)m", "")
+        case .workoutTime:
+            let minutes = Int((total * 60).rounded(.down))
+            return (total > 0 && minutes == 0 ? "<1m" : minutes < 60 ? "\(minutes)m" : "\(minutes / 60)h \(minutes % 60)m", "")
         }
     }
 }
@@ -821,7 +831,7 @@ private struct HealthOverviewTile: View {
                     .frame(width: 36, height: 36)
                     .background(kind.tint.opacity(0.12), in: Circle())
                 Spacer()
-                Text(kind == .sleep ? "NIGHT" : "2H")
+                Text(kind == .workoutTime ? "WEEK" : "2H")
                     .font(FitTheme.medium(10))
                     .foregroundStyle(.white.opacity(0.25))
             }
@@ -837,7 +847,7 @@ private struct HealthOverviewTile: View {
 
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text(reading.value)
-                    .font(FitTheme.metric(kind == .sleep ? 19 : 22))
+                    .font(FitTheme.metric(kind == .workoutTime ? 19 : 22))
                     .lineLimit(1)
                     .minimumScaleFactor(0.65)
                 if !reading.unit.isEmpty {
@@ -919,17 +929,20 @@ private struct HealthOverviewTile: View {
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
-        case .sleep:
-            HStack(alignment: .center, spacing: 3) {
+        case .workoutTime:
+            HStack(alignment: .bottom, spacing: 4) {
                 ForEach(series.buckets.indices, id: \.self) { index in
-                    let fraction = series.buckets[index]
-                    Capsule()
-                        .fill(fraction > 0 ? kind.tint.opacity(0.45 + 0.5 * fraction) : kind.tint.opacity(0.12))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 7 + CGFloat(fraction) * 31)
+                    let duration = series.buckets[index]
+                    VStack(spacing: 4) {
+                        Capsule()
+                            .fill(kind.tint.opacity(duration > 0 ? 0.85 : 0.15))
+                            .frame(height: duration > 0 ? 5 + CGFloat(duration / peak) * 29 : 3)
+                        Text(String(Calendar.current.veryShortWeekdaySymbols[(Calendar.current.firstWeekday - 1 + index) % 7]))
+                            .font(FitTheme.medium(8)).foregroundStyle(FitTheme.textSecondary)
+                    }.frame(maxWidth: .infinity)
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         }
     }
 }

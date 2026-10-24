@@ -1,6 +1,64 @@
 import XCTest
 @testable import FitOut
 final class HomeStateTests: XCTestCase {
+    func testWeeklyWorkoutTimeIncludesActiveAndCompletedTimeWithoutPauses() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Kolkata")!; calendar.firstWeekday = 2
+        let now = calendar.date(from: DateComponents(year: 2026, month: 10, day: 24, hour: 12))!
+        let week = calendar.dateInterval(of: .weekOfYear, for: now)!
+        let monday = week.start.addingTimeInterval(12 * 3600)
+        let completed = WorkoutSession(title: "Monday", startedAt: monday, endedAt: monday.addingTimeInterval(3600), status: .completed, pausedSeconds: 600)
+        let active = WorkoutSession(title: "Now", startedAt: now.addingTimeInterval(-1800), pausedSeconds: 300)
+        let result = HomeStateResolver.weeklyWorkoutTime([completed, active], now: now, calendar: calendar)
+        XCTAssertEqual(result.total, 1.25)
+        XCTAssertEqual(result.buckets.count, 7)
+        XCTAssertEqual(result.buckets[0], 3000)
+        XCTAssertEqual(result.buckets[5], 1500)
+        XCTAssertEqual(result.buckets.reduce(0, +), 4500)
+    }
+
+    func testWeeklyWorkoutTimeFreezesPausedSessionAndExcludesOtherWeeksAndUnfinishedHistory() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!; calendar.firstWeekday = 2
+        let now = calendar.date(from: DateComponents(year: 2026, month: 10, day: 24, hour: 12))!
+        let week = calendar.dateInterval(of: .weekOfYear, for: now)!
+        let paused = WorkoutSession(title: "Paused", startedAt: now.addingTimeInterval(-1800), status: .paused,
+            pausedAt: now.addingTimeInterval(-600), pausedSeconds: 300)
+        let previous = WorkoutSession(title: "Previous", startedAt: week.start.addingTimeInterval(-7200), endedAt: week.start.addingTimeInterval(-3600), status: .completed)
+        let skipped = WorkoutSession(title: "Skipped", startedAt: now.addingTimeInterval(-3600), endedAt: now, status: .skipped)
+        var abandoned = skipped; abandoned.status = .abandoned
+        let future = WorkoutSession(title: "Future", startedAt: now.addingTimeInterval(1))
+        let badEnd = WorkoutSession(title: "Missing end", startedAt: now.addingTimeInterval(-3600), status: .completed)
+        let result = HomeStateResolver.weeklyWorkoutTime([paused, previous, skipped, abandoned, future, badEnd], now: now, calendar: calendar)
+        XCTAssertEqual(result.total, 0.25)
+        XCTAssertEqual(HomeStateResolver.weeklyWorkoutTime([paused], now: now.addingTimeInterval(120), calendar: calendar).total, 0.25)
+        XCTAssertEqual(HomeStateResolver.weeklyWorkoutTime([], now: now, calendar: calendar).total, 0)
+    }
+
+    func testWorkoutTimeUsesCalendarWeekInsteadOfRollingSevenDaysAndResetsAtBoundary() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "Asia/Kolkata")!; calendar.firstWeekday = 2
+        let monday = calendar.date(from: DateComponents(year: 2026, month: 10, day: 19))!
+        let sunday = monday.addingTimeInterval(-7200)
+        let excluded = WorkoutSession(title: "Sunday", startedAt: sunday, endedAt: sunday.addingTimeInterval(3600), status: .completed)
+        let included = WorkoutSession(title: "Monday", startedAt: monday, endedAt: monday.addingTimeInterval(3600), status: .completed)
+        let now = monday.addingTimeInterval(7200)
+        XCTAssertEqual(HomeStateResolver.weeklyWorkoutTime([excluded, included], now: now, calendar: calendar).total, 1)
+        let nextWeek = calendar.date(byAdding: .weekOfYear, value: 1, to: monday)!
+        XCTAssertEqual(HomeStateResolver.weeklyWorkoutTime([included], now: nextWeek, calendar: calendar).total, 0)
+    }
+
+    func testWorkoutTimeDailyBucketsRespectDaylightSavingCalendarDays() {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(identifier: "America/Los_Angeles")!; calendar.firstWeekday = 1
+        let start = calendar.date(from: DateComponents(year: 2026, month: 3, day: 9, hour: 0, minute: 30))!
+        let completed = WorkoutSession(title: "After DST", startedAt: start, endedAt: start.addingTimeInterval(1800), status: .completed)
+        let result = HomeStateResolver.weeklyWorkoutTime([completed], now: start.addingTimeInterval(3600), calendar: calendar)
+        XCTAssertEqual(result.total, 0.5)
+        XCTAssertEqual(result.buckets[1], 1800)
+        XCTAssertEqual(result.buckets[0], 0)
+    }
+
     func testNoRoutineAndFlexibleDayAreDistinct() {
         XCTAssertEqual(HomeStateResolver.workout(HomeWorkoutInput()), .noRoutine)
         XCTAssertEqual(HomeStateResolver.workout(HomeWorkoutInput(hasRoutine: true)), .flexible)

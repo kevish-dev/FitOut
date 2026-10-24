@@ -46,7 +46,7 @@ Implemented directly from the updated reference mock (`media_1792768403220_fb918
    - **Water intake**: Logged liters and 2-hour log bubbles.
    - **Steps**: Today's count and a 2-hour pace trace.
    - **Active calories**: Active energy burned and 2-hour movement-energy bars.
-   - **Sleep**: Last night's asleep duration and a 12-segment timeline.
+   - **Workout time**: Total active workout-session time for the current calendar week, with seven daily bars. This uses FitOut sessions and works without Apple Health access. Completed sessions and the ongoing session count; paused time, skipped/abandoned sessions and future dates do not. Sessions are assigned to the week/day they start, matching other weekly analytics. The ongoing duration refreshes every minute and immediately on saved workout changes. Empty weeks show zero. Shared Health queries remain intact; the Home grid no longer displays sleep readings or sleep-query errors.
    - The section uses Apple Health readings already shared with FitOut. Empty readings show a clear missing-data state; the section links to Health access and supports pull-to-refresh. No personal goals are inferred from the artwork.
 
 ## Background Asset
