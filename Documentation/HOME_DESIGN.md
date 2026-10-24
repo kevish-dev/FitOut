@@ -7,11 +7,11 @@ Implemented directly from the updated reference mock (`media_1792768403220_fb918
 1. **Hero Header**:
    - Left: "Hi [Name]," (bold white) with a subtle settings gear shortcut, followed by "Welcome!" (heavy bold #FF4D00 orange).
    - Right: Fixed circular menu control that expands five navigation buttons (Home, Gym, Nutrition, Health, AI Coach).
-   - Active button displays a vibrant orange glowing border and an indicator dot on its top-right corner.
+   - Active destinations use an orange foreground icon on neutral glass, without a colored glow.
 
 2. **Workout Routine CTA Card**:
    - Dark frosted glass card (`.ultraThinMaterial` over dark surface with 20pt corner radius).
-   - Left: Circular badge with radial orange glow and dumbbell icon.
+   - Status badge: neutral charcoal with a small orange foreground label and icon.
    - Center: "Set up your workout routine" with description "Get a personalized plan based on your goals" (or today's planned/active workout details).
    - Right: Circular deep-orange gradient button with right chevron arrow that launches routine creation or today's session.
 
@@ -51,7 +51,7 @@ Implemented directly from the updated reference mock (`media_1792768403220_fb918
 
 ## Background Asset
 
-Full-screen cinematic fitness background (`HomeAthlete` asset) featuring a muscular martial artist executing an explosive high kick toward the left with glowing fiery orange energy trails and embers, matching the visual aesthetic of the reference mock.
+Full-screen matte charcoal fitness background (`HomeAthlete` asset) featuring the male martial artist kicking toward the left. Soft neutral lighting keeps the pose readable without fire, embers, neon outlines or colored reflections. See [the current asset prompts and visual policy](SUBTLE_BACKGROUNDS.md).
 
 ## Current behavior after navigation and data correction
 
@@ -99,7 +99,8 @@ simulator, device launch, or runtime visual verification was performed.
 
 ## Background replacement
 
-`HomeAthlete` now contains the supplied “Fiery Kick in the Shadows” image.
+`HomeAthlete` now contains a subdued edit of the supplied kicking-athlete image.
+Its pose is retained; fiery lighting and energy trails have been removed.
 The Home scroll view draws that asset directly behind its content, so the
 navigation container cannot leave an opaque black gap below the greeting.
 The fixed header row was removed to keep the photo and content aligned.
@@ -116,8 +117,8 @@ flexible day; a quick workout does not replace the setup prompt.
 
 The streak card sits immediately below the routine card as a short, wide
 rectangle. It uses three horizontal zones: streak and flame, seven daily
-completion markers, and the current week's count. The flame is a separate
-asset; numbers and checks come from completed workout history.
+completion markers, and the current week's count. A faint neutral flame outline
+replaces the glowing image; numbers and checks come from completed workout history.
 
 Custom pages share a 20 pt horizontal page inset and a 16 pt section/card
 spacing scale. On Home the greeting, routine, streak, weekly tracker, metrics,

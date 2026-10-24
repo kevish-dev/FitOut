@@ -275,7 +275,7 @@ struct HomeView: View {
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel("\(streak.consecutiveDays) day workout streak")
 
-                    streakDivider(color: accent.opacity(0.52))
+                    streakDivider(color: Color.white.opacity(0.15))
 
                     HStack(spacing: 0) {
                         ForEach(0..<streak.weekDays.count, id: \.self) { index in
@@ -297,7 +297,6 @@ struct HomeView: View {
                                                 .foregroundStyle(.white)
                                         }
                                     }
-                                    .shadow(color: day.isCompleted ? accent.opacity(0.30) : .clear, radius: 6)
                             }
                             .frame(maxWidth: .infinity)
                             .accessibilityElement(children: .ignore)
@@ -327,18 +326,13 @@ struct HomeView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background {
                     RoundedRectangle(cornerRadius: 22)
-                        .fill(LinearGradient(colors: [Color(red: 0.14, green: 0.055, blue: 0.035),
-                                                      FitTheme.dashboardBackground,
-                                                      Color(red: 0.12, green: 0.065, blue: 0.045)],
-                                             startPoint: .leading, endPoint: .trailing))
+                        .fill(FitTheme.surface)
                         .overlay(alignment: .leading) {
-                            Image("StreakFlame")
-                                .resizable()
-                                .scaledToFill()
+                            Image(systemName: "flame")
+                                .font(.system(size: 76, weight: .ultraLight))
+                                .foregroundStyle(.white.opacity(0.035))
                                 .frame(width: compact ? 108 : 130, height: 96)
                                 .clipped()
-                                .blendMode(.screen)
-                                .opacity(0.55)
                                 .offset(x: compact ? 54 : 65, y: 10)
                                 .accessibilityHidden(true)
                         }
@@ -346,8 +340,7 @@ struct HomeView: View {
                 }
                 .overlay {
                     RoundedRectangle(cornerRadius: 22)
-                        .stroke(LinearGradient(colors: [accent.opacity(0.72), .white.opacity(0.19)],
-                                               startPoint: .leading, endPoint: .trailing), lineWidth: 1)
+                        .stroke(.white.opacity(0.14), lineWidth: 1)
                 }
             }
             .frame(height: 96)

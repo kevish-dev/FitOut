@@ -164,8 +164,9 @@ relevant modules instead of requiring additional top-level tabs.
     VoiceOver labels, adequate contrast and accessible tap targets.
 -   Support dark appearance as the default visual direction; follow the
     system appearance or provide an explicit theme setting.
--   Consistent near-black/charcoal surfaces and restrained
-    neon/burnt-lime accent based on the approved design reference.
+-   Consistent near-black/charcoal surfaces and restrained orange foreground
+    accents. Background imagery uses soft neutral lighting without neon,
+    colored glow, fire or flashy lighting effects.
     Centralize tokens; do not hardcode colors throughout views.
 -   Haptics must be subtle and configurable.
 -   Respect reduced motion and notification preferences.

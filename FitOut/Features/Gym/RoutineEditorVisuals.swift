@@ -75,10 +75,6 @@ struct RoutinePlanHero: View {
         .padding(FitTheme.cardInset)
         .background {
             RoundedRectangle(cornerRadius: 24).fill(FitTheme.surface)
-                .overlay {
-                    RadialGradient(colors: [FitTheme.dashboardAccent.opacity(0.1), .clear], center: .topTrailing, startRadius: 8, endRadius: 260)
-                        .clipShape(RoundedRectangle(cornerRadius: 24))
-                }
         }
         .overlay { RoundedRectangle(cornerRadius: 24).strokeBorder(.white.opacity(0.06), lineWidth: 1) }
     }

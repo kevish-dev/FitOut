@@ -128,7 +128,6 @@ struct ProfileScreen: View {
                     Text(emoji).font(.system(size: 25 * scale))
                         .frame(width: 39 * scale, height: 39 * scale)
                         .fitSurface(selected: selected, radius: 25)
-                        .shadow(color: selected ? FitTheme.orange.opacity(0.2) : .clear, radius: 6)
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.plain)

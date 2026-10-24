@@ -360,8 +360,10 @@ struct DashboardWorkoutPreview: View {
     private var statusBadge: some View {
         Label(status, systemImage: statusSymbol)
             .font(FitTheme.medium(12))
+            .foregroundStyle(FitTheme.dashboardAccent)
             .padding(.horizontal, 12).padding(.vertical, 9)
-            .background(FitTheme.dashboardAccent, in: Capsule())
+            .background(FitTheme.surface.opacity(0.85), in: Capsule())
+            .overlay { Capsule().strokeBorder(.white.opacity(0.14), lineWidth: 1) }
     }
 
     private var facts: some View {

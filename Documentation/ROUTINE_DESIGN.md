@@ -35,6 +35,11 @@ introduced.
 
 ## Generated graphic
 
+The current asset uses soft neutral lighting and matte graphite equipment.
+Orange rim lighting and the warm halo were removed in the subsequent
+[subtle-background update](SUBTLE_BACKGROUNDS.md), which records the final prompt.
+The original generation information below is historical.
+
 Tool: built-in `image_gen` tool, with `transparent_background: true`.
 
 Project asset:

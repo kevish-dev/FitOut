@@ -7,8 +7,7 @@ enum FitTheme {
     static let orange = Color(red: 1, green: 0.27, blue: 0.015)
     static let background = Color(red: 0.018, green: 0.018, blue: 0.018)
     static let border = Color.white.opacity(0.19)
-    // Dashboard palette from the FitOut brand guidelines. The reference
-    // onboarding retains its existing styling.
+    // Neutral backgrounds and surfaces; orange is reserved for foreground actions.
     static let dashboardAccent = Color(red: 1, green: 77.0 / 255, blue: 0)
     static let dashboardBackground = Color(red: 11.0 / 255, green: 11.0 / 255, blue: 13.0 / 255)
     static let surface = Color(red: 21.0 / 255, green: 21.0 / 255, blue: 24.0 / 255)
@@ -35,13 +34,7 @@ struct Surface: ViewModifier {
         content
             .background {
                 RoundedRectangle(cornerRadius: radius)
-                    .fill(selected ? FitTheme.orange.opacity(0.07) : Color.white.opacity(0.025))
-                    .overlay {
-                        if selected {
-                            RadialGradient(colors: [FitTheme.orange.opacity(0.12), .clear], center: .bottomLeading, startRadius: 0, endRadius: 220)
-                                .clipShape(RoundedRectangle(cornerRadius: radius))
-                        }
-                    }
+                    .fill(Color.white.opacity(selected ? 0.055 : 0.025))
             }
             .overlay { RoundedRectangle(cornerRadius: radius).stroke(selected ? FitTheme.orange : FitTheme.border, lineWidth: selected ? 1.4 : 1) }
     }
@@ -111,17 +104,18 @@ private struct DashboardGlass<S: Shape>: ViewModifier {
         if reduceTransparency {
             content
                 .background(FitTheme.elevated, in: shape)
-                .overlay { shape.stroke(highlighted ? FitTheme.dashboardAccent : .white.opacity(0.18), lineWidth: 1) }
+                .overlay { shape.stroke(.white.opacity(highlighted ? 0.28 : 0.18), lineWidth: 1) }
         } else if #available(iOS 26.0, *) {
             content.glassEffect(
-                .regular.tint(highlighted ? FitTheme.dashboardAccent.opacity(0.18) : FitTheme.surface.opacity(0.25))
+                .regular.tint(FitTheme.surface.opacity(highlighted ? 0.5 : 0.4))
                     .interactive(interactive),
                 in: shape
             )
+            .overlay { shape.stroke(.white.opacity(highlighted ? 0.22 : 0.08), lineWidth: 1) }
         } else {
             content
                 .background(.ultraThinMaterial, in: shape)
-                .background(FitTheme.surface.opacity(0.35), in: shape)
+                .background(FitTheme.surface.opacity(0.5), in: shape)
                 .overlay {
                     shape.stroke(
                         LinearGradient(colors: [.white.opacity(highlighted ? 0.38 : 0.24), .white.opacity(0.05), .white.opacity(0.12)], startPoint: .topLeading, endPoint: .bottomTrailing),
@@ -231,7 +225,6 @@ struct SlideToFinish: View {
                     .overlay { Circle().stroke(.white.opacity(0.13), lineWidth: 1) }
                     .overlay { Image(systemName: "arrow.right").font(.system(size: 23, weight: .medium)) }
                     .frame(width: 54, height: 54)
-                    .shadow(color: FitTheme.orange.opacity(0.25), radius: 14)
                     .offset(x: offset + 2)
                     .gesture(DragGesture(minimumDistance: 2)
                         .onChanged { value in
