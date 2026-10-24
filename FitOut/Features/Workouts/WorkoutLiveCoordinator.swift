@@ -31,6 +31,7 @@ import SwiftUI
     private var syncTask: Task<Void, Never>?
     private var watchTask: Task<Void, Never>?
     private var watchedActivityID: String?
+    private var selfEndedIDs: Set<String> = []
     private(set) var liveActivityMessage: String?
     private struct Request { var session: WorkoutSession?; var unit: WeightUnit; var allowStart: Bool }
 
@@ -75,15 +76,15 @@ import SwiftUI
     private func synchronize(_ request: Request) async {
         let activities = Activity<WorkoutLiveAttributes>.activities
         guard let session = request.session else {
-            for activity in activities { await Self.endActivity(activity.id) }
+            for activity in activities { selfEndedIDs.insert(activity.id); await Self.endActivity(activity.id) }
             liveActivityMessage = nil; return
         }
-        for activity in activities where activity.attributes.sessionID != session.id { await Self.endActivity(activity.id) }
+        for activity in activities where activity.attributes.sessionID != session.id { selfEndedIDs.insert(activity.id); await Self.endActivity(activity.id) }
         let state = Self.content(for: session, unit: request.unit)
         let content = ActivityContent(state: state, staleDate: state.paused ? nil : state.restUntil)
         let matching = activities.filter { $0.attributes.sessionID == session.id && [.active, .stale].contains($0.activityState) }
         if let activity = matching.first {
-            for duplicate in matching.dropFirst() { await Self.endActivity(duplicate.id) }
+            for duplicate in matching.dropFirst() { selfEndedIDs.insert(duplicate.id); await Self.endActivity(duplicate.id) }
             await Self.updateActivity(activity.id, content: content)
             watch(activity); liveActivityMessage = nil
             return
@@ -118,7 +119,7 @@ import SwiftUI
         watchTask = Task { [weak self] in
             for await state in activity.activityStateUpdates {
                 guard !Task.isCancelled else { return }
-                if state == .dismissed {
+                if state == .dismissed, self?.selfEndedIDs.contains(activity.id) != true {
                     self?.defaults.set(true, forKey: "workout.live.dismissed." + activity.attributes.sessionID.uuidString)
                     self?.liveActivityMessage = "Live Activity dismissed. You can show it again for this workout."
                 }
@@ -126,6 +127,7 @@ import SwiftUI
         }
     }
     static func content(for session: WorkoutSession, unit: WeightUnit, now: Date = .now) -> WorkoutLiveAttributes.ContentState {
+        let unit = session.execution?.preferredUnit ?? unit
         func bounded(_ text: String) -> String { String(decoding: text.utf8.prefix(200), as: UTF8.self) }
         let focus = session.focusedWork
         func values(_ set: WorkoutSet, kind: ExerciseKind) -> String {
@@ -138,12 +140,12 @@ import SwiftUI
         let setRunning = focus?.set.startedAt != nil && focus?.set.timedActiveSeconds == nil && session.status == .inProgress
         return WorkoutLiveAttributes.ContentState(revision: session.telemetry?.revision ?? session.id,
             title: bounded(session.title), exercise: bounded(focus?.entry.exercise.name ?? (session.entries.isEmpty ? "Choose exercises in FitOut" : "All remaining sets logged")),
-            target: bounded(focus.map { "Next: " + values($0.set, kind: $0.entry.exercise.kind) } ?? ""),
+            target: bounded(focus.map { work in "Set \((work.entry.sets.firstIndex { $0.id == work.set.id } ?? 0) + 1)/\(work.entry.sets.count) · " + values(work.set, kind: work.entry.exercise.kind) } ?? ""),
             lastSet: bounded(completed.map { $0.0.name + " · " + values($0.1, kind: $0.0.kind) } ?? ""),
             clockStart: session.startedAt.addingTimeInterval(session.pausedSeconds), paused: session.status == .paused,
             elapsed: session.duration(at: now), loggedSets: session.completedSets.count, totalSets: session.trackedSetCount,
-            laps: session.telemetry?.laps.count ?? 0, lastLap: session.telemetry?.laps.last?.activeSeconds,
+            laps: 0, lastLap: nil,
             setTimerStart: setRunning ? setElapsed.map { now.addingTimeInterval(-$0) } : nil, setTimerElapsed: setElapsed,
-            restUntil: session.restUntil, pausedRest: session.restRemaining(at: now))
+            restUntil: session.restUntil, pausedRest: session.restRemaining(at: now), phase: session.execution?.phase.rawValue, skippedSets: session.skippedSets.count)
     }
 }

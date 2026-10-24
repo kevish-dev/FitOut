@@ -233,7 +233,7 @@ struct WorkoutSetEditor: View {
     }
 }
 
-private struct WorkoutLogNumberField: View {
+struct WorkoutLogNumberField: View {
     let title: String
     @Binding var value: Double
     var integer = false

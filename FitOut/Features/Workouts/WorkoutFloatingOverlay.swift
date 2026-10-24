@@ -135,7 +135,6 @@ private struct FloatingWorkoutPill: View {
         .padding(.leading, 14).padding(.trailing, 4).foregroundStyle(FitTheme.textPrimary)
         .dashboardGlass(in: Capsule(), highlighted: true, interactive: true)
         .shadow(color: .black.opacity(0.25), radius: 16, y: 5)
-        .accessibilityAction(named: Text("Record lap")) { if session.status == .inProgress { store.markLap() } }
         .accessibilityAction(named: Text("End rest")) { if session.restUntil != nil { store.endRest() } }
     }
 }

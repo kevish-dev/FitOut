@@ -61,7 +61,7 @@ enum WorkoutRecall {
     /// User edits and measurements already in progress also win over suggestions.
     static func filling(_ target: WorkoutSet, from source: WorkoutSet, kind: ExerciseKind,
                         fields: Set<WorkoutInputField> = [.load, .reps, .seconds, .distance]) -> WorkoutSet {
-        guard target.completedAt == nil, target.startedAt == nil else { return target }
+        guard target.status == .pending, target.startedAt == nil else { return target }
         var result = target
         let protected = target.editedInputs ?? []
         if kind == .weighted, fields.contains(.load), !protected.contains(.load), target.plannedTarget?.loadKG == nil { result.loadKG = source.loadKG }

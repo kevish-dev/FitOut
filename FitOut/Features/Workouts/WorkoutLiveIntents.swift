@@ -3,7 +3,7 @@ import AppIntents
 
 struct WorkoutLiveIntent: LiveActivityIntent {
     static let title: LocalizedStringResource = "Control FitOut workout"
-    static let description = IntentDescription("Pauses, resumes, records a lap or ends rest for the displayed workout.")
+    static let description = IntentDescription("Pauses, resumes, starts a set or adjusts rest for the displayed workout.")
     static let openAppWhenRun = false
     static let isDiscoverable = false
     static let authenticationPolicy: IntentAuthenticationPolicy = .alwaysAllowed
@@ -16,7 +16,7 @@ struct WorkoutLiveIntent: LiveActivityIntent {
     }
     func perform() async throws -> some IntentResult {
         guard let session = UUID(uuidString: sessionID), let command = UUID(uuidString: commandID),
-              ["pause", "resume", "lap", "endRest"].contains(operation) else { throw WorkoutLiveActionError.invalidCommand }
+              ["pause", "resume", "startSet", "endRest", "extendRest"].contains(operation) else { throw WorkoutLiveActionError.invalidCommand }
         try await execute(session: session, command: command)
         return .result()
     }

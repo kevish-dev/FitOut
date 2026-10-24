@@ -25,239 +25,29 @@ struct WorkoutsPanel: View {
 
     }
 }
-struct ActiveWorkoutView: View {
-    @Bindable var store: WorkoutStore
-    let gym: GymStore
-    let unit: WeightUnit
-    let defaults: UserDefaults
-    @State private var selecting = false
-    @State private var replacing: UUID?
-    @State private var finishing = false
-    @State private var finished: WorkoutSession?
-    @State private var expandedEntry: UUID?
-    @State private var keyboardVisible = false
-    @State private var timingDetails = false
-    @Environment(\.dismiss) private var dismiss
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
-
-    var body: some View {
-        Group {
-            if let session = store.active {
-                ScrollViewReader { proxy in
-                    ScrollView {
-                        LazyVStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
-                            TimelineView(.periodic(from: .now, by: 1)) { context in
-                                WorkoutSessionHero(session: session, unit: unit, now: context.date)
-                            }
-                            HStack {
-                                Button("Timing & laps", systemImage: "stopwatch") { dismissKeyboard(); timingDetails = true }
-                                Spacer()
-                                Button("Lap \((session.telemetry?.laps.count ?? 0) + 1)", systemImage: "flag") { dismissKeyboard(); store.markLap() }
-                                    .disabled(session.status == .paused).accessibilityIdentifier("recordWorkoutLap")
-                            }.font(FitTheme.medium(13)).frame(minHeight: 44)
-                            if let presentation = WorkoutRuntime.presentation, let message = presentation.liveActivityMessage {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Text(message).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-                                    Button("Show Live Activity") { presentation.showLiveActivity() }.font(FitTheme.medium(12)).frame(minHeight: 44)
-                                }
-                            }
-                            if session.entries.isEmpty {
-                                WorkoutEmptyState()
-                                Button("End session") { finishing = true }
-                                    .font(FitTheme.medium(13)).frame(maxWidth: .infinity, minHeight: 44)
-                                    .accessibilityIdentifier("finishWorkout")
-                            } else {
-                                HStack {
-                                    Text("Your exercises").font(FitTheme.section(18))
-                                    Spacer()
-                                    Text("\(session.remainingSetCount) sets remaining").font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-                                }
-                                ForEach(session.entries) { entry in
-                                    WorkoutExerciseCard(entry: entry,
-                                        expanded: Binding(get: { expandedEntry == entry.id }, set: { dismissKeyboard(); expandedEntry = $0 ? entry.id : nil }),
-                                        unit: unit, session: session, canComplete: session.status == .inProgress,
-                                        reference: { store.reference(entryID: entry.id, setID: $0) },
-                                        reuse: { dismissKeyboard(); store.reusePrevious(entryID: entry.id, setID: $0) },
-                                        repeatInputs: { dismissKeyboard(); store.repeatInputs(entryID: entry.id, setID: $0) },
-                                        binding: { setBinding(entry.id, $0) }, complete: { toggleSet(entry.id, $0) },
-                                        start: { dismissKeyboard(); store.startSet(entryID: entry.id, setID: $0) },
-                                        stopTimer: { dismissKeyboard(); store.stopSetTimer(entryID: entry.id, setID: $0) },
-                                        deleteSet: { deleteSet(entry.id, $0) }, addSet: { addSet(entry.id) },
-                                        notes: Binding(get: { store.active?.entries.first { $0.id == entry.id }?.notes ?? "" }, set: { value in changeEntry(entry.id) { $0.notes = value } }),
-                                        replace: { dismissKeyboard(); replacing = entry.id; selecting = true },
-                                        toggleSkip: { dismissKeyboard(); changeEntry(entry.id) { $0.skipped.toggle() } })
-                                        .id(entry.id)
-                                }
-                            }
-                            DisclosureGroup("Session notes") {
-                                TextField("How did this workout feel?", text: Binding(get: { store.active?.notes ?? "" }, set: { value in store.update { $0.notes = value } }), axis: .vertical)
-                                    .font(FitTheme.body(14)).padding(.top, 10)
-                            }.font(FitTheme.medium(13)).routinePanel()
-                        }
-                        .frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity)
-                    }
-                    .scrollDismissesKeyboard(.interactively).scrollBounceBehavior(.basedOnSize)
-                    .scrollIndicators(.hidden)
-                    .onChange(of: expandedEntry) { _, id in
-                        if let id { withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.25)) { proxy.scrollTo(id, anchor: .top) } }
-                    }
-                }
-                .safeAreaInset(edge: .bottom, spacing: 0) { footer(session) }
-                .onAppear { expandFirstEntry(session) }
-            } else if let finished {
-                WorkoutSummary(session: finished, unit: unit, history: store.history)
-            } else {
-                ContentUnavailableView("No active workout", systemImage: "dumbbell", description: Text("Your ended sessions are in workout history."))
-            }
-        }
-        .background(FitTheme.dashboardBackground).foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)
-        .navigationTitle(finished == nil ? "Workout" : "Workout summary").navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .cancellationAction) {
-                if let session = store.active {
-                    Button {
-                        dismissKeyboard()
-                        if session.status == .paused { store.resume() } else { store.pause() }
-                    } label: {
-                        Label(session.status == .paused ? "Resume" : "Pause", systemImage: session.status == .paused ? "play.fill" : "pause")
-                    }.accessibilityIdentifier("pauseResumeWorkout")
-                }
-            }
-            ToolbarItem(placement: .confirmationAction) { Button("Close") { dismissKeyboard(); dismiss() } }
-        }
-        .presentationDragIndicator(.visible).presentationCornerRadius(30)
-        .onAppear { store.editorAppeared() }
-        .onDisappear { store.editorDisappeared() }
-        .sheet(isPresented: $timingDetails) { if let session = store.active { WorkoutTimingDetails(session: session, unit: unit) } }
-        .sheet(isPresented: $selecting) {
-            NavigationStack {
-                ExerciseBrowser(store: gym, title: replacing == nil ? "Add exercises" : "Replace exercise",
-                    mode: replacing == nil ? .multiple : .single) { exercises in
-                        if let replacing, let exercise = exercises.first {
-                            let index = store.active?.entries.firstIndex { $0.id == replacing }
-                            store.replace(entryID: replacing, with: exercise)
-                            if let index, let entries = store.active?.entries, entries.indices.contains(index) { expandedEntry = entries[index].id }
-                        }
-                        else if store.add(exercises) { expandedEntry = store.active?.entries.suffix(exercises.count).first?.id }
-                        selecting = false
-                    }
-            }
-        }
-        .confirmationDialog("End this workout", isPresented: $finishing, titleVisibility: .visible) {
-            Button("Complete workout") { finish(.completed) }.disabled(store.active?.completedSets.isEmpty != false)
-            Button("Mark skipped") { finish(.skipped) }
-            Button("Abandon workout", role: .destructive) { finish(.abandoned) }
-        } message: {
-            Text(store.active?.completedSets.isEmpty == true ? "No sets logged yet. You can keep training or mark this session skipped." : "Your logged sets and notes will be kept in workout history.")
-        }
-        .alert("Workout could not be updated", isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
-            Button("OK", role: .cancel) { store.error = nil }
-        } message: { Text(store.error ?? "") }
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in keyboardVisible = true }
-        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardVisible = false }
-        .onReceive(timer) { date in
-            if let session = store.active, session.status == .inProgress, let deadline = session.restUntil, deadline <= date {
-                if store.update({ $0.restUntil = nil }), !defaults.bool(forKey: "haptics.disabled") {
-                    UINotificationFeedbackGenerator().notificationOccurred(.success)
-                }
-            }
-        }
-    }
-
-    private func footer(_ session: WorkoutSession) -> some View {
-        VStack(spacing: 12) {
-            if keyboardVisible {
-                Button(action: dismissKeyboard) {
-                    Label("Done editing", systemImage: "keyboard.chevron.compact.down").font(FitTheme.button(15))
-                        .frame(maxWidth: .infinity, minHeight: 54).dashboardGlass(in: RoundedRectangle(cornerRadius: 16), interactive: true)
-                }.buttonStyle(RoutineEditorPressStyle())
-            } else {
-                if session.restUntil != nil {
-                    TimelineView(.periodic(from: .now, by: 1)) { context in
-                        WorkoutRestCard(session: session, now: context.date) { store.endRest() }
-                    }
-                }
-                HStack(spacing: 12) {
-                    if !session.entries.isEmpty {
-                        Button(action: chooseExercises) {
-                            Image(systemName: "plus").font(.system(size: 20)).frame(width: 54, height: 54)
-                                .dashboardGlass(in: RoundedRectangle(cornerRadius: 16), interactive: true)
-                        }.buttonStyle(RoutineEditorPressStyle()).accessibilityLabel("Add exercise").accessibilityIdentifier("workoutAddExercise")
-                    }
-                    Button {
-                        if session.entries.isEmpty { chooseExercises() } else { dismissKeyboard(); finishing = true }
-                    } label: {
-                        HStack {
-                            Text(session.entries.isEmpty ? "Choose exercises" : "Finish workout")
-                            Spacer(minLength: 4)
-                            Image(systemName: session.entries.isEmpty ? "plus" : "checkmark")
-                        }
-                        .font(FitTheme.button(15)).padding(.horizontal, 18).padding(.vertical, 12)
-                        .frame(maxWidth: .infinity, minHeight: 54)
-                        .foregroundStyle(.white)
-                .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
-                    }
-                    .buttonStyle(RoutineEditorPressStyle()).accessibilityIdentifier(session.entries.isEmpty ? "workoutAddExercise" : "finishWorkout")
-                }
-            }
-        }
-        .frame(maxWidth: 560).padding(.horizontal, FitTheme.pageInset).padding(.vertical, 12)
-        .frame(maxWidth: .infinity).background(.bar)
-        .animation(reduceMotion ? nil : .easeInOut(duration: 0.22), value: session.restUntil != nil)
-    }
-    private func dismissKeyboard() { UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) }
-    private func chooseExercises() { dismissKeyboard(); replacing = nil; selecting = true }
-    private func expandFirstEntry(_ session: WorkoutSession) {
-        guard expandedEntry == nil else { return }
-        expandedEntry = session.entries.first { !$0.skipped && $0.sets.contains { $0.completedAt == nil } }?.id ?? session.entries.first?.id
-    }
-    private func toggleSet(_ entryID: UUID, _ setID: UUID) {
-        dismissKeyboard()
-        let wasLogged = store.active?.entries.first { $0.id == entryID }?.sets.first { $0.id == setID }?.completedAt != nil
-        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) { store.toggleSet(entryID: entryID, setID: setID) }
-        if !wasLogged, store.active?.entries.first(where: { $0.id == entryID })?.sets.first(where: { $0.id == setID })?.completedAt != nil,
-           !defaults.bool(forKey: "haptics.disabled") { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
-    }
-    private func addSet(_ entryID: UUID) {
-        dismissKeyboard()
-        store.appendSet(entryID: entryID)
-    }
-    private func deleteSet(_ entryID: UUID, _ setID: UUID) {
-        let latest = store.active?.completedSets.max { ($0.completedAt ?? .distantPast) < ($1.completedAt ?? .distantPast) }?.id
-        store.update { session in
-            if let index = session.entries.firstIndex(where: { $0.id == entryID }) { session.entries[index].sets.removeAll { $0.id == setID } }
-            if latest == setID { session.restUntil = nil }
-        }
-    }
-    private func finish(_ status: SessionStatus) {
-        dismissKeyboard()
-        let id = store.active?.id
-        if store.finish(status) { finished = store.history.first { $0.id == id } }
-    }
-    private func changeEntry(_ id: UUID, _ mutation: (inout WorkoutEntry) -> Void) {
-        store.update { session in if let index = session.entries.firstIndex(where: { $0.id == id }) { mutation(&session.entries[index]) } }
-    }
-    private func setBinding(_ entry: UUID, _ set: UUID) -> Binding<WorkoutSet> {
-        Binding(get: { store.active?.entries.first { $0.id == entry }?.sets.first { $0.id == set } ?? WorkoutSet() }, set: { value in
-            changeEntry(entry) { item in if let index = item.sets.firstIndex(where: { $0.id == set }) { item.sets[index] = value } }
-        })
-    }
-}
-
 struct WorkoutSummary: View {
     let session: WorkoutSession
     let unit: WeightUnit
     var history: [WorkoutSession] = []
+    var store: WorkoutStore? = nil
     @State private var showTiming = false
     private var records: [String] { Array(Set(WorkoutAnalytics.newRecords(in: session, history: history))).sorted() }
     var body: some View {
+        let unit = session.execution?.preferredUnit ?? self.unit
         ScrollView {
             LazyVStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
                 WorkoutSessionHero(session: session, unit: unit, now: session.endedAt ?? .now)
+                Label("\(session.completedSets.count) completed · \(session.skippedSets.count) skipped · \(session.remainingSetCount) unfinished", systemImage: "checklist")
+                    .font(FitTheme.medium(13))
+                if let store, session.execution?.undo != nil {
+                    Button(store.active?.id == session.id ? "Restored to current workout" : "Undo last set", systemImage: "arrow.uturn.backward") {
+                        store.performFocused(.undo, sessionID: session.id)
+                    }.disabled(store.active?.id == session.id).frame(minHeight: 44)
+                    if let error = store.error { Text(error).font(FitTheme.body(12)).foregroundStyle(.red) }
+                }
                 Label(session.startedAt.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
                     .font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
-                Button("Timing, laps & session timeline", systemImage: "stopwatch") { showTiming = true }
+                Button("Timing & session timeline", systemImage: "stopwatch") { showTiming = true }
                     .font(FitTheme.button(14)).frame(minHeight: 44)
                 if !records.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
@@ -281,14 +71,20 @@ struct WorkoutSummary: View {
                                     .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
                             }
                         }
-                        let completed = entry.sets.filter { $0.completedAt != nil }
+                        let completed = entry.sets.filter { $0.status != .pending }
                         if !completed.isEmpty { Divider().overlay(FitTheme.textPrimary.opacity(0.06)) }
                         ForEach(completed) { set in
+                            if set.status == .skipped {
+                                Label("Set \((entry.sets.firstIndex { $0.id == set.id } ?? 0) + 1) · Skipped", systemImage: "forward.end")
+                                    .font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
+                                if let elapsed = set.timedActiveSeconds { Text("Time before skip · " + WorkoutDisplay.clock(elapsed)).font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary) }
+                            } else {
                             HStack(alignment: .firstTextBaseline, spacing: 10) {
                                 Image(systemName: "checkmark.circle.fill").foregroundStyle(FitTheme.dashboardAccent).font(.system(size: 13))
                                 VStack(alignment: .leading, spacing: 4) {
                                     if set.type != .working { Text(set.type.rawValue).font(FitTheme.medium(10)).foregroundStyle(FitTheme.textSecondary) }
                                     Text(entry.exercise.kind == .duration ? "\(set.seconds.formatted()) sec" : "\(set.reps) reps").font(FitTheme.strong(15))
+                                    if let elapsed = set.actual?.seconds { Text("Set duration · " + WorkoutDisplay.clock(elapsed)).font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary) }
                                 }
                                 Spacer(minLength: 4)
                                 if entry.exercise.kind == .weighted {
@@ -297,6 +93,8 @@ struct WorkoutSummary: View {
                                     Text("\(set.distanceMeters.formatted()) m").font(FitTheme.body(14))
                                 }
                             }
+                            }
+                            if let note = set.note, !note.isEmpty { Text(note).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary) }
                         }
                         if completed.isEmpty && !entry.skipped { Text("No sets logged").font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary) }
                         if !entry.notes.isEmpty { Text(entry.notes).font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary) }
@@ -326,7 +124,7 @@ struct WorkoutHistory: View {
             if store.history.isEmpty { ContentUnavailableView("No workout history", systemImage: "calendar", description: Text("Finished, skipped and abandoned workouts will appear here.")) }
             if let error = store.error { Text(error).foregroundStyle(.red) }
             ForEach(store.history) { session in
-                NavigationLink { WorkoutSummary(session: session, unit: unit, history: store.history) } label: {
+                NavigationLink { WorkoutSummary(session: session, unit: unit, history: store.history, store: store) } label: {
                     VStack(alignment: .leading) { Text(session.title); Text("\(session.startedAt.formatted(date: .abbreviated, time: .shortened)) · \(session.status.rawValue)").font(FitTheme.body(12)).foregroundStyle(.secondary) }
                 }.swipeActions { Button("Delete", role: .destructive) { deleting = session.id } }
             }

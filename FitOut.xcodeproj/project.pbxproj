@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F19000000000000000000007 /* FocusedWorkoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19000000000000000000008; };
+		F19000000000000000000005 /* FocusedWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19000000000000000000006; };
+		F19000000000000000000003 /* FocusedWorkoutModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19000000000000000000004; };
+		F19000000000000000000001 /* WorkoutExecution.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19000000000000000000002; };
 		F18000000000000000000003 /* AppPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18000000000000000000004 /* AppPresentationTests.swift */; };
 		F18000000000000000000001 /* AppPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18000000000000000000002 /* AppPresentation.swift */; };
 		F17000000000000000000001 /* WorkoutRecall.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17000000000000000000002 /* WorkoutRecall.swift */; };
@@ -151,6 +155,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F19000000000000000000008 /* FocusedWorkoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedWorkoutTests.swift; sourceTree = "<group>"; };
+		F19000000000000000000006 /* FocusedWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedWorkoutView.swift; sourceTree = "<group>"; };
+		F19000000000000000000004 /* FocusedWorkoutModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedWorkoutModel.swift; sourceTree = "<group>"; };
+		F19000000000000000000002 /* WorkoutExecution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutExecution.swift; sourceTree = "<group>"; };
 		F18000000000000000000004 /* AppPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPresentationTests.swift; sourceTree = "<group>"; };
 		F18000000000000000000002 /* AppPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPresentation.swift; sourceTree = "<group>"; };
 		F17000000000000000000002 /* WorkoutRecall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecall.swift; sourceTree = "<group>"; };
@@ -293,6 +301,7 @@
 		3EC67EAD137BE1CFEDEA8F7E /* FitOutTests */ = {
 			isa = PBXGroup;
 			children = (
+				F19000000000000000000008 /* FocusedWorkoutTests.swift */,
 				F18000000000000000000004 /* AppPresentationTests.swift */,
 				F04000000000000000000007 /* CoachTests.swift */,
 				C07A9882386626872680CEC6 /* AnalyticsTests.swift */,
@@ -533,6 +542,9 @@
 		D7CB24A5F6FD15559F06C45B /* Workouts */ = {
 			isa = PBXGroup;
 			children = (
+				F19000000000000000000006 /* FocusedWorkoutView.swift */,
+				F19000000000000000000004 /* FocusedWorkoutModel.swift */,
+				F19000000000000000000002 /* WorkoutExecution.swift */,
 				F17000000000000000000002 /* WorkoutRecall.swift */,
 				F16000000000000000000001 /* WorkoutTelemetry.swift */,
 				F16000000000000000000002 /* WorkoutTimingViews.swift */,
@@ -715,6 +727,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F19000000000000000000007 /* FocusedWorkoutTests.swift in Sources */,
 				F18000000000000000000003 /* AppPresentationTests.swift in Sources */,
 				1975EAD2999B084B2337BEE6 /* AnalyticsTests.swift in Sources */,
 				5B942A6F130D212AA769CB19 /* CapabilityTests.swift in Sources */,
@@ -745,6 +758,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F19000000000000000000005 /* FocusedWorkoutView.swift in Sources */,
+				F19000000000000000000003 /* FocusedWorkoutModel.swift in Sources */,
+				F19000000000000000000001 /* WorkoutExecution.swift in Sources */,
 				F18000000000000000000001 /* AppPresentation.swift in Sources */,
 				F17000000000000000000001 /* WorkoutRecall.swift in Sources */,
 				F16000000000000000000014 /* WorkoutTelemetry.swift in Sources */,

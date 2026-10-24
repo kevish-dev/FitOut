@@ -109,22 +109,30 @@ struct SessionPlanDetails: Codable {
         var loggedActiveSeconds: TimeInterval?
         var timedActiveSeconds: TimeInterval?
         var editedInputs: Set<WorkoutInputField>?
+        var skippedAt: Date?
+        var actual: WorkoutActual?
+        var inputTarget: WorkoutActual?
+        var note: String?
     }
     var sets: [UUID: SetDetail]
     var telemetry: WorkoutTelemetry?
     var inputMemoryVersion: Int?
+    var execution: WorkoutExecution?
     init(_ session: WorkoutSession) {
         sets = Dictionary(uniqueKeysWithValues: session.entries.flatMap(\.sets).map {
             ($0.id, SetDetail(restSeconds: $0.restSeconds, targetRPE: $0.targetRPE, targetRepMax: $0.targetRepMax, plannedTarget: $0.plannedTarget,
-                startedAt: $0.startedAt, startedActiveSeconds: $0.startedActiveSeconds, loggedActiveSeconds: $0.loggedActiveSeconds, timedActiveSeconds: $0.timedActiveSeconds, editedInputs: $0.editedInputs))
+                startedAt: $0.startedAt, startedActiveSeconds: $0.startedActiveSeconds, loggedActiveSeconds: $0.loggedActiveSeconds, timedActiveSeconds: $0.timedActiveSeconds, editedInputs: $0.editedInputs,
+                skippedAt: $0.skippedAt, actual: $0.actual, inputTarget: $0.inputTarget, note: $0.note))
         })
         telemetry = session.telemetry
         inputMemoryVersion = session.inputMemoryVersion
+        execution = session.execution
     }
     func applying(to session: WorkoutSession) -> WorkoutSession {
         var result = session
         result.telemetry = telemetry
         result.inputMemoryVersion = inputMemoryVersion
+        result.execution = execution
         for entry in result.entries.indices {
             for index in result.entries[entry].sets.indices {
                 let id = result.entries[entry].sets[index].id
@@ -138,6 +146,10 @@ struct SessionPlanDetails: Codable {
                 result.entries[entry].sets[index].loggedActiveSeconds = detail.loggedActiveSeconds
                 result.entries[entry].sets[index].timedActiveSeconds = detail.timedActiveSeconds
                 result.entries[entry].sets[index].editedInputs = detail.editedInputs
+                result.entries[entry].sets[index].skippedAt = detail.skippedAt
+                result.entries[entry].sets[index].actual = detail.actual
+                result.entries[entry].sets[index].inputTarget = detail.inputTarget
+                result.entries[entry].sets[index].note = detail.note
             }
         }
         return result

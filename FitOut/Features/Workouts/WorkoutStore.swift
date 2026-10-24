@@ -42,6 +42,7 @@ import Observation
                 ?? WorkoutSession(title: "Quick workout", startedAt: now)
             session.entries = session.entries.map { WorkoutRecall.seeded($0, current: nil, history: history) }
             session.inputMemoryVersion = 1
+            WorkoutExecutionEngine.prepare(&session, at: now)
             return save(session, at: now)
         } catch { self.error = error.localizedDescription; return false }
     }
@@ -60,7 +61,14 @@ import Observation
     }
     @discardableResult func pause(now: Date = .now, origin: WorkoutEventOrigin = .app, receipt: String? = nil) -> Bool {
         guard active != nil else { return false }
-        return update(at: now, origin: origin, receipt: receipt) { if $0.status == .inProgress { $0.status = .paused; $0.pausedAt = now } }
+        return update(at: now, origin: origin, receipt: receipt) {
+            WorkoutExecutionEngine.prepare(&$0, at: now)
+            if $0.status == .inProgress {
+                let previousPhase = $0.execution?.phase
+                $0.execution?.resumePhase = previousPhase; $0.execution?.phase = .paused
+                $0.status = .paused; $0.pausedAt = now
+            }
+        }
     }
     @discardableResult func resume(now: Date = .now, origin: WorkoutEventOrigin = .app, receipt: String? = nil) -> Bool {
         guard active != nil else { return false }
@@ -74,6 +82,7 @@ import Observation
                 }
             }
             $0.pausedAt = nil; $0.status = .inProgress
+            WorkoutExecutionEngine.prepare(&$0, at: now)
         }
     }
     @discardableResult func finish(_ status: SessionStatus, now: Date = .now) -> Bool {
@@ -92,6 +101,7 @@ import Observation
                 WorkoutRecall.seeded(WorkoutEntry(exercise: $0, sets: [WorkoutSet()]), current: session, history: history)
             }
             session.entries.append(contentsOf: additions)
+            WorkoutExecutionEngine.prepare(&session, at: .now)
         }
     }
     func replace(entryID: UUID, with exercise: ExerciseDefinition) {
@@ -205,30 +215,22 @@ import Observation
             if entry.exercise.kind == .duration { session.entries[e].sets[s].seconds = elapsed }
         }
     }
-    @discardableResult func markLap(now: Date = .now, origin: WorkoutEventOrigin = .app, receipt: String? = nil) -> Bool {
-        guard let active, active.status == .inProgress else { error = "Resume the workout to record a lap."; return false }
-        return update(at: now, origin: origin, receipt: receipt) { session in
-            guard var log = session.telemetry else { return }
-            let previous = log.laps.last
-            let elapsed = session.duration(at: now)
-            let start = previous?.endedAt ?? session.startedAt
-            log.laps.append(WorkoutLap(number: log.laps.count + 1, startedAt: start, endedAt: now,
-                activeSeconds: max(0, elapsed - (previous?.elapsedActiveSeconds ?? 0)), wallSeconds: max(0, now.timeIntervalSince(start)),
-                elapsedActiveSeconds: elapsed, entryID: session.focusedWork?.entry.id))
-            session.telemetry = log
-        }
-    }
     @discardableResult func endRest(now: Date = .now, origin: WorkoutEventOrigin = .app, receipt: String? = nil) -> Bool {
-        update(at: now, origin: origin, receipt: receipt) { $0.restUntil = nil }
+        if let active, active.execution?.phase == .resting {
+            return performFocused(.skipRest, sessionID: active.id, now: now, origin: origin, receipt: receipt)
+        }
+        return update(at: now, origin: origin, receipt: receipt) { $0.restUntil = nil }
     }
     @discardableResult func runQuickAction(_ operation: String, sessionID: UUID, commandID: UUID, now: Date = .now) -> Bool {
         guard active?.id == sessionID else { error = "This workout has ended. Open FitOut for the current session."; return false }
         let key = commandID.uuidString + ":" + operation
         if active?.telemetry?.actionReceipts.contains(key) == true { return true }
+        if ["startSet", "extendRest", "endRest"].contains(operation), active?.telemetry?.revision != commandID { return true }
         switch operation {
         case "pause": return pause(now: now, origin: .liveActivity, receipt: key)
         case "resume": return resume(now: now, origin: .liveActivity, receipt: key)
-        case "lap": return markLap(now: now, origin: .liveActivity, receipt: key)
+        case "extendRest": return performFocused(.extendRest, sessionID: sessionID, now: now, origin: .liveActivity, receipt: key)
+        case "startSet": return performFocused(.startSet, sessionID: sessionID, now: now, origin: .liveActivity, receipt: key)
         case "endRest": return endRest(now: now, origin: .liveActivity, receipt: key)
         default: error = "This workout action is unavailable."; return false
         }
@@ -241,7 +243,7 @@ import Observation
         }
         catch { context.rollback(); self.error = error.localizedDescription; return false }
     }
-    private func save(_ input: WorkoutSession, before: WorkoutSession? = nil, at now: Date = .now, origin: WorkoutEventOrigin = .app) -> Bool {
+    func save(_ input: WorkoutSession, before: WorkoutSession? = nil, at now: Date = .now, origin: WorkoutEventOrigin = .app) -> Bool {
         let session = WorkoutTelemetryRecorder.prepare(input, before: before, at: now, origin: origin)
         guard session.entries.flatMap(\.sets).allSatisfy(\.isValid) else { error = "Check reps, load, duration, distance and RPE. Values must be finite and within the supported range."; return false }
         do {

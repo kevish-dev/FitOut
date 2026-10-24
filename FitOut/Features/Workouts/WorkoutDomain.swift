@@ -20,6 +20,10 @@ struct WorkoutSet: Identifiable, Codable, Equatable {
     var loggedActiveSeconds: TimeInterval?
     var timedActiveSeconds: TimeInterval?
     var editedInputs: Set<WorkoutInputField>?
+    var skippedAt: Date?
+    var actual: WorkoutActual?
+    var inputTarget: WorkoutActual?
+    var note: String?
     var isValid: Bool {
         (0...1000).contains(reps) && loadKG.isFinite && (0...1000).contains(loadKG)
             && seconds.isFinite && (0...86400).contains(seconds)
@@ -30,6 +34,8 @@ struct WorkoutSet: Identifiable, Codable, Equatable {
             && (targetRepMax == nil || (1...100).contains(targetRepMax!))
             && (plannedTarget == nil || plannedTarget!.isValid)
             && [startedActiveSeconds, loggedActiveSeconds, timedActiveSeconds].compactMap { $0 }.allSatisfy { $0.isFinite && $0 >= 0 }
+            && !(skippedAt != nil && completedAt != nil)
+            && (actual?.isValid ?? true) && (inputTarget?.isValid ?? true)
     }
     func nextWorkingSet() -> WorkoutSet {
         WorkoutSet(reps: reps, loadKG: loadKG, seconds: seconds, distanceMeters: distanceMeters)
@@ -57,8 +63,9 @@ struct WorkoutSession: Identifiable, Codable, Equatable {
     var entries: [WorkoutEntry] = []
     var telemetry: WorkoutTelemetry?
     var inputMemoryVersion: Int?
+    var execution: WorkoutExecution?
     var isActive: Bool { status == .inProgress || status == .paused }
-    var completedSets: [WorkoutSet] { entries.flatMap(\.sets).filter { $0.completedAt != nil } }
+    var completedSets: [WorkoutSet] { entries.flatMap(\.sets).filter { $0.status == .completed } }
     var completedExercises: Int { entries.filter { $0.sets.contains { $0.completedAt != nil } }.count }
     func duration(at now: Date = .now) -> Double { max(0, (endedAt ?? pausedAt ?? now).timeIntervalSince(startedAt) - pausedSeconds) }
     var volumeKG: Double {
@@ -70,11 +77,11 @@ struct WorkoutSession: Identifiable, Codable, Equatable {
 
 extension WorkoutSession {
     var remainingSetCount: Int {
-        entries.filter { !$0.skipped }.flatMap(\.sets).filter { $0.completedAt == nil }.count
+        entries.filter { !$0.skipped }.flatMap(\.sets).filter { $0.status == .pending }.count
     }
     // Skipped, unlogged sets are not a goal; previously logged sets stay counted.
-    var trackedSetCount: Int { completedSets.count + remainingSetCount }
-    var setProgress: Double { trackedSetCount == 0 ? 0 : Double(completedSets.count) / Double(trackedSetCount) }
+    var trackedSetCount: Int { completedSets.count + skippedSets.count + remainingSetCount }
+    var setProgress: Double { trackedSetCount == 0 ? 0 : Double(completedSets.count + skippedSets.count) / Double(trackedSetCount) }
     func restRemaining(at now: Date) -> TimeInterval {
         guard let restUntil else { return 0 }
         return max(0, restUntil.timeIntervalSince(status == .paused ? pausedAt ?? now : now))

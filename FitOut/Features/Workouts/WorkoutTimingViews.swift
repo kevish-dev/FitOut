@@ -3,7 +3,6 @@ import SwiftUI
 struct WorkoutTimingDetails: View {
     let session: WorkoutSession
     let unit: WeightUnit
-    @State private var showTimeline = false
     @State private var exportURL: URL?
     @State private var exportError: String?
     @Environment(\.dismiss) private var dismiss
@@ -19,34 +18,12 @@ struct WorkoutTimingDetails: View {
                             LabeledContent("Total elapsed", value: preciseTime(max(0, (session.endedAt ?? context.date).timeIntervalSince(session.startedAt))))
                         }.font(FitTheme.medium(14)).monospacedDigit().routinePanel()
                     }
-                    Picker("Timing detail", selection: $showTimeline) {
-                        Text("Laps (\(session.telemetry?.laps.count ?? 0))").tag(false)
-                        Text("Timeline").tag(true)
-                    }.pickerStyle(.segmented)
                     if let log = session.telemetry {
                         if log.recordedSince.timeIntervalSince(session.startedAt) > 1 {
                             Text("Detailed events recorded from \(log.recordedSince.formatted(date: .abbreviated, time: .standard)). Earlier totals are preserved.")
                                 .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
                         }
-                        if showTimeline {
-                            ForEach(log.events.sorted { $0.date > $1.date }) { event in eventRow(event) }
-                        } else {
-                            if log.laps.isEmpty {
-                                ContentUnavailableView("No laps yet", systemImage: "flag", description: Text("Use Record lap during the workout to save an active-time split."))
-                            }
-                            ForEach(log.laps.reversed()) { lap in
-                                VStack(alignment: .leading, spacing: 10) {
-                                    HStack {
-                                        Label("Lap \(lap.number)", systemImage: "flag.fill").font(FitTheme.section(15))
-                                        Spacer()
-                                        Text(preciseTime(lap.activeSeconds)).font(FitTheme.metric(18)).monospacedDigit()
-                                    }
-                                    Text("\(lap.endedAt.formatted(date: .omitted, time: .standard)) · \(preciseTime(max(0, lap.wallSeconds - lap.activeSeconds))) paused in this split")
-                                        .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-                                    Text("Total active: \(preciseTime(lap.elapsedActiveSeconds))").font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-                                }.routinePanel()
-                            }
-                        }
+                        ForEach(log.events.filter { $0.kind != .lap }.sorted { $0.date > $1.date }) { event in eventRow(event) }
                     } else {
                         Text("Detailed events were not recorded for this older session.").font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
                     }
@@ -67,7 +44,7 @@ struct WorkoutTimingDetails: View {
                 .frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity)
             }
             .background(FitTheme.dashboardBackground)
-            .navigationTitle("Timing & laps").navigationBarTitleDisplayMode(.inline)
+            .navigationTitle("Timing & timeline").navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
         }.foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)
     }

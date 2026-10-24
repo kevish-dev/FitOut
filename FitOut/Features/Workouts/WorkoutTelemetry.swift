@@ -3,7 +3,7 @@ import Foundation
 enum WorkoutEventOrigin: String, Codable { case app, liveActivity }
 enum WorkoutEventKind: String, Codable {
     case started, trackingEnabled, paused, resumed, lap, setCreated, setStarted, setTimerStopped, setLogged, setUndone, setEdited, setDeleted
-    case exerciseAdded, exerciseRemoved, exerciseChanged, exerciseSkipped, notesChanged, restChanged, finished
+    case exerciseAdded, exerciseRemoved, exerciseChanged, exerciseSkipped, setSkipped, notesChanged, restChanged, finished
     var title: String {
         switch self {
         case .started: "Workout started"; case .trackingEnabled: "Detailed tracking enabled"
@@ -11,6 +11,7 @@ enum WorkoutEventKind: String, Codable {
         case .setCreated: "Set added"; case .setStarted: "Set timer started"; case .setLogged: "Set logged"
         case .setTimerStopped: "Set timer stopped"
         case .setUndone: "Set undone"; case .setEdited: "Set updated"; case .setDeleted: "Set removed"
+        case .setSkipped: "Set skipped"
         case .exerciseAdded: "Exercise added"; case .exerciseRemoved: "Exercise removed"
         case .exerciseChanged: "Exercise replaced"; case .exerciseSkipped: "Exercise availability changed"
         case .notesChanged: "Notes updated"; case .restChanged: "Rest updated"; case .finished: "Workout ended"
@@ -124,6 +125,7 @@ enum WorkoutTelemetryRecorder {
                 }
                 if old == nil { event(.setCreated, entry: entry, set: set.id, new: set) }
                 else if old?.completedAt != set.completedAt { event(set.completedAt == nil ? .setUndone : .setLogged, entry: entry, set: set.id, old: old, new: set) }
+                else if old?.skippedAt != set.skippedAt { event(set.skippedAt == nil ? .setUndone : .setSkipped, entry: entry, set: set.id, old: old, new: set) }
                 else if old?.startedAt != set.startedAt { event(.setStarted, entry: entry, set: set.id, old: old, new: set) }
                 else if old?.timedActiveSeconds != set.timedActiveSeconds { event(.setTimerStopped, entry: entry, set: set.id, old: old, new: set) }
                 else if old != set { event(.setEdited, entry: entry, set: set.id, old: old, new: set) }
@@ -164,9 +166,10 @@ extension WorkoutSession {
         return max(0, (set.loggedActiveSeconds ?? duration(at: now)) - start)
     }
     var focusedWork: (entry: WorkoutEntry, set: WorkoutSet)? {
+        if let current = executingWork { return current }
         if let entry = entries.first(where: { $0.id == telemetry?.focusedEntryID && !$0.skipped }),
-           let set = entry.sets.first(where: { $0.id == telemetry?.focusedSetID && $0.completedAt == nil }) { return (entry, set) }
-        for entry in entries where !entry.skipped { if let set = entry.sets.first(where: { $0.completedAt == nil }) { return (entry, set) } }
+           let set = entry.sets.first(where: { $0.id == telemetry?.focusedSetID && $0.status == .pending }) { return (entry, set) }
+        for entry in entries where !entry.skipped { if let set = entry.sets.first(where: { $0.status == .pending }) { return (entry, set) } }
         return nil
     }
 }

@@ -19,6 +19,8 @@ struct WorkoutLiveAttributes: ActivityAttributes, Sendable {
         var setTimerElapsed: TimeInterval?
         var restUntil: Date?
         var pausedRest: TimeInterval
+        var phase: String? = nil
+        var skippedSets: Int? = nil
     }
     var sessionID: UUID
 }

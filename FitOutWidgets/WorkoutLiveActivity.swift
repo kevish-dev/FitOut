@@ -22,7 +22,7 @@ struct FitOutWorkoutLiveActivity: Widget {
                 DynamicIslandExpandedRegion(.bottom) {
                     VStack(alignment: .leading, spacing: 9) {
                         HStack {
-                            Text("\(context.state.loggedSets)/\(context.state.totalSets) sets · \(context.state.laps) laps")
+                            Text("\(context.state.loggedSets) done · \(context.state.skippedSets ?? 0) skipped / \(context.state.totalSets)")
                             Spacer(minLength: 4)
                             WorkoutLiveRest(state: context.state, stale: context.isStale)
                         }.font(.caption2).foregroundStyle(.secondary)
@@ -58,7 +58,7 @@ private struct WorkoutLiveLockScreen: View {
             }
             HStack {
                 Text("\(context.state.loggedSets)/\(context.state.totalSets) sets")
-                Text("\(context.state.laps) laps")
+                Text("\(context.state.skippedSets ?? 0) skipped")
                 Spacer(minLength: 4)
                 WorkoutLiveRest(state: context.state, stale: context.isStale)
             }.font(.caption).foregroundStyle(.secondary)
@@ -79,8 +79,6 @@ private struct WorkoutLiveSplit: View {
                 Text("Set")
                 if let start = state.setTimerStart { Text(start, style: .timer).monospacedDigit() }
                 else { Text(liveClock(elapsed)).monospacedDigit() }
-            } else if let lap = state.lastLap {
-                Text("Last lap · " + liveClock(lap)).monospacedDigit()
             }
         }
     }
@@ -118,8 +116,11 @@ private struct WorkoutLiveActions: View {
     var body: some View {
         HStack(spacing: 10) {
             action(state.paused ? "Resume" : "Pause", symbol: state.paused ? "play.fill" : "pause.fill", operation: state.paused ? "resume" : "pause")
-            action("Lap", symbol: "flag", operation: "lap").disabled(state.paused)
-            if state.restUntil != nil { action("End rest", symbol: "forward.end", operation: "endRest") }
+            if state.restUntil != nil {
+                action("+15s", symbol: "plus", operation: "extendRest").disabled(state.paused)
+                action("Skip rest", symbol: "forward.end", operation: "endRest").disabled(state.paused)
+            }
+            else if !state.paused && ["ready", "exerciseTransition"].contains(state.phase ?? "") { action("Start set", symbol: "play", operation: "startSet") }
             else { Link(destination: URL(string: "fitout://widget/workout")!) { Image(systemName: "arrow.up.forward").frame(minWidth: 36, minHeight: 36) }.accessibilityLabel("Open workout") }
         }.buttonStyle(.bordered).tint(.orange)
     }
