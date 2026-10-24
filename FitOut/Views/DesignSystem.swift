@@ -35,6 +35,12 @@ enum FitTheme {
     static func strong(_ size: CGFloat = 16) -> Font { .custom("Inter-Bold", size: size, relativeTo: .body) }
 }
 
+/// Short, event-driven feedback only; no idle loops or page entrance choreography.
+enum FitMotion {
+    static func change(reduceMotion: Bool) -> Animation? { reduceMotion ? nil : .easeOut(duration: 0.18) }
+    static func press(reduceMotion: Bool) -> Animation? { reduceMotion ? nil : .easeOut(duration: 0.12) }
+}
+
 struct Surface: ViewModifier {
     var selected = false
     var radius: CGFloat = 16
@@ -155,6 +161,7 @@ struct ScreenHeading: View {
 struct StepProgress: View {
     let step: Int
     var totalSteps = 4
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var body: some View {
         HStack(spacing: 5) {
             ForEach(1...totalSteps, id: \.self) { index in
@@ -164,6 +171,7 @@ struct StepProgress: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Setup step \(step) of \(totalSteps)")
+        .animation(FitMotion.change(reduceMotion: reduceMotion), value: step)
     }
 }
 
@@ -176,7 +184,7 @@ struct BackButton: View {
                 .frame(width: 55, height: 55)
                 .fitSurface(radius: 30)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(RoutineEditorPressStyle())
         .accessibilityLabel("Back")
         .accessibilityIdentifier("backButton")
     }
@@ -194,7 +202,7 @@ struct NextButton: View {
             .background(FitTheme.textPrimary.opacity(0.035), in: Capsule())
             .fitSurface(radius: 30)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(RoutineEditorPressStyle())
         .accessibilityIdentifier("nextButton")
     }
 }

@@ -19,6 +19,7 @@ struct ExerciseBrowser: View {
     @FocusState private var searchFocused: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var filtered: [ExerciseDefinition] { query.results(in: store.exercises) }
     private var chosen: [ExerciseDefinition] { selection.exercises(in: store.exercises) }
@@ -187,6 +188,7 @@ struct ExerciseBrowser: View {
         .padding(.leading, 12).padding(.trailing, 4).padding(.vertical, 8)
         .background(index == nil ? FitTheme.surface : FitTheme.dashboardAccent.opacity(0.08), in: RoundedRectangle(cornerRadius: 20))
         .overlay { RoundedRectangle(cornerRadius: 20).strokeBorder(index == nil ? FitTheme.textPrimary.opacity(0.045) : FitTheme.dashboardAccent.opacity(0.65), lineWidth: 1) }
+        .animation(FitMotion.change(reduceMotion: reduceMotion), value: index != nil)
     }
 
     private func cardLabel(_ exercise: ExerciseDefinition, index: Int?) -> some View {
@@ -201,7 +203,8 @@ struct ExerciseBrowser: View {
                 ZStack {
                     Circle().fill(index == nil ? .clear : FitTheme.dashboardAccent)
                     Circle().strokeBorder(index == nil ? FitTheme.textSecondary.opacity(0.4) : .clear, lineWidth: 1.5)
-                    if let index { Text("\(index + 1)").font(FitTheme.strong(12)).foregroundStyle(FitTheme.textPrimary).lineLimit(1).minimumScaleFactor(0.5) }
+                    if let index { Text("\(index + 1)").font(FitTheme.strong(12)).foregroundStyle(FitTheme.textPrimary).lineLimit(1).minimumScaleFactor(0.5)
+                        .contentTransition(.numericText()).animation(FitMotion.change(reduceMotion: reduceMotion), value: index) }
                 }.frame(width: 25, height: 25).accessibilityHidden(true)
             } else {
                 Image(systemName: mode == .browse ? "chevron.right" : "plus.circle")
@@ -217,11 +220,12 @@ struct ExerciseBrowser: View {
                     Button { reviewSelection.toggle() } label: {
                         Label("\(chosen.count) selected", systemImage: reviewSelection ? "chevron.down" : "list.bullet")
                             .font(FitTheme.medium(13)).frame(minHeight: 44)
+                            .contentTransition(.numericText()).animation(FitMotion.change(reduceMotion: reduceMotion), value: chosen.count)
                     }.disabled(chosen.isEmpty)
                     Spacer()
                     if !chosen.isEmpty { Button("Clear") { selection.clear(); reviewSelection = false }.font(FitTheme.medium(12)).frame(minHeight: 44) }
                 }
-                if reviewSelection && !chosen.isEmpty { selectionTray }
+                if reviewSelection && !chosen.isEmpty { selectionTray.transition(.opacity) }
             }
             Button { searchFocused = false; onSelect?(chosen) } label: {
                 HStack {
@@ -239,6 +243,7 @@ struct ExerciseBrowser: View {
         }
         .frame(maxWidth: 560).padding(.horizontal, FitTheme.pageInset).padding(.vertical, 10)
         .frame(maxWidth: .infinity).background(.bar)
+        .animation(FitMotion.change(reduceMotion: reduceMotion), value: reviewSelection)
     }
 
     private var selectionTray: some View {

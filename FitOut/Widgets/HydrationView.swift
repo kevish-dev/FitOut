@@ -13,6 +13,7 @@ struct HydrationView: View {
     @State private var loaded = false
     @State private var editing: WidgetWaterLog?
     @Environment(\.scenePhase) private var phase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private var today: Bool { Calendar.current.isDate(date, inSameDayAs: now) }
     private var logs: [WidgetWaterLog] { store.state.water.filter { $0.date <= now && Calendar.current.isDate($0.date, inSameDayAs: date) }.sorted { $0.date > $1.date } }
     private var total: Double { today ? store.state.totalWater(at: now) : Double(logs.reduce(0) { $0 + $1.milliliters }) }
@@ -24,8 +25,10 @@ struct HydrationView: View {
                 Picker("Display unit", selection: Binding(get: { store.state.waterDisplayUnit ?? "ml" }, set: { store.displayUnit($0) })) { Text("ml").tag("ml"); Text("L").tag("L") }.pickerStyle(.segmented)
                 Text("\((liters ? total / 1_000 : total).formatted(.number.precision(.fractionLength(0...(liters ? 2 : 0))))) \(liters ? "L" : "ml")")
                     .font(FitTheme.metric(30)).foregroundStyle(FitTheme.dashboardAccent)
+                    .contentTransition(.numericText()).animation(FitMotion.change(reduceMotion: reduceMotion), value: total)
                 if let goal = store.state.goals.waterML {
                     ProgressView(value: min(goal, total), total: goal)
+                        .animation(FitMotion.change(reduceMotion: reduceMotion), value: total)
                     Text("Your current goal: \(Int(goal)) ml").font(FitTheme.body(13))
                 }
                 Text(today ? "FitOut logs plus water shared by Apple Health. Local entries are not written back to Health." : "Past dates show FitOut water logs only; historical Apple Health readings are not imported here.")
@@ -63,7 +66,7 @@ struct HydrationView: View {
     private func quick(_ value: Int) -> some View {
         Button { store.log(value, at: NutritionDates.timestamp(on: date)) } label: {
             Text("+\(value) ml").font(FitTheme.button(14)).frame(maxWidth: .infinity, minHeight: 44).dashboardGlass(in: Capsule(), interactive: true)
-        }.buttonStyle(.plain)
+        }.buttonStyle(RoutineEditorPressStyle())
     }
     private func waterRow(_ log: WidgetWaterLog) -> some View {
         Button { editing = log } label: {

@@ -530,6 +530,7 @@ struct HomeView: View {
                         .font(FitTheme.metric(30))
                         .lineLimit(1).minimumScaleFactor(0.65)
                         .contentTransition(.numericText())
+                        .animation(FitMotion.change(reduceMotion: reduceMotion), value: trend.currentWeekKG)
                     Text("\(unit.rawValue)·reps")
                         .font(FitTheme.medium(12))
                         .foregroundStyle(FitTheme.textSecondary)

@@ -66,7 +66,7 @@ struct NutritionPrimaryButton: View {
         Button(action: action) {
             Label(title, systemImage: symbol).font(FitTheme.button(15)).frame(maxWidth: .infinity, minHeight: 48)
                 .foregroundStyle(.white).background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 14))
-        }.buttonStyle(.plain)
+        }.buttonStyle(RoutineEditorPressStyle())
     }
 }
 extension View {

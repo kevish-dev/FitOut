@@ -32,6 +32,7 @@ struct QuickWorkoutSetupView: View {
     @State private var editing: WorkoutEntry?
     @State private var discarding = false
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     init(store: WorkoutStore, gym: GymStore, unit: WeightUnit, defaults: UserDefaults?, addingToSession: Bool = false, onAdded: (() -> Void)? = nil, onStarted: (() -> Void)? = nil) {
         self.store = store; self.gym = gym; self.addingToSession = addingToSession; self.onAdded = onAdded; self.onStarted = onStarted
         _unit = State(initialValue: unit)
@@ -94,7 +95,9 @@ struct QuickWorkoutSetupView: View {
                         }.buttonStyle(.plain).dashboardGlass(in: Capsule(), interactive: true)
                             .accessibilityIdentifier("configureQuickExercise-\(entry.exercise.id)")
                     }.padding(FitTheme.cardInset).background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 20))
+                        .transition(.opacity)
                 }
+                .animation(FitMotion.change(reduceMotion: reduceMotion), value: saved.draft.entries.map(\.id))
                 Button { selecting = true } label: {
                     Label(saved.draft.entries.isEmpty ? "Choose exercises" : "Add exercises", systemImage: "plus")
                         .font(FitTheme.button(16)).frame(maxWidth: .infinity, minHeight: 54)
@@ -179,6 +182,7 @@ struct WorkoutEntryConfigurationView: View {
     @State private var invalid: Set<String> = []
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private var valid: Bool {
         invalid.isEmpty && !entry.sets.isEmpty && entry.sets.allSatisfy { set in
             set.isValid && (set.status != .pending || (entry.exercise.kind == .duration ? set.seconds > 0 : set.reps > 0))
@@ -203,6 +207,7 @@ struct WorkoutEntryConfigurationView: View {
                         Image(systemName: "minus").frame(width: 44, height: 44)
                     }.disabled(!canRemoveLast).accessibilityLabel("Remove last unstarted set")
                     Text("\(entry.sets.count)").font(FitTheme.strong(20)).monospacedDigit().frame(minWidth: 26)
+                        .contentTransition(.numericText()).animation(FitMotion.change(reduceMotion: reduceMotion), value: entry.sets.count)
                     Button(action: addSet) { Image(systemName: "plus").frame(width: 44, height: 44) }
                         .disabled(entry.sets.count >= 100).accessibilityLabel("Add set").accessibilityIdentifier("addConfiguredSet")
                 }.buttonStyle(.plain)
@@ -245,9 +250,10 @@ struct WorkoutEntryConfigurationView: View {
                         } else {
                             Text(WorkoutConfigurationDisplay.inputs(set, kind: entry.exercise.kind, unit: unit)).font(FitTheme.medium(15))
                         }
-                    }.padding(.vertical, 4)
+                    }.padding(.vertical, 4).transition(.opacity)
                     Divider()
                 }
+                .animation(FitMotion.change(reduceMotion: reduceMotion), value: entry.sets.map(\.id))
             }.frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity)
         }
         .background(FitTheme.dashboardBackground).foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)

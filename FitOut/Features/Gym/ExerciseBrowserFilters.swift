@@ -99,6 +99,7 @@ struct ExerciseChoiceChip: View {
     var symbol: String? = nil
     let selected: Bool
     let action: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     var body: some View {
         Button(action: action) {
             HStack(spacing: 6) {
@@ -110,6 +111,7 @@ struct ExerciseChoiceChip: View {
             .foregroundStyle(selected ? FitTheme.dashboardAccent : FitTheme.textSecondary)
             .background(selected ? FitTheme.dashboardAccent.opacity(0.1) : FitTheme.surface, in: RoundedRectangle(cornerRadius: 13))
             .overlay { RoundedRectangle(cornerRadius: 13).strokeBorder(selected ? FitTheme.dashboardAccent.opacity(0.65) : FitTheme.subtleBorder, lineWidth: 1) }
+            .animation(FitMotion.change(reduceMotion: reduceMotion), value: selected)
         }
         .buttonStyle(RoutineEditorPressStyle())
         .accessibilityAddTraits(selected ? .isSelected : [])
