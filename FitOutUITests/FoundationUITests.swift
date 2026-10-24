@@ -1,6 +1,32 @@
 import XCTest
 
 final class FoundationUITests: XCTestCase {
+    @MainActor func testNavigationPreferencePersistsAndReselectingHomeReturnsToDashboard() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-session", UUID().uuidString]
+        app.launch()
+        let settings = app.buttons["Open Settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 10))
+        reveal(settings, in: app); settings.tap()
+        app.buttons["editProfileNavigation"].tap()
+        app.buttons["navigationStyle-bottomBar"].tap()
+        XCTAssertTrue(app.descendants(matching: .any)["bottomNavigationBar"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.buttons["navigationMenuButton"].exists)
+        app.buttons["navigate-0"].tap()
+        XCTAssertTrue(app.staticTexts["Welcome!"].waitForExistence(timeout: 3))
+        app.terminate(); app.launch()
+        XCTAssertTrue(app.descendants(matching: .any)["bottomNavigationBar"].waitForExistence(timeout: 10))
+        for (destination, title) in [(1, "gymTitle"), (4, "coachTitle"), (0, "Welcome!")] {
+            app.buttons["navigate-\(destination)"].tap()
+            XCTAssertTrue(app.staticTexts[title].waitForExistence(timeout: 3))
+        }
+        reveal(settings, in: app); settings.tap()
+        app.buttons["editProfileNavigation"].tap()
+        app.buttons["navigationStyle-topRight"].tap()
+        XCTAssertTrue(app.buttons["navigationMenuButton"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.descendants(matching: .any)["bottomNavigationBar"].exists)
+    }
+
     @MainActor private func navigate(_ destination: Int, in app: XCUIApplication) {
         app.buttons["navigationMenuButton"].tap()
         app.buttons["navigate-\(destination)"].tap()

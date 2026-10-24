@@ -5,9 +5,11 @@ struct AppShell: View {
     let container: AppContainer
     @Binding var widgetDestination: WidgetDestination?
     @State private var tab = 0
+    @State private var navigationRevision = UUID()
     @State private var menuOpen = false
     @State private var widgetSheet: WidgetDestination?
     @State private var widgetError: String?
+    @State private var keyboardVisible = false
     @Environment(\.scenePhase) private var phase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -24,42 +26,48 @@ struct AppShell: View {
                 }
             }
         }
-        .id(tab)
+        .id("\(tab)-\(navigationRevision)")
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .foregroundStyle(.white)
+        .foregroundStyle(FitTheme.textPrimary)
         .background(FitTheme.dashboardBackground.ignoresSafeArea())
         .overlay(alignment: .topTrailing) {
-            VStack(spacing: 10) {
-                Button {
-                    withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.85)) { menuOpen.toggle() }
-                } label: {
-                    Image(systemName: menuOpen ? "xmark" : "line.3.horizontal")
-                        .font(.system(size: 22, weight: .regular))
-                        .frame(width: 52, height: 52)
-                        .foregroundStyle(FitTheme.dashboardAccent)
-                        .dashboardGlass(in: Circle(), highlighted: true, interactive: true)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel(menuOpen ? "Close navigation menu" : "Open navigation menu")
-                .accessibilityValue(menuOpen ? "Expanded" : "Collapsed")
-                .accessibilityHint(menuOpen ? "Hides the navigation destinations." : "Shows Home, Gym, Nutrition, Health and AI Coach.")
-                .accessibilityIdentifier("navigationMenuButton")
-
-                if menuOpen {
-                    VStack(spacing: 10) {
-                        navigationButton("Home", symbol: "house", destination: 0)
-                        navigationButton("Gym", symbol: "dumbbell", destination: 1)
-                        navigationButton("Nutrition", symbol: "fork.knife", destination: 2)
-                        navigationButton("Health", symbol: "heart", destination: 3)
-                        navigationButton("AI Coach", symbol: "sparkles", destination: 4)
+            if container.presentation.navigationStyle == .topRight {
+                VStack(spacing: 10) {
+                    Button {
+                        withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.85)) { menuOpen.toggle() }
+                    } label: {
+                        Image(systemName: menuOpen ? "xmark" : "line.3.horizontal")
+                            .font(.system(size: 22, weight: .regular))
+                            .frame(width: 52, height: 52)
+                            .foregroundStyle(FitTheme.dashboardAccent)
+                            .dashboardGlass(in: Circle(), highlighted: true, interactive: true)
                     }
-                    .transition(.opacity)
+                    .buttonStyle(.plain)
+                    .accessibilityLabel(menuOpen ? "Close navigation menu" : "Open navigation menu")
+                    .accessibilityValue(menuOpen ? "Expanded" : "Collapsed")
+                    .accessibilityHint(menuOpen ? "Hides the navigation destinations." : "Shows Home, Gym, Nutrition, Health and AI Coach.")
+                    .accessibilityIdentifier("navigationMenuButton")
+
+                    if menuOpen {
+                        VStack(spacing: 10) {
+                            ForEach(AppSection.allCases) { destination in
+                                navigationButton(destination.title, symbol: destination.symbol, destination: destination.rawValue)
+                            }
+                        }
+                        .transition(.opacity)
+                    }
                 }
+                // Center the 52 pt menu control on the native 44 pt navigation row.
+                .padding(.top, -4)
+                .padding(.trailing, FitTheme.pageInset)
             }
-            // Center the 52 pt menu control on the native 44 pt navigation row.
-            .padding(.top, -4)
-            .padding(.trailing, FitTheme.pageInset)
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if container.presentation.navigationStyle == .bottomBar && !keyboardVisible { BottomAppNavigation(selection: tab, select: select) }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in keyboardVisible = true }
+        .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardVisible = false }
+        .onChange(of: container.presentation.navigationStyle) { _, _ in menuOpen = false }
         .accessibilityAction(.escape) { menuOpen = false }
         .onChange(of: tab) { _, _ in menuOpen = false }
         .task { openPendingWidget() }
@@ -132,13 +140,14 @@ struct AppShell: View {
 
     private func select(_ destination: Int) {
         menuOpen = false
-        tab = destination
+        if tab == destination { navigationRevision = UUID() }
+        else { tab = destination }
     }
 
     private func navigationButton(_ title: String, symbol: String, destination: Int) -> some View {
         Button { select(destination) } label: {
             Image(systemName: symbol).font(.system(size: 22, weight: .regular))
-            .foregroundStyle(tab == destination ? FitTheme.dashboardAccent : .white)
+            .foregroundStyle(tab == destination ? FitTheme.dashboardAccent : FitTheme.textPrimary)
             .frame(width: 52, height: 52)
             .dashboardGlass(in: Circle(), highlighted: tab == destination, interactive: true)
         }
@@ -162,7 +171,8 @@ struct FoundationSettings: View {
         List {
             Section("Profile") {
                 LabeledContent("Name", value: container.profile.draft.trimmedName)
-                NavigationLink("Edit profile") { ProfileEditor(store: container.profile) }
+                NavigationLink("Edit profile & navigation") { ProfileEditor(store: container.profile, presentation: container.presentation) }
+                    .accessibilityIdentifier("editProfileNavigation")
             }
             NavigationLink("Apple Health") { HealthConnectionView(service: container.health) }
             NavigationLink("Water intake") { HydrationView(store: container.hydration, health: container.health, reminders: container.hydrationReminders) }

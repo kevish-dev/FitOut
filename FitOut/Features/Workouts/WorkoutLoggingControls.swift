@@ -49,7 +49,7 @@ struct WorkoutExerciseCard: View {
                 .accessibilityLabel("Options for \(entry.exercise.name)")
             }
             if expanded {
-                Divider().overlay(.white.opacity(0.05))
+                Divider().overlay(FitTheme.textPrimary.opacity(0.05))
                 if entry.skipped {
                     Text("Previously logged sets are kept.").font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
                     Button("Restore exercise", action: toggleSkip).font(FitTheme.button(14)).frame(minHeight: 44)
@@ -64,7 +64,7 @@ struct WorkoutExerciseCard: View {
                     }
                     Button(action: addSet) {
                         Label("Add set", systemImage: "plus").font(FitTheme.button(13)).frame(maxWidth: .infinity, minHeight: 48)
-                            .background(.white.opacity(0.035), in: RoundedRectangle(cornerRadius: 13))
+                            .background(FitTheme.textPrimary.opacity(0.035), in: RoundedRectangle(cornerRadius: 13))
                             .overlay { RoundedRectangle(cornerRadius: 13).strokeBorder(FitTheme.subtleBorder, style: StrokeStyle(lineWidth: 1, dash: [4])) }
                     }.buttonStyle(RoutineEditorPressStyle())
                     DisclosureGroup("Exercise notes") {
@@ -156,7 +156,7 @@ struct WorkoutSetEditor: View {
         }
         .padding(12)
         .background(FitTheme.dashboardBackground.opacity(0.55), in: RoundedRectangle(cornerRadius: 17))
-        .overlay { RoundedRectangle(cornerRadius: 17).strokeBorder(isLogged ? FitTheme.dashboardAccent.opacity(0.3) : .white.opacity(0.06), lineWidth: 1) }
+        .overlay { RoundedRectangle(cornerRadius: 17).strokeBorder(isLogged ? FitTheme.dashboardAccent.opacity(0.3) : FitTheme.textPrimary.opacity(0.06), lineWidth: 1) }
     }
     private func previousValues(_ source: WorkoutSetReference) -> some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -215,10 +215,10 @@ struct WorkoutSetEditor: View {
                     .font(.system(size: 30, weight: .regular))
                 if stacked { Text(isLogged ? "Logged · Undo" : "Log set").font(FitTheme.button(14)) }
             }
-                .foregroundStyle(isLogged ? FitTheme.dashboardAccent : .white)
+                .foregroundStyle(isLogged ? FitTheme.dashboardAccent : FitTheme.textPrimary)
                 .frame(minWidth: 48, minHeight: 60)
                 .frame(maxWidth: stacked ? .infinity : nil)
-                .background(isLogged ? FitTheme.dashboardAccent.opacity(0.1) : .white.opacity(0.04), in: RoundedRectangle(cornerRadius: 13))
+                .background(isLogged ? FitTheme.dashboardAccent.opacity(0.1) : FitTheme.textPrimary.opacity(0.04), in: RoundedRectangle(cornerRadius: 13))
         }
         .buttonStyle(RoutineEditorPressStyle()).disabled(!canComplete || (!isLogged && !canLog))
         .accessibilityLabel(isLogged ? "Set completed — undo" : "Complete set")

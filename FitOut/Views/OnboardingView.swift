@@ -65,7 +65,7 @@ struct OnboardingView: View {
                 }
             }
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(FitTheme.textPrimary)
         .alert("Unable to save", isPresented: Binding(get: { store.storageError != nil }, set: { if !$0 { store.storageError = nil } })) {
             Button("OK", role: .cancel) { store.storageError = nil }
         } message: { Text(store.storageError ?? "") }
@@ -73,6 +73,7 @@ struct OnboardingView: View {
 }
 
 struct WelcomeScreen: View {
+    @Environment(\.colorScheme) private var scheme
     let onStart: () -> Void
     @State private var slideOffset: CGFloat = 0
     @State private var started = false
@@ -92,15 +93,16 @@ struct WelcomeScreen: View {
                     Image("FitnessHero").resizable().scaledToFill()
                         .frame(width: background.size.width, height: background.size.height)
                         .clipped()
+                        .overlay { if scheme == .light { FitTheme.background.opacity(0.65) } }
                 }.ignoresSafeArea()
-                LinearGradient(stops: [.init(color: .clear, location: 0.5), .init(color: .black.opacity(0.12), location: 0.7), .init(color: .black.opacity(0.7), location: 1)], startPoint: .top, endPoint: .bottom).ignoresSafeArea()
+                LinearGradient(stops: [.init(color: .clear, location: 0.5), .init(color: FitTheme.background.opacity(0.12), location: 0.7), .init(color: FitTheme.background.opacity(0.7), location: 1)], startPoint: .top, endPoint: .bottom).ignoresSafeArea()
                 VStack(alignment: .leading, spacing: 14) {
                     Text("STRONGER\nHEALTHIER\nHAPPIER\nYOU")
                         .font(FitTheme.medium(11)).tracking(3.7).lineSpacing(4)
-                        .foregroundStyle(.white.opacity(0.8))
+                        .foregroundStyle(FitTheme.textPrimary.opacity(0.8))
                     HStack(spacing: 0) {
                         Rectangle().fill(FitTheme.orange).frame(width: 26)
-                        Rectangle().fill(.white.opacity(0.2)).frame(width: 40)
+                        Rectangle().fill(FitTheme.textPrimary.opacity(0.2)).frame(width: 40)
                     }.frame(height: 2.5)
                 }
                 .padding(.leading, FitTheme.pageInset)
@@ -119,7 +121,7 @@ struct WelcomeScreen: View {
                     .accessibilityAddTraits(.isHeader)
                     Text("Track workouts, stay consistent,\nand build a healthier, stronger you.")
                         .font(FitTheme.body(width * 0.037))
-                        .foregroundStyle(.white.opacity(0.7))
+                        .foregroundStyle(FitTheme.textPrimary.opacity(0.7))
                         .lineSpacing(3)
                 }
                 .padding(.horizontal, FitTheme.pageInset)
@@ -136,7 +138,7 @@ struct WelcomeScreen: View {
                                 .padding(.leading, 64)
                             Image(systemName: "arrow.right")
                                 .font(.system(size: 28, weight: .medium))
-                                .foregroundStyle(.black)
+                                .foregroundStyle(.white)
                                 .frame(width: 64, height: 55)
                                 .background(FitTheme.orange, in: RoundedRectangle(cornerRadius: 9))
                                 .contentShape(Rectangle())
@@ -158,7 +160,7 @@ struct WelcomeScreen: View {
                                     })
                         }
                         .frame(height: 55)
-                        .background(.black.opacity(0.5))
+                        .background(FitTheme.surface.opacity(0.85))
                         .fitSurface(radius: 9)
                     }
                     .frame(height: 55)

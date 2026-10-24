@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F18000000000000000000003 /* AppPresentationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18000000000000000000004 /* AppPresentationTests.swift */; };
+		F18000000000000000000001 /* AppPresentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = F18000000000000000000002 /* AppPresentation.swift */; };
 		F17000000000000000000001 /* WorkoutRecall.swift in Sources */ = {isa = PBXBuildFile; fileRef = F17000000000000000000002 /* WorkoutRecall.swift */; };
 		F16000000000000000000014 /* WorkoutTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000001 /* WorkoutTelemetry.swift */; };
 		F16000000000000000000015 /* WorkoutTimingViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = F16000000000000000000002 /* WorkoutTimingViews.swift */; };
@@ -149,6 +151,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F18000000000000000000004 /* AppPresentationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPresentationTests.swift; sourceTree = "<group>"; };
+		F18000000000000000000002 /* AppPresentation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppPresentation.swift; sourceTree = "<group>"; };
 		F17000000000000000000002 /* WorkoutRecall.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecall.swift; sourceTree = "<group>"; };
 		F16000000000000000000001 /* WorkoutTelemetry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTelemetry.swift; sourceTree = "<group>"; };
 		F16000000000000000000002 /* WorkoutTimingViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutTimingViews.swift; sourceTree = "<group>"; };
@@ -289,6 +293,7 @@
 		3EC67EAD137BE1CFEDEA8F7E /* FitOutTests */ = {
 			isa = PBXGroup;
 			children = (
+				F18000000000000000000004 /* AppPresentationTests.swift */,
 				F04000000000000000000007 /* CoachTests.swift */,
 				C07A9882386626872680CEC6 /* AnalyticsTests.swift */,
 				E06E72006F94C883E88ADE79 /* CapabilityTests.swift */,
@@ -334,6 +339,7 @@
 		53EBEA5497E668D73C1D6CDF /* Shell */ = {
 			isa = PBXGroup;
 			children = (
+				F18000000000000000000002 /* AppPresentation.swift */,
 				19FBD164460FD92A1C24AAB5 /* AppShell.swift */,
 			);
 			path = Shell;
@@ -709,6 +715,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F18000000000000000000003 /* AppPresentationTests.swift in Sources */,
 				1975EAD2999B084B2337BEE6 /* AnalyticsTests.swift in Sources */,
 				5B942A6F130D212AA769CB19 /* CapabilityTests.swift in Sources */,
 				F04000000000000000000006 /* CoachTests.swift in Sources */,
@@ -738,6 +745,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F18000000000000000000001 /* AppPresentation.swift in Sources */,
 				F17000000000000000000001 /* WorkoutRecall.swift in Sources */,
 				F16000000000000000000014 /* WorkoutTelemetry.swift in Sources */,
 				F16000000000000000000015 /* WorkoutTimingViews.swift in Sources */,

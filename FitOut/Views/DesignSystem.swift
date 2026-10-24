@@ -1,19 +1,27 @@
 import SwiftUI
+import UIKit
 
 enum FitTheme {
     static let pageInset: CGFloat = 20
     static let sectionSpacing: CGFloat = 16
     static let cardInset: CGFloat = 16
-    static let orange = Color(red: 1, green: 0.27, blue: 0.015)
-    static let background = Color(red: 0.018, green: 0.018, blue: 0.018)
-    static let border = Color.white.opacity(0.19)
+    static let orange = adaptive(light: (0.73, 0.23, 0), dark: (1, 0.27, 0.015))
+    static let background = adaptive(light: (0.96, 0.96, 0.97), dark: (0.018, 0.018, 0.018))
+    static let textPrimary = Color(uiColor: .label)
+    static let border = textPrimary.opacity(0.19)
     // Neutral backgrounds and surfaces; orange is reserved for foreground actions.
-    static let dashboardAccent = Color(red: 1, green: 77.0 / 255, blue: 0)
-    static let dashboardBackground = Color(red: 11.0 / 255, green: 11.0 / 255, blue: 13.0 / 255)
-    static let surface = Color(red: 21.0 / 255, green: 21.0 / 255, blue: 24.0 / 255)
-    static let elevated = Color(red: 34.0 / 255, green: 34.0 / 255, blue: 38.0 / 255)
-    static let textSecondary = Color(red: 161.0 / 255, green: 161.0 / 255, blue: 170.0 / 255)
-    static let subtleBorder = Color(red: 41.0 / 255, green: 41.0 / 255, blue: 46.0 / 255)
+    static let dashboardAccent = adaptive(light: (0.73, 0.23, 0), dark: (1, 77.0 / 255, 0))
+    static let dashboardBackground = adaptive(light: (0.95, 0.95, 0.96), dark: (11.0 / 255, 11.0 / 255, 13.0 / 255))
+    static let surface = adaptive(light: (1, 1, 1), dark: (21.0 / 255, 21.0 / 255, 24.0 / 255))
+    static let elevated = adaptive(light: (0.90, 0.90, 0.92), dark: (34.0 / 255, 34.0 / 255, 38.0 / 255))
+    static let textSecondary = Color(uiColor: .secondaryLabel)
+    static let subtleBorder = Color(uiColor: .separator)
+    private static func adaptive(light: (Double, Double, Double), dark: (Double, Double, Double)) -> Color {
+        Color(uiColor: UIColor { traits in
+            let value = traits.userInterfaceStyle == .dark ? dark : light
+            return UIColor(red: value.0, green: value.1, blue: value.2, alpha: 1)
+        })
+    }
     // The reference uses broad, geometric headlines and compact, clean UI copy.
     // Keep the sizes centralized so every screen follows the same hierarchy.
     static func hero(_ size: CGFloat = 36) -> Font { .custom("Orbitron-ExtraBold", size: size, relativeTo: .largeTitle) }
@@ -34,7 +42,7 @@ struct Surface: ViewModifier {
         content
             .background {
                 RoundedRectangle(cornerRadius: radius)
-                    .fill(Color.white.opacity(selected ? 0.055 : 0.025))
+                    .fill(FitTheme.textPrimary.opacity(selected ? 0.055 : 0.025))
             }
             .overlay { RoundedRectangle(cornerRadius: radius).stroke(selected ? FitTheme.orange : FitTheme.border, lineWidth: selected ? 1.4 : 1) }
     }
@@ -52,6 +60,7 @@ extension View {
 
 /// Home and Gym share one viewport, hero clearance, and vertical scroll behavior.
 struct DashboardScroll<Header: View, Content: View, Backdrop: View>: View {
+    @Environment(\.appNavigationStyle) private var navigationStyle
     private let header: Header
     private let content: Content
     private let backdrop: Backdrop
@@ -73,7 +82,7 @@ struct DashboardScroll<Header: View, Content: View, Backdrop: View>: View {
                 VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
                     header
                         .padding(.leading, FitTheme.pageInset)
-                        .padding(.trailing, FitTheme.pageInset + 68)
+                        .padding(.trailing, FitTheme.pageInset + (navigationStyle == .topRight ? 68 : 0))
                         .padding(.top, 16)
                     Color.clear
                         .frame(height: min(480, max(340, geometry.size.height * 0.56)))
@@ -104,21 +113,21 @@ private struct DashboardGlass<S: Shape>: ViewModifier {
         if reduceTransparency {
             content
                 .background(FitTheme.elevated, in: shape)
-                .overlay { shape.stroke(.white.opacity(highlighted ? 0.28 : 0.18), lineWidth: 1) }
+                .overlay { shape.stroke(FitTheme.textPrimary.opacity(highlighted ? 0.28 : 0.18), lineWidth: 1) }
         } else if #available(iOS 26.0, *) {
             content.glassEffect(
                 .regular.tint(FitTheme.surface.opacity(highlighted ? 0.5 : 0.4))
                     .interactive(interactive),
                 in: shape
             )
-            .overlay { shape.stroke(.white.opacity(highlighted ? 0.22 : 0.08), lineWidth: 1) }
+            .overlay { shape.stroke(FitTheme.textPrimary.opacity(highlighted ? 0.22 : 0.08), lineWidth: 1) }
         } else {
             content
                 .background(.ultraThinMaterial, in: shape)
                 .background(FitTheme.surface.opacity(0.5), in: shape)
                 .overlay {
                     shape.stroke(
-                        LinearGradient(colors: [.white.opacity(highlighted ? 0.38 : 0.24), .white.opacity(0.05), .white.opacity(0.12)], startPoint: .topLeading, endPoint: .bottomTrailing),
+                        LinearGradient(colors: [FitTheme.textPrimary.opacity(highlighted ? 0.38 : 0.24), FitTheme.textPrimary.opacity(0.05), FitTheme.textPrimary.opacity(0.12)], startPoint: .topLeading, endPoint: .bottomTrailing),
                         lineWidth: 1
                     )
                 }
@@ -132,7 +141,7 @@ struct ScreenHeading: View {
     var size: CGFloat = 29
     var body: some View {
         VStack(spacing: 2) {
-            Text(first).foregroundStyle(.white)
+            Text(first).foregroundStyle(FitTheme.textPrimary)
             Text(accent).foregroundStyle(FitTheme.orange)
         }
         .font(FitTheme.display(size))
@@ -150,7 +159,7 @@ struct StepProgress: View {
     var body: some View {
         HStack(spacing: 5) {
             ForEach(1...totalSteps, id: \.self) { index in
-                Capsule().fill(index <= step ? FitTheme.orange : Color.white.opacity(0.13))
+                Capsule().fill(index <= step ? FitTheme.orange : FitTheme.textPrimary.opacity(0.13))
                     .frame(width: 23, height: 6)
             }
         }
@@ -183,7 +192,7 @@ struct NextButton: View {
                 Image(systemName: "arrow.right").font(.system(size: 20))
             }
             .frame(width: 132, height: 55)
-            .background(Color.white.opacity(0.035), in: Capsule())
+            .background(FitTheme.textPrimary.opacity(0.035), in: Capsule())
             .fitSurface(radius: 30)
         }
         .buttonStyle(.plain)
@@ -216,14 +225,14 @@ struct SlideToFinish: View {
                 Capsule().stroke(FitTheme.orange.opacity(enabled ? 0.8 : 0.25), lineWidth: 1.5)
                 Text("Slide to Create My Journey")
                     .font(FitTheme.medium(13))
-                    .foregroundStyle(.white.opacity(0.7))
+                    .foregroundStyle(FitTheme.textPrimary.opacity(0.7))
                     .lineLimit(1).minimumScaleFactor(0.7)
                     .padding(.leading, 64).padding(.trailing, 12)
                     .opacity(1 - Double(offset / travel))
                 Circle()
                     .fill(FitTheme.orange)
-                    .overlay { Circle().stroke(.white.opacity(0.13), lineWidth: 1) }
-                    .overlay { Image(systemName: "arrow.right").font(.system(size: 23, weight: .medium)) }
+                    .overlay { Circle().stroke(FitTheme.textPrimary.opacity(0.13), lineWidth: 1) }
+                    .overlay { Image(systemName: "arrow.right").font(.system(size: 23, weight: .medium)).foregroundStyle(.white) }
                     .frame(width: 54, height: 54)
                     .offset(x: offset + 2)
                     .gesture(DragGesture(minimumDistance: 2)
@@ -257,7 +266,7 @@ struct AvatarView: View {
     var placeholder = false
     var body: some View {
         ZStack {
-            Circle().fill(Color.white.opacity(0.015))
+            Circle().fill(FitTheme.textPrimary.opacity(0.015))
             if profile.usesPhoto, let data = profile.photoData, let image = UIImage(data: data) {
                 Image(uiImage: image).resizable().scaledToFill().frame(width: size, height: size).clipShape(Circle())
             } else if placeholder {

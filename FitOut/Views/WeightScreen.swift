@@ -31,7 +31,7 @@ struct WeightScreen: View {
                     .font(FitTheme.display(44 * scale))
                     .contentTransition(.numericText())
                     .lineLimit(1).minimumScaleFactor(0.5)
-                Text(profile.unit.rawValue).font(FitTheme.medium(19)).foregroundStyle(.white.opacity(0.4))
+                Text(profile.unit.rawValue).font(FitTheme.medium(19)).foregroundStyle(FitTheme.textPrimary.opacity(0.4))
             }
             .padding(FitTheme.cardInset)
             .frame(width: 190 * scale, height: 163 * scale)
@@ -51,7 +51,7 @@ struct WeightScreen: View {
                     } label: {
                         Text(unit.rawValue)
                             .font(FitTheme.button(17))
-                            .foregroundStyle(unit == profile.unit ? FitTheme.orange : .white.opacity(0.8))
+                            .foregroundStyle(unit == profile.unit ? FitTheme.orange : FitTheme.textPrimary.opacity(0.8))
                             .frame(maxWidth: .infinity).frame(height: 42)
                             .fitSurface(selected: unit == profile.unit, radius: 12)
                     }
@@ -74,7 +74,7 @@ struct WeightScreen: View {
             isTarget = target
         } label: {
             Text(title).font(FitTheme.section(18))
-                .foregroundStyle(isTarget == target ? FitTheme.orange : .white.opacity(0.85))
+                .foregroundStyle(isTarget == target ? FitTheme.orange : FitTheme.textPrimary.opacity(0.85))
                 .frame(maxWidth: .infinity).frame(height: 38)
                 .fitSurface(selected: isTarget == target, radius: 12)
         }
@@ -128,13 +128,13 @@ struct WeightRuler: View {
                                 if major {
                                     Text("\(tick / 5)")
                                         .font(selected ? FitTheme.strong(12) : FitTheme.medium(12))
-                                        .foregroundStyle(selected ? accent : .white.opacity(0.7))
+                                        .foregroundStyle(selected ? accent : FitTheme.textPrimary.opacity(0.7))
                                         .fixedSize().offset(y: 1)
                                 }
                             }
                             .overlay(alignment: .top) {
                                 Rectangle()
-                                    .fill(.white.opacity(major ? 0.65 : 0.4))
+                                    .fill(FitTheme.textPrimary.opacity(major ? 0.65 : 0.4))
                                     .frame(width: major ? 1.3 : 1, height: major ? 48 : 25)
                                     .offset(y: major ? 24 : 37)
                             }

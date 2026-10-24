@@ -35,7 +35,7 @@ struct ExerciseArtwork: View {
         .aspectRatio(expanded ? presentationRatio : 1, contentMode: .fit)
         .frame(maxWidth: expanded ? .infinity : nil)
         .clipShape(RoundedRectangle(cornerRadius: expanded ? 20 : 12))
-        .overlay { RoundedRectangle(cornerRadius: expanded ? 20 : 12).strokeBorder(.white.opacity(0.08), lineWidth: 1) }
+        .overlay { RoundedRectangle(cornerRadius: expanded ? 20 : 12).strokeBorder(FitTheme.textPrimary.opacity(0.08), lineWidth: 1) }
         .accessibilityHidden(!expanded)
         .accessibilityLabel(artwork == nil ? "Exercise image not yet available" : "\(exercise?.name ?? "Exercise") reference image")
     }
@@ -99,7 +99,7 @@ private struct ExerciseImageViewer: View {
             .background(FitTheme.dashboardBackground)
             .navigationTitle(exercise.name).navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
-        }.tint(FitTheme.dashboardAccent).preferredColorScheme(.dark)
+        }.tint(FitTheme.dashboardAccent)
     }
 }
 

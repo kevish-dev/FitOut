@@ -10,7 +10,7 @@ struct FitOutApp: App {
     }
 
     var body: some Scene {
-        WindowGroup { AppRoot().font(FitTheme.body()).tint(FitTheme.orange).preferredColorScheme(.dark) }
+        WindowGroup { AppRoot().font(FitTheme.body()).tint(FitTheme.orange) }
     }
 }
 
@@ -33,7 +33,9 @@ struct AppRoot: View {
                     Text("Your saved files are preserved. \(failure)")
                 } actions: { Button("Retry", action: open).buttonStyle(.borderedProminent) }
             } else { ProgressView("Opening FitOut…").task { open() } }
-        }.onOpenURL { url in
+        }.preferredColorScheme(container?.presentation.appearance.colorScheme)
+        .environment(\.appNavigationStyle, container?.presentation.navigationStyle ?? .topRight)
+        .onOpenURL { url in
             if let destination = WidgetDestination(url: url) { widgetDestination = destination; widgetRouteID = UUID() }
         }
     }

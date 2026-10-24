@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct CoachView: View {
+    @Environment(\.appNavigationStyle) private var navigationStyle
     @Bindable var store: CoachStore
     let profile: ProfileData
     @Environment(\.scenePhase) private var scenePhase
@@ -48,7 +49,7 @@ struct CoachView: View {
             }
         }
         .background(FitTheme.dashboardBackground.ignoresSafeArea())
-        .foregroundStyle(.white)
+        .foregroundStyle(FitTheme.textPrimary)
         .safeAreaInset(edge: .bottom, spacing: 0) { composer }
         .navigationTitle("AI Coach")
         .toolbar(.hidden, for: .navigationBar)
@@ -76,7 +77,7 @@ struct CoachView: View {
                     .font(FitTheme.body(13))
                     .foregroundStyle(FitTheme.textSecondary)
             }
-            .padding(.trailing, 68)
+            .padding(.trailing, navigationStyle == .topRight ? 68 : 0)
             HStack {
                 HStack(spacing: 6) {
                     Circle().fill(store.availability.isAvailable ? Color.green : FitTheme.textSecondary)
@@ -228,9 +229,10 @@ struct CoachView: View {
                 } label: {
                     Image(systemName: store.isResponding ? "stop.fill" : "arrow.up")
                         .font(.system(size: store.isResponding ? 15 : 20, weight: .semibold))
-                        .foregroundStyle(.black)
+                        .foregroundStyle(.white)
                         .frame(width: 46, height: 46)
                         .background(FitTheme.dashboardAccent.opacity(store.isResponding || store.canSend ? 1 : 0.3), in: Circle())
+                        .foregroundStyle(.white)
                 }
                 .buttonStyle(.plain)
                 .disabled(!store.isResponding && !store.canSend)

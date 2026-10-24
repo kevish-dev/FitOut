@@ -22,6 +22,7 @@ private enum NutritionSheet: Identifiable {
 }
 
 struct NutritionView: View {
+    @Environment(\.appNavigationStyle) private var navigationStyle
     let container: AppContainer
     @State private var date = Date()
     @State private var sheet: NutritionSheet?
@@ -60,7 +61,7 @@ struct NutritionView: View {
             .frame(maxWidth: .infinity)
         }
         .scrollIndicators(.hidden).scrollBounceBehavior(.basedOnSize)
-        .background(FitTheme.dashboardBackground).foregroundStyle(.white).tint(FitTheme.dashboardAccent)
+        .background(FitTheme.dashboardBackground).foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)
         .toolbar(.hidden, for: .navigationBar)
         .refreshable { do { try store.reload() } catch { store.error = error.localizedDescription }; container.hydration.refresh() }
         .safeAreaInset(edge: .bottom) {
@@ -80,7 +81,7 @@ struct NutritionView: View {
             Text("FOOD & NUTRITION").font(FitTheme.medium(10)).tracking(2).foregroundStyle(FitTheme.dashboardAccent)
             Text("Fuel your day.").font(FitTheme.hero(30)).lineLimit(2)
             Text("Your meals, your rhythm.").font(FitTheme.body(14)).foregroundStyle(FitTheme.textSecondary)
-        }.padding(.trailing, 68).accessibilityAddTraits(.isHeader)
+        }.padding(.trailing, navigationStyle == .topRight ? 68 : 0).accessibilityAddTraits(.isHeader)
     }
     private var dateSelector: some View {
         VStack(spacing: 0) {
@@ -112,13 +113,13 @@ struct NutritionView: View {
                 }.frame(maxWidth: .infinity, alignment: .leading)
                 if let goal = target.calories, goal > 0 {
                     ZStack {
-                        Circle().stroke(.white.opacity(0.07), lineWidth: 9)
+                        Circle().stroke(FitTheme.textPrimary.opacity(0.07), lineWidth: 9)
                         Circle().trim(from: 0, to: min(1, (summary.values.calories ?? 0) / goal)).stroke(FitTheme.dashboardAccent, style: StrokeStyle(lineWidth: 9, lineCap: .round)).rotationEffect(.degrees(-90))
                         Image(systemName: "fork.knife").font(.system(size: 25, weight: .light)).foregroundStyle(FitTheme.dashboardAccent)
                     }.frame(width: 76, height: 76).accessibilityHidden(true)
                 }
             }
-            Divider().overlay(.white.opacity(0.06))
+            Divider().overlay(FitTheme.textPrimary.opacity(0.06))
             Button { sheet = .details } label: {
                 HStack(alignment: .top, spacing: 16) {
                     macro(.protein, title: "Protein"); macro(.carbohydrates, title: "Carbs"); macro(.fat, title: "Fat")
@@ -182,7 +183,7 @@ struct NutritionView: View {
                     } else {
                         ForEach(entries) { entry in entryRow(entry) }
                     }
-                    Rectangle().fill(.white.opacity(0.07)).frame(height: 1)
+                    Rectangle().fill(FitTheme.textPrimary.opacity(0.07)).frame(height: 1)
                 }
             }
         }
@@ -191,12 +192,12 @@ struct NutritionView: View {
         Button { sheet = .entry(entry) } label: {
             HStack(alignment: .top, spacing: 12) {
                 VStack(alignment: .leading, spacing: 5) {
-                    Text(entry.portion.food.name).font(FitTheme.medium(14)).foregroundStyle(.white)
+                    Text(entry.portion.food.name).font(FitTheme.medium(14)).foregroundStyle(FitTheme.textPrimary)
                     Text(entry.portion.label).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
                     Text(entry.portion.food.sourceTitle).font(FitTheme.body(10)).foregroundStyle(FitTheme.textSecondary)
                 }
                 Spacer(minLength: 0)
-                Text(NutritionUI.value(entry.portion.values.calories)).font(FitTheme.section(15)).foregroundStyle(.white)
+                Text(NutritionUI.value(entry.portion.values.calories)).font(FitTheme.section(15)).foregroundStyle(FitTheme.textPrimary)
                 Image(systemName: "chevron.right").font(.system(size: 10)).foregroundStyle(FitTheme.textSecondary).padding(.top, 3)
             }.padding(.vertical, 4).contentShape(Rectangle())
         }.buttonStyle(.plain).contextMenu {

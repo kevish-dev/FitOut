@@ -6,7 +6,7 @@ Implemented directly from the updated reference mock (`media_1792768403220_fb918
 
 1. **Hero Header**:
    - Left: "Hi [Name]," (bold white) with a subtle settings gear shortcut, followed by "Welcome!" (heavy bold #FF4D00 orange).
-   - Right: Fixed circular menu control that expands five navigation buttons (Home, Gym, Nutrition, Health, AI Coach).
+   - Navigation: the default fixed top-right control expands five buttons (Home, Gym, Nutrition, Health, AI Coach). Profile can switch to a bottom glass bar with the same destinations. See [navigation and appearance](NAVIGATION_APPEARANCE.md).
    - Active destinations use an orange foreground icon on neutral glass, without a colored glow.
 
 2. **Workout Routine CTA Card**:
@@ -56,7 +56,7 @@ Full-screen matte charcoal fitness background (`HomeAthlete` asset) featuring th
 ## Current behavior after navigation and data correction
 
 The Home scroll view owns the greeting, so it moves away with the cards.
-The shell overlays only the circular navigation control at the top right.
+With top-right navigation selected, the shell overlays the circular control at the top right.
 It uses a menu icon when collapsed and a close icon when expanded; Home has
 its own house icon in the destination list. Tapping the control opens five
 destination buttons directly below it; choosing a destination closes the
@@ -64,7 +64,7 @@ menu. Settings is reachable at the bottom of Home.
 
 A responsive 340–480 pt clear hero area exposes the background before the
 routine card, weekly calendar, and metric grid. All dashboard cards scroll;
-only the navigation control stays fixed. Long routine titles can wrap.
+only the selected navigation layout stays fixed. Bottom navigation reserves its own safe-area inset. Long routine titles can wrap.
 
 The numeric values above describe the supplied visual reference, not saved
 user data. Production uses actual workout counts and routine targets. Day

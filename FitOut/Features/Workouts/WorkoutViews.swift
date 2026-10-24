@@ -111,7 +111,7 @@ struct ActiveWorkoutView: View {
                 ContentUnavailableView("No active workout", systemImage: "dumbbell", description: Text("Your ended sessions are in workout history."))
             }
         }
-        .background(FitTheme.dashboardBackground).foregroundStyle(.white).tint(FitTheme.dashboardAccent)
+        .background(FitTheme.dashboardBackground).foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)
         .navigationTitle(finished == nil ? "Workout" : "Workout summary").navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
@@ -126,7 +126,7 @@ struct ActiveWorkoutView: View {
             }
             ToolbarItem(placement: .confirmationAction) { Button("Close") { dismissKeyboard(); dismiss() } }
         }
-        .presentationDragIndicator(.visible).presentationCornerRadius(30).preferredColorScheme(.dark)
+        .presentationDragIndicator(.visible).presentationCornerRadius(30)
         .onAppear { store.editorAppeared() }
         .onDisappear { store.editorDisappeared() }
         .sheet(isPresented: $timingDetails) { if let session = store.active { WorkoutTimingDetails(session: session, unit: unit) } }
@@ -195,7 +195,8 @@ struct ActiveWorkoutView: View {
                         }
                         .font(FitTheme.button(15)).padding(.horizontal, 18).padding(.vertical, 12)
                         .frame(maxWidth: .infinity, minHeight: 54)
-                        .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
+                        .foregroundStyle(.white)
+                .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
                     }
                     .buttonStyle(RoutineEditorPressStyle()).accessibilityIdentifier(session.entries.isEmpty ? "workoutAddExercise" : "finishWorkout")
                 }
@@ -281,7 +282,7 @@ struct WorkoutSummary: View {
                             }
                         }
                         let completed = entry.sets.filter { $0.completedAt != nil }
-                        if !completed.isEmpty { Divider().overlay(.white.opacity(0.06)) }
+                        if !completed.isEmpty { Divider().overlay(FitTheme.textPrimary.opacity(0.06)) }
                         ForEach(completed) { set in
                             HStack(alignment: .firstTextBaseline, spacing: 10) {
                                 Image(systemName: "checkmark.circle.fill").foregroundStyle(FitTheme.dashboardAccent).font(.system(size: 13))
@@ -310,7 +311,7 @@ struct WorkoutSummary: View {
             }
             .frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity)
         }
-        .background(FitTheme.dashboardBackground).foregroundStyle(.white).tint(FitTheme.dashboardAccent)
+        .background(FitTheme.dashboardBackground).foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)
         .navigationTitle("Workout summary").navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showTiming) { WorkoutTimingDetails(session: session, unit: unit) }
     }

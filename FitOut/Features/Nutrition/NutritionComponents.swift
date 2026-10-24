@@ -34,7 +34,7 @@ struct NutritionValuesList: View {
         ForEach(NutritionNutrient.allCases) { key in
             LabeledContent {
                 Text(NutritionUI.value(values[key], unit: key.unit, decimals: key == .calories ? 0 : 1) + (incomplete.contains(key) && values[key] != nil ? " · partial" : ""))
-                    .foregroundStyle(values[key] == nil ? FitTheme.textSecondary : .white)
+                    .foregroundStyle(values[key] == nil ? FitTheme.textSecondary : FitTheme.textPrimary)
             } label: { Text(key.title) }
         }
     }
@@ -45,16 +45,16 @@ struct NutritionFoodRow: View {
         HStack(spacing: 12) {
             Image(systemName: food.source == .recipe ? "book.closed" : "fork.knife")
                 .font(.system(size: 18)).foregroundStyle(FitTheme.dashboardAccent)
-                .frame(width: 42, height: 48).background(.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 12))
+                .frame(width: 42, height: 48).background(FitTheme.textPrimary.opacity(0.04), in: RoundedRectangle(cornerRadius: 12))
             VStack(alignment: .leading, spacing: 4) {
-                Text(food.name).font(FitTheme.section(15)).foregroundStyle(.white)
+                Text(food.name).font(FitTheme.section(15)).foregroundStyle(FitTheme.textPrimary)
                 Text("\(food.baseQuantity.formatted()) \(food.baseUnit.rawValue) · \(food.sourceTitle)")
                     .font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
                 Text("P \(NutritionUI.value(food.values.protein, decimals: 1)) · C \(NutritionUI.value(food.values.carbohydrates, decimals: 1)) · F \(NutritionUI.value(food.values.fat, decimals: 1)) g")
                     .font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
             }
             Spacer(minLength: 4)
-            Text(NutritionUI.value(food.values.calories)).font(FitTheme.section(15)).foregroundStyle(.white)
+            Text(NutritionUI.value(food.values.calories)).font(FitTheme.section(15)).foregroundStyle(FitTheme.textPrimary)
         }.padding(.vertical, 5)
     }
 }
@@ -71,7 +71,7 @@ struct NutritionPrimaryButton: View {
 }
 extension View {
     func nutritionForm() -> some View {
-        self.font(FitTheme.body(14)).foregroundStyle(.white).tint(FitTheme.dashboardAccent)
+        self.font(FitTheme.body(14)).foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)
             .scrollContentBackground(.hidden).background(FitTheme.dashboardBackground)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -37,7 +37,7 @@ struct GoalsScreen: View {
                     .lineLimit(1).minimumScaleFactor(0.75)
                     .layoutPriority(1)
             }
-            .foregroundStyle(selected ? FitTheme.orange : .white)
+            .foregroundStyle(selected ? FitTheme.orange : FitTheme.textPrimary)
             .padding(.horizontal, 14 * scale)
             .frame(maxWidth: .infinity)
             .frame(height: 51 * scale)

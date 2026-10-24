@@ -31,7 +31,6 @@ targets:
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
         UISupportedInterfaceOrientations: [UIInterfaceOrientationPortrait]
-        UIUserInterfaceStyle: Dark
         UIAppFonts: [Inter-Regular.otf, Inter-Medium.otf, Inter-SemiBold.otf, Inter-Bold.otf, orbitron-700.ttf, orbitron-800.ttf, rajdhani-500.ttf, rajdhani-600.ttf]
     entitlements:
       path: FitOut/FitOut.entitlements

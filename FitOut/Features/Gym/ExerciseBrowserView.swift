@@ -46,7 +46,7 @@ struct ExerciseBrowser: View {
         .safeAreaInset(edge: .top, spacing: 0) { controls }
         .safeAreaInset(edge: .bottom, spacing: 0) { if mode == .multiple { selectionFooter } }
         .navigationTitle(title).navigationBarTitleDisplayMode(.inline)
-        .tint(FitTheme.dashboardAccent).foregroundStyle(.white)
+        .tint(FitTheme.dashboardAccent).foregroundStyle(FitTheme.textPrimary)
         .toolbar {
             if mode != .browse { ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } } }
             ToolbarItem(placement: .topBarTrailing) {
@@ -108,7 +108,7 @@ struct ExerciseBrowser: View {
                             Button { query.scope = scope } label: {
                                 Text(scope.rawValue).font(FitTheme.medium(12)).fixedSize(horizontal: false, vertical: true)
                                     .frame(maxWidth: .infinity, minHeight: 44)
-                                    .foregroundStyle(query.scope == scope ? .white : FitTheme.textSecondary)
+                                    .foregroundStyle(query.scope == scope ? FitTheme.textPrimary : FitTheme.textSecondary)
                                     .background(query.scope == scope ? FitTheme.elevated : .clear, in: RoundedRectangle(cornerRadius: 12))
                             }
                             .buttonStyle(RoutineEditorPressStyle()).accessibilityAddTraits(query.scope == scope ? .isSelected : [])
@@ -185,7 +185,7 @@ struct ExerciseBrowser: View {
         }
         .padding(.leading, 12).padding(.trailing, 4).padding(.vertical, 8)
         .background(index == nil ? FitTheme.surface : FitTheme.dashboardAccent.opacity(0.08), in: RoundedRectangle(cornerRadius: 20))
-        .overlay { RoundedRectangle(cornerRadius: 20).strokeBorder(index == nil ? .white.opacity(0.045) : FitTheme.dashboardAccent.opacity(0.65), lineWidth: 1) }
+        .overlay { RoundedRectangle(cornerRadius: 20).strokeBorder(index == nil ? FitTheme.textPrimary.opacity(0.045) : FitTheme.dashboardAccent.opacity(0.65), lineWidth: 1) }
     }
 
     private func cardLabel(_ exercise: ExerciseDefinition, index: Int?) -> some View {
@@ -195,7 +195,7 @@ struct ExerciseBrowser: View {
                 ZStack {
                     Circle().fill(index == nil ? .clear : FitTheme.dashboardAccent)
                     Circle().strokeBorder(index == nil ? FitTheme.textSecondary.opacity(0.4) : .clear, lineWidth: 1.5)
-                    if let index { Text("\(index + 1)").font(FitTheme.strong(12)).foregroundStyle(.white).lineLimit(1).minimumScaleFactor(0.5) }
+                    if let index { Text("\(index + 1)").font(FitTheme.strong(12)).foregroundStyle(FitTheme.textPrimary).lineLimit(1).minimumScaleFactor(0.5) }
                 }.frame(width: 25, height: 25).accessibilityHidden(true)
             } else {
                 Image(systemName: mode == .browse ? "chevron.right" : "plus.circle")
@@ -225,6 +225,7 @@ struct ExerciseBrowser: View {
                 }
                 .font(FitTheme.button(15)).padding(.horizontal, 16).padding(.vertical, 12)
                 .frame(maxWidth: .infinity, minHeight: 54)
+                .foregroundStyle(.white)
                 .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
             }
             .buttonStyle(RoutineEditorPressStyle()).disabled(chosen.isEmpty).opacity(chosen.isEmpty ? 0.45 : 1)

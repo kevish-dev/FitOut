@@ -2,6 +2,7 @@ import Foundation
 import ActivityKit
 import Observation
 import UIKit
+import SwiftUI
 
 @MainActor enum WorkoutRuntime {
     private static var cached: AppContainer?
@@ -60,6 +61,7 @@ import UIKit
         }
     }
     func flush() async { await syncTask?.value }
+    func appearanceChanged(_ scheme: ColorScheme?) { floating.setAppearance(scheme) }
     @discardableResult func openCurrentWorkout() -> Bool {
         guard enabled, store.active != nil else { return false }
         floating.sceneChanged(active: true)

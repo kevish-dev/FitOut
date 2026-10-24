@@ -61,7 +61,7 @@ struct ProfileScreen: View {
                         Label("Emoji", systemImage: "face.smiling.fill")
                             .font(FitTheme.medium(15))
                             .frame(maxWidth: .infinity).frame(height: 38)
-                            .foregroundStyle(!profile.usesPhoto ? FitTheme.orange : .white)
+                            .foregroundStyle(!profile.usesPhoto ? FitTheme.orange : FitTheme.textPrimary)
                             .fitSurface(selected: !profile.usesPhoto, radius: 13)
                     }.buttonStyle(.plain)
                     Button {
@@ -73,7 +73,7 @@ struct ProfileScreen: View {
                         Label("Upload", systemImage: "square.and.arrow.up")
                             .font(FitTheme.medium(15))
                             .frame(maxWidth: .infinity).frame(height: 38)
-                            .foregroundStyle(profile.usesPhoto ? FitTheme.orange : .white)
+                            .foregroundStyle(profile.usesPhoto ? FitTheme.orange : FitTheme.textPrimary)
                             .fitSurface(selected: profile.usesPhoto, radius: 13)
                     }
                     .buttonStyle(.plain)
@@ -96,7 +96,7 @@ struct ProfileScreen: View {
             HStack(spacing: 1) {
                 ForEach(0..<4, id: \.self) { page in
                     Button { emojiPage = page } label: {
-                        Capsule().fill(emojiPage == page ? FitTheme.orange : Color.white.opacity(0.13))
+                        Capsule().fill(emojiPage == page ? FitTheme.orange : FitTheme.textPrimary.opacity(0.13))
                             .frame(width: 24, height: 4)
                             .frame(height: 32)
                     }

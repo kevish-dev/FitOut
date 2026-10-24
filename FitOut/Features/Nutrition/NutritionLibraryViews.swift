@@ -121,7 +121,7 @@ struct NutritionRecipeEditor: View {
                             VStack(alignment: .leading, spacing: 5) {
                                 Text(ingredient.food.name).font(FitTheme.medium(15))
                                 Text("\(ingredient.label) · \(NutritionUI.value(ingredient.values.calories)) kcal").font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-                            }.foregroundStyle(.white).padding(.vertical, 4)
+                            }.foregroundStyle(FitTheme.textPrimary).padding(.vertical, 4)
                         }
                     }.onDelete { recipe.ingredients.remove(atOffsets: $0) }
                     Button("Add ingredient", systemImage: "plus") { adding = true }
@@ -165,7 +165,7 @@ struct NutritionSavedMealEditor: View {
                 Section("Foods & portions") {
                     ForEach(meal.items) { item in
                         Button { editing = item } label: {
-                            VStack(alignment: .leading, spacing: 5) { Text(item.food.name); Text(item.label).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary) }.foregroundStyle(.white)
+                            VStack(alignment: .leading, spacing: 5) { Text(item.food.name); Text(item.label).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary) }.foregroundStyle(FitTheme.textPrimary)
                         }
                     }.onDelete { meal.items.remove(atOffsets: $0) }
                     Button("Add food", systemImage: "plus") { adding = true }

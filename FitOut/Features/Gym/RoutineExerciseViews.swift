@@ -65,12 +65,12 @@ struct RoutineExerciseCard: View {
                     Button("Remove exercise", role: .destructive) { removing = true }
                 } label: {
                     Image(systemName: "ellipsis").frame(width: 44, height: 44)
-                        .background(.white.opacity(0.035), in: Circle())
+                        .background(FitTheme.textPrimary.opacity(0.035), in: Circle())
                 }
                 .accessibilityLabel("Options for \(definition?.name ?? "exercise")")
             }
             if expanded {
-                Divider().overlay(.white.opacity(0.1))
+                Divider().overlay(FitTheme.textPrimary.opacity(0.1))
                 ExerciseImageButton(exercise: definition)
                 VStack(alignment: .leading, spacing: 10) {
                     Stepper(value: $plan.restSeconds, in: 0...3600, step: 15) {
@@ -106,7 +106,7 @@ struct RoutineExerciseCard: View {
                     }
                 } label: {
                     Label("Add set", systemImage: "plus").font(FitTheme.button(13)).frame(maxWidth: .infinity, minHeight: 44)
-                        .background(.white.opacity(0.035), in: RoundedRectangle(cornerRadius: 12))
+                        .background(FitTheme.textPrimary.opacity(0.035), in: RoundedRectangle(cornerRadius: 12))
                         .overlay { RoundedRectangle(cornerRadius: 12).strokeBorder(FitTheme.subtleBorder, style: StrokeStyle(lineWidth: 1, dash: [4])) }
                 }
                 .disabled((plan.setTargets?.count ?? 0) >= 40)
@@ -219,7 +219,7 @@ private struct PlannedSetRow: View {
         }
         .padding(12)
         .background(FitTheme.dashboardBackground.opacity(0.6), in: RoundedRectangle(cornerRadius: 16))
-        .overlay { RoundedRectangle(cornerRadius: 16).strokeBorder(.white.opacity(0.05), lineWidth: 1) }
+        .overlay { RoundedRectangle(cornerRadius: 16).strokeBorder(FitTheme.textPrimary.opacity(0.05), lineWidth: 1) }
         .accessibilityElement(children: .contain)
     }
     private func integer(_ value: Binding<Int>) -> Binding<Double?> {

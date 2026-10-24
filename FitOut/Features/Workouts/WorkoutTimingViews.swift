@@ -69,7 +69,7 @@ struct WorkoutTimingDetails: View {
             .background(FitTheme.dashboardBackground)
             .navigationTitle("Timing & laps").navigationBarTitleDisplayMode(.inline)
             .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
-        }.foregroundStyle(.white).tint(FitTheme.dashboardAccent).preferredColorScheme(.dark)
+        }.foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)
     }
     private func eventRow(_ event: WorkoutEvent) -> some View {
         DisclosureGroup {

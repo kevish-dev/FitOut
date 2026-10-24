@@ -137,7 +137,7 @@ struct HomeView: View {
             Button { showingRestartConfirmation = true } label: {
                 Label("Start Over (Testing)", systemImage: "arrow.counterclockwise")
                     .font(FitTheme.button(14))
-                    .foregroundStyle(.white.opacity(0.8))
+                    .foregroundStyle(FitTheme.textPrimary.opacity(0.8))
                     .padding(.horizontal, 20).padding(.vertical, 14)
                     .dashboardGlass(in: Capsule(), interactive: true)
             }
@@ -168,7 +168,7 @@ struct HomeView: View {
         } backdrop: {
             HomeBackdrop(contentMode: .fill)
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(FitTheme.textPrimary)
         .tint(accent)
         .navigationTitle("Home")
         .navigationBarTitleDisplayMode(.inline)
@@ -270,7 +270,7 @@ struct HomeView: View {
                         HStack(alignment: .firstTextBaseline, spacing: 3) {
                             Text("\(streak.consecutiveDays)")
                                 .font(FitTheme.metric(streak.consecutiveDays >= 100 ? 24 : streak.consecutiveDays >= 10 ? 29 : narrow ? 31 : compact ? 36 : 39))
-                                .foregroundStyle(.white)
+                                .foregroundStyle(FitTheme.textPrimary)
                             Text(streak.consecutiveDays == 1 ? "Day" : "Days")
                                 .font(FitTheme.strong(narrow ? 10 : compact ? 12 : 13))
                                 .foregroundStyle(accent)
@@ -282,7 +282,7 @@ struct HomeView: View {
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel("\(streak.consecutiveDays) day workout streak")
 
-                    streakDivider(color: Color.white.opacity(0.15))
+                    streakDivider(color: FitTheme.textPrimary.opacity(0.15))
 
                     HStack(spacing: 0) {
                         ForEach(0..<streak.weekDays.count, id: \.self) { index in
@@ -292,16 +292,16 @@ struct HomeView: View {
                                     .font(FitTheme.medium(narrow ? 9 : compact ? 10 : 11))
                                     .foregroundStyle(FitTheme.textSecondary)
                                 Circle()
-                                    .fill(day.isCompleted ? accent : Color.white.opacity(0.04))
+                                    .fill(day.isCompleted ? accent : FitTheme.textPrimary.opacity(0.04))
                                     .frame(width: markerSize, height: markerSize)
                                     .overlay {
-                                        Circle().stroke(day.isCompleted ? accent : Color.white.opacity(0.25), lineWidth: 1.5)
+                                        Circle().stroke(day.isCompleted ? accent : FitTheme.textPrimary.opacity(0.25), lineWidth: 1.5)
                                     }
                                     .overlay {
                                         if day.isCompleted {
                                             Image(systemName: "checkmark")
                                                 .font(.system(size: narrow ? 8 : compact ? 10 : 11, weight: .bold))
-                                                .foregroundStyle(.white)
+                                                .foregroundStyle(FitTheme.textPrimary)
                                         }
                                     }
                             }
@@ -313,7 +313,7 @@ struct HomeView: View {
                     }
                     .frame(maxWidth: .infinity)
 
-                    streakDivider(color: Color.white.opacity(0.15))
+                    streakDivider(color: FitTheme.textPrimary.opacity(0.15))
 
                     VStack(alignment: .center, spacing: 1) {
                         Text("\(streak.completedDaysThisWeek)/7")
@@ -337,7 +337,7 @@ struct HomeView: View {
                         .overlay(alignment: .leading) {
                             Image(systemName: "flame")
                                 .font(.system(size: 76, weight: .ultraLight))
-                                .foregroundStyle(.white.opacity(0.035))
+                                .foregroundStyle(FitTheme.textPrimary.opacity(0.035))
                                 .frame(width: compact ? 108 : 130, height: 96)
                                 .clipped()
                                 .offset(x: compact ? 54 : 65, y: 10)
@@ -347,7 +347,7 @@ struct HomeView: View {
                 }
                 .overlay {
                     RoundedRectangle(cornerRadius: 22)
-                        .stroke(.white.opacity(0.14), lineWidth: 1)
+                        .stroke(FitTheme.textPrimary.opacity(0.14), lineWidth: 1)
                 }
             }
             .frame(height: 96)
@@ -370,7 +370,7 @@ struct HomeView: View {
             HStack {
                 Text("Workouts")
                     .font(FitTheme.section())
-                    .foregroundStyle(.white)
+                    .foregroundStyle(FitTheme.textPrimary)
 
                 Spacer()
 
@@ -406,7 +406,7 @@ struct HomeView: View {
                 HStack(alignment: .firstTextBaseline, spacing: 2) {
                     Text("\(completedCount)")
                         .font(FitTheme.metric(26))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(FitTheme.textPrimary)
                     Text(weeklyGoal > 0 ? "/\(weeklyGoal)" : "")
                         .font(FitTheme.medium(18))
                         .foregroundStyle(FitTheme.textSecondary)
@@ -420,13 +420,13 @@ struct HomeView: View {
                 Spacer()
 
                 Rectangle()
-                    .fill(Color.white.opacity(0.12))
+                    .fill(FitTheme.textPrimary.opacity(0.12))
                     .frame(width: 1, height: 32)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text(weeklyGoal > 0 ? "\(onTrackPercentage)%" : "—")
                         .font(FitTheme.metric(18))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(FitTheme.textPrimary)
                     Text(weeklyGoal > 0 ? "Of weekly goal" : "No routine yet")
                         .font(FitTheme.body(12))
                         .foregroundStyle(FitTheme.textSecondary)
@@ -447,16 +447,16 @@ struct HomeView: View {
                     .frame(width: 34, height: 34)
                 Image(systemName: "checkmark")
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(FitTheme.textPrimary)
 
             case .rest:
                 Circle()
-                    .fill(Color.white.opacity(0.06))
+                    .fill(FitTheme.textPrimary.opacity(0.06))
                     .frame(width: 34, height: 34)
-                    .overlay { Circle().stroke(Color.white.opacity(0.08), lineWidth: 1) }
+                    .overlay { Circle().stroke(FitTheme.textPrimary.opacity(0.08), lineWidth: 1) }
                 Image(systemName: "moon.fill")
                     .font(.system(size: 13))
-                    .foregroundStyle(Color.white.opacity(0.65))
+                    .foregroundStyle(FitTheme.textPrimary.opacity(0.65))
 
             case .missed:
                 Circle()
@@ -464,11 +464,11 @@ struct HomeView: View {
                     .frame(width: 34, height: 34)
                 Image(systemName: "xmark")
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(FitTheme.textPrimary)
 
             case .todayPlanned:
                 Circle()
-                    .fill(Color.white.opacity(0.08))
+                    .fill(FitTheme.textPrimary.opacity(0.08))
                     .frame(width: 34, height: 34)
                     .overlay { Circle().stroke(FitTheme.orange, lineWidth: 1.5) }
                 Image(systemName: "dumbbell")
@@ -477,11 +477,11 @@ struct HomeView: View {
 
             case .futurePlanned:
                 Circle()
-                    .fill(Color.white.opacity(0.05))
+                    .fill(FitTheme.textPrimary.opacity(0.05))
                     .frame(width: 34, height: 34)
-                    .overlay { Circle().stroke(Color.white.opacity(0.15), lineWidth: 1) }
+                    .overlay { Circle().stroke(FitTheme.textPrimary.opacity(0.15), lineWidth: 1) }
             case .noLog:
-                Circle().fill(.white.opacity(0.05)).frame(width: 34, height: 34)
+                Circle().fill(FitTheme.textPrimary.opacity(0.05)).frame(width: 34, height: 34)
                 Image(systemName: "minus").font(.system(size: 12)).foregroundStyle(FitTheme.textSecondary)
             case .inProgress:
                 Circle().stroke(FitTheme.orange, lineWidth: 1.5).frame(width: 34, height: 34)
@@ -510,9 +510,9 @@ struct HomeView: View {
                 } label: {
                     Image(systemName: "arrow.up.right")
                         .font(.system(size: 14, weight: .semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(FitTheme.textPrimary)
                         .frame(width: 36, height: 36)
-                        .background(.white.opacity(0.08), in: Circle())
+                        .background(FitTheme.textPrimary.opacity(0.08), in: Circle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("View workout volume analytics")
@@ -541,7 +541,7 @@ struct HomeView: View {
                         .foregroundStyle(FitTheme.textSecondary)
                     Spacer()
                     Text("\(unit.display(trend.previousWeekKG).formatted(.number.precision(.fractionLength(0)))) \(unit.rawValue)·reps")
-                        .foregroundStyle(.white)
+                        .foregroundStyle(FitTheme.textPrimary)
                 }
                 .font(FitTheme.medium(12))
                 Text("Completed weighted sets · load × reps")
@@ -654,7 +654,7 @@ struct HomeView: View {
                 Button { tab = 3 } label: {
                     Label("Connect Apple Health to see your daily readings", systemImage: "heart.text.square")
                         .font(FitTheme.medium(12))
-                        .foregroundStyle(.white.opacity(0.8))
+                        .foregroundStyle(FitTheme.textPrimary.opacity(0.8))
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .buttonStyle(.plain)
@@ -731,10 +731,10 @@ private struct WeeklyVolumeBars: View {
                 VStack(spacing: 7) {
                     ZStack(alignment: .bottom) {
                         RoundedRectangle(cornerRadius: 5)
-                            .fill(.white.opacity(0.06))
+                            .fill(FitTheme.textPrimary.opacity(0.06))
                             .frame(height: 68)
                         RoundedRectangle(cornerRadius: 5)
-                            .fill(week.isCurrent ? FitTheme.dashboardAccent : .white.opacity(0.36))
+                            .fill(week.isCurrent ? FitTheme.dashboardAccent : FitTheme.textPrimary.opacity(0.36))
                             .frame(height: week.volumeKG > 0
                                    ? max(5, CGFloat(week.volumeKG / max(1, trend.peakKG)) * 68)
                                    : 2)
@@ -833,7 +833,7 @@ private struct HealthOverviewTile: View {
                 Spacer()
                 Text(kind == .workoutTime ? "WEEK" : "2H")
                     .font(FitTheme.medium(10))
-                    .foregroundStyle(.white.opacity(0.25))
+                    .foregroundStyle(FitTheme.textSecondary)
             }
 
             Text(kind.title)
@@ -861,7 +861,7 @@ private struct HealthOverviewTile: View {
             Text(isLoading && series.total == nil ? "UPDATING…" : series.errorMessage != nil ? "COULDN’T LOAD" : series.total == nil ? "NO READING YET" : kind.context)
                 .font(FitTheme.medium(10))
                 .tracking(0.7)
-                .foregroundStyle(series.total == nil ? FitTheme.textSecondary : kind.tint)
+                .foregroundStyle(FitTheme.textSecondary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
@@ -876,7 +876,7 @@ private struct HealthOverviewTile: View {
                 }
                 .clipShape(RoundedRectangle(cornerRadius: 23))
         }
-        .overlay { RoundedRectangle(cornerRadius: 23).stroke(.white.opacity(0.10), lineWidth: 1) }
+        .overlay { RoundedRectangle(cornerRadius: 23).stroke(FitTheme.textPrimary.opacity(0.10), lineWidth: 1) }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(kind.title), \(series.errorMessage != nil ? "could not load reading" : series.total == nil ? "no reading yet" : "\(reading.value) \(reading.unit), \(kind.context.lowercased())")")
     }
@@ -968,6 +968,7 @@ struct WeekDayItem: Identifiable {
 
 // MARK: - Background
 struct HomeBackdrop: View {
+    @Environment(\.colorScheme) private var scheme
     var assetName = "HomeAthlete"
     var contentMode: ContentMode = .fit
 
@@ -978,9 +979,10 @@ struct HomeBackdrop: View {
                 .aspectRatio(contentMode: contentMode)
                 .frame(width: geometry.size.width, height: geometry.size.height, alignment: .top)
                 .clipped()
+                .overlay { if scheme == .light { FitTheme.dashboardBackground.opacity(0.65) } }
                 .overlay {
                     LinearGradient(stops: [
-                        .init(color: .black.opacity(0.42), location: 0),
+                        .init(color: FitTheme.dashboardBackground.opacity(0.42), location: 0),
                         .init(color: .clear, location: 0.18),
                         .init(color: .clear, location: 0.62),
                         .init(color: FitTheme.dashboardBackground.opacity(0.22), location: 0.82),

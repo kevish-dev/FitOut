@@ -13,7 +13,7 @@ struct MuscleSelection: View {
                     } label: {
                         Text(muscle.title).font(FitTheme.medium(12))
                             .frame(maxWidth: .infinity, minHeight: 44)
-                            .foregroundStyle(selection.contains(muscle) ? FitTheme.dashboardAccent : .white)
+                            .foregroundStyle(selection.contains(muscle) ? FitTheme.dashboardAccent : FitTheme.textPrimary)
                             .dashboardGlass(in: RoundedRectangle(cornerRadius: 12), highlighted: selection.contains(muscle), interactive: true)
                     }.buttonStyle(.plain).accessibilityValue(selection.contains(muscle) ? "Selected" : "Not selected")
                 }
@@ -112,6 +112,6 @@ struct CustomExerciseEditor: View {
                         .disabled(exercise.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || exercise.muscles.isEmpty)
                 }
             }
-        }.tint(FitTheme.dashboardAccent).preferredColorScheme(.dark)
+        }.tint(FitTheme.dashboardAccent)
     }
 }

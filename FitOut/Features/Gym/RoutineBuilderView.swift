@@ -83,12 +83,12 @@ struct RoutineEditor: View {
             }
         }
         .tint(FitTheme.dashboardAccent)
-        .foregroundStyle(.white)
+        .foregroundStyle(FitTheme.textPrimary)
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(30)
         .presentationBackground(FitTheme.dashboardBackground)
-        .preferredColorScheme(.dark)
+
         .onAppear(perform: restoreDraft)
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in keyboardIsVisible = true }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardIsVisible = false }
@@ -418,7 +418,8 @@ struct RoutineEditor: View {
             }
             .font(FitTheme.button(15)).padding(.horizontal, 16).padding(.vertical, 12)
             .frame(maxWidth: .infinity, minHeight: 54)
-            .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
+            .foregroundStyle(.white)
+                .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(RoutineEditorPressStyle())
         .disabled(stage == .schedule && !scheduleIsReady)

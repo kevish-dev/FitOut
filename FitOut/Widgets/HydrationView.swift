@@ -72,7 +72,7 @@ struct HydrationView: View {
                 Text(String(log.milliliters) + " ml")
                 Spacer()
                 Text(log.date, style: .time).foregroundStyle(FitTheme.textSecondary)
-            }.foregroundStyle(Color.white)
+            }.foregroundStyle(FitTheme.textPrimary)
         }.swipeActions { Button("Delete", role: .destructive) { store.remove(log.id) } }
     }
 }

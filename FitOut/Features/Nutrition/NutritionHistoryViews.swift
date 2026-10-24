@@ -109,7 +109,7 @@ struct NutritionHistoryView: View {
                             if metric != 2, let goal = store.target(on: day.date)[NutritionHistoryDay.nutrient(metric)],
                                let end = Calendar.current.date(byAdding: .day, value: 1, to: day.date) {
                                 RuleMark(xStart: .value("From", day.date), xEnd: .value("To", end), y: .value("Target", goal))
-                                    .foregroundStyle(.white.opacity(0.45)).lineStyle(StrokeStyle(lineWidth: 1, dash: [3, 3]))
+                                    .foregroundStyle(FitTheme.textPrimary.opacity(0.45)).lineStyle(StrokeStyle(lineWidth: 1, dash: [3, 3]))
                             }
                         }
                         .chartXAxis { AxisMarks(values: .stride(by: .day, count: range == 7 ? 1 : 7)) { AxisValueLabel(format: .dateTime.day()) } }
@@ -130,12 +130,12 @@ struct NutritionHistoryView: View {
                         Button { onSelect(day.date); dismiss() } label: {
                             HStack {
                                 VStack(alignment: .leading, spacing: 5) {
-                                    Text(day.date.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated))).font(FitTheme.medium(14)).foregroundStyle(.white)
+                                    Text(day.date.formatted(.dateTime.weekday(.abbreviated).day().month(.abbreviated))).font(FitTheme.medium(14)).foregroundStyle(FitTheme.textPrimary)
                                     Text(day.summary.entries.isEmpty ? "No food logged" : "\(day.summary.entries.count) food entries" + (day.summary.isComplete(.calories) ? "" : " · incomplete energy"))
                                         .font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
                                 }
                                 Spacer()
-                                Text(NutritionUI.value(day.value(metric), unit: unit, decimals: 1)).font(FitTheme.medium(13)).foregroundStyle(.white)
+                                Text(NutritionUI.value(day.value(metric), unit: unit, decimals: 1)).font(FitTheme.medium(13)).foregroundStyle(FitTheme.textPrimary)
                             }.padding(.vertical, 5)
                         }
                     }

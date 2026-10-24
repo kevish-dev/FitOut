@@ -73,7 +73,8 @@ struct ExerciseFilterSheet: View {
                 Button { apply(draft); dismiss() } label: {
                     Text("Show \(count) \(count == 1 ? "exercise" : "exercises")")
                         .font(FitTheme.button(16)).padding(.vertical, 12).frame(maxWidth: .infinity, minHeight: 54)
-                        .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
+                        .foregroundStyle(.white)
+                .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
                 }
                 .buttonStyle(RoutineEditorPressStyle()).accessibilityIdentifier("applyExerciseFilters")
                 .frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity).background(.bar)
@@ -84,7 +85,7 @@ struct ExerciseFilterSheet: View {
                         .toolbar { Button("Done") { showMap = false } }
                 }
             }
-        }.tint(FitTheme.dashboardAccent).foregroundStyle(.white).preferredColorScheme(.dark)
+        }.tint(FitTheme.dashboardAccent).foregroundStyle(FitTheme.textPrimary)
             .presentationDragIndicator(.visible).presentationCornerRadius(28)
     }
     private var headingLayout: AnyLayout {

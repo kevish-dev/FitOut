@@ -15,6 +15,7 @@ import Observation
     let hydrationReminders: HydrationReminderStore
     let database: ModelContainer
     let repository: SwiftDataRepository
+    let presentation: AppPresentationPreferences
     let profile: ProfileStore
     let capabilities: any RuntimeCapabilityProviding
 
@@ -27,6 +28,7 @@ import Observation
         coach = CoachStore(capabilities: capabilities)
         self.database = database
         repository = SwiftDataRepository(container: database)
+        presentation = try AppPresentationPreferences(repository: repository, defaults: defaults)
         self.capabilities = capabilities
         if let legacyDefaults { try LegacyOnboardingImporter.importIfNeeded(from: legacyDefaults, into: repository) }
         profile = try ProfileStore(container: database, legacy: repository.loadSnapshot())
@@ -64,6 +66,8 @@ import Observation
         workoutPresentation = WorkoutPresentationCoordinator(store: workouts, gym: gym, profile: profile, defaults: defaults,
             enabled: production && !database.configurations.allSatisfy(\.isStoredInMemoryOnly))
         workouts.onChange = { [weak widgets, weak workoutPresentation] in widgets?.publish(); workoutPresentation?.changed() }
+        presentation.onChange = { [weak presentation, weak workoutPresentation] in workoutPresentation?.appearanceChanged(presentation?.appearance.colorScheme) }
+        workoutPresentation.appearanceChanged(presentation.appearance.colorScheme)
     }
 
     static func live() throws -> AppContainer {

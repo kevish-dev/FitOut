@@ -23,7 +23,7 @@ struct GenderAgeScreen: View {
                                 .frame(height: 82 * scale)
                             Text(gender.rawValue).font(FitTheme.button(17 * scale))
                         }
-                        .foregroundStyle(selected ? FitTheme.orange : .white)
+                        .foregroundStyle(selected ? FitTheme.orange : FitTheme.textPrimary)
                         .frame(width: 192 * scale, height: 136 * scale)
                         .fitSurface(selected: selected, radius: 16)
                     }
@@ -54,7 +54,7 @@ struct AgeWheel: View {
                         ForEach(13...100, id: \.self) { value in
                             Text("\(value)")
                                 .font(selectedAge == value ? FitTheme.display(27) : FitTheme.body(22))
-                                .foregroundStyle(selectedAge == value ? FitTheme.orange : .white.opacity(0.4))
+                                .foregroundStyle(selectedAge == value ? FitTheme.orange : FitTheme.textPrimary.opacity(0.4))
                                 .frame(maxWidth: .infinity).frame(height: rowHeight)
                                 .id(value)
                         }

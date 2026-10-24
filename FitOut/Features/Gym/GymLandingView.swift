@@ -41,7 +41,7 @@ struct GymView: View {
         } backdrop: {
             HomeBackdrop(assetName: "FitnessHero", contentMode: .fill)
         }
-        .foregroundStyle(.white)
+        .foregroundStyle(FitTheme.textPrimary)
         .tint(accent)
         .navigationTitle("Gym")
         .navigationBarTitleDisplayMode(.inline)
@@ -82,7 +82,7 @@ struct GymView: View {
                 .accessibilityIdentifier("gymTitle")
             Text("Your training. Your pace.")
                 .font(FitTheme.body(14))
-                .foregroundStyle(.white.opacity(0.78))
+                .foregroundStyle(FitTheme.textPrimary.opacity(0.78))
                 .fixedSize(horizontal: false, vertical: true)
             if let routine = store.activeRoutine {
                 Label(routine.name, systemImage: "calendar")
@@ -91,7 +91,7 @@ struct GymView: View {
             } else {
                 Text("BUILD A ROUTINE THAT FITS YOU")
                     .font(FitTheme.medium(10)).tracking(1.4)
-                    .foregroundStyle(.white.opacity(0.6))
+                    .foregroundStyle(FitTheme.textPrimary.opacity(0.6))
             }
         }
     }
@@ -329,6 +329,7 @@ struct DashboardWorkoutPreview: View {
                     Text(actionTitle).font(FitTheme.button(13))
                     Image(systemName: "arrow.up.right").font(.system(size: 12, weight: .semibold))
                 }
+                .foregroundStyle(FitTheme.textPrimary)
                 .padding(.horizontal, 14).frame(minHeight: 44)
                 .dashboardGlass(in: Capsule(), highlighted: true)
                 .padding(.top, 3)
@@ -352,7 +353,7 @@ struct DashboardWorkoutPreview: View {
         }
         .foregroundStyle(.white)
         .clipShape(RoundedRectangle(cornerRadius: 24))
-        .overlay { RoundedRectangle(cornerRadius: 24).strokeBorder(.white.opacity(0.18), lineWidth: 1) }
+        .overlay { RoundedRectangle(cornerRadius: 24).strokeBorder(FitTheme.textPrimary.opacity(0.18), lineWidth: 1) }
         .contentShape(RoundedRectangle(cornerRadius: 24))
         .accessibilityElement(children: .combine)
     }
@@ -363,7 +364,7 @@ struct DashboardWorkoutPreview: View {
             .foregroundStyle(FitTheme.dashboardAccent)
             .padding(.horizontal, 12).padding(.vertical, 9)
             .background(FitTheme.surface.opacity(0.85), in: Capsule())
-            .overlay { Capsule().strokeBorder(.white.opacity(0.14), lineWidth: 1) }
+            .overlay { Capsule().strokeBorder(FitTheme.textPrimary.opacity(0.14), lineWidth: 1) }
     }
 
     private var facts: some View {
@@ -488,7 +489,7 @@ private struct GymDayTile: View {
                 Text(day.date, format: .dateTime.day()).font(FitTheme.section(14))
             }.foregroundStyle(day.isToday ? FitTheme.dashboardAccent : FitTheme.textSecondary)
             Image(systemName: symbol).font(.system(size: 21, weight: .medium))
-                .foregroundStyle(day.status == .completed || day.isToday ? FitTheme.dashboardAccent : .white.opacity(0.65))
+                .foregroundStyle(day.status == .completed || day.isToday ? FitTheme.dashboardAccent : FitTheme.textPrimary.opacity(0.65))
                 .padding(.vertical, 3)
             Text(day.title).font(FitTheme.section(12)).lineLimit(3)
                 .frame(maxWidth: .infinity, minHeight: 44, alignment: .topLeading)

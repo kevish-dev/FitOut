@@ -30,7 +30,7 @@ struct RoutineStageBar: View {
                     Text(stage.rawValue).font(FitTheme.medium(12))
                 }
                 .frame(maxWidth: .infinity, minHeight: 48)
-                .foregroundStyle(selected ? .white : FitTheme.textSecondary)
+                .foregroundStyle(selected ? FitTheme.textPrimary : FitTheme.textSecondary)
                 .background {
                     if selected {
                         RoundedRectangle(cornerRadius: 15)
@@ -66,9 +66,9 @@ struct RoutinePlanHero: View {
             }
             metricLayout {
                 metric("\(routine.trainingDays.count)", title: "Training days")
-                if !typeSize.isAccessibilitySize { Divider().frame(height: 30).overlay(.white.opacity(0.08)) }
+                if !typeSize.isAccessibilitySize { Divider().frame(height: 30).overlay(FitTheme.textPrimary.opacity(0.08)) }
                 metric("\(exercises.count)", title: "Exercises")
-                if !typeSize.isAccessibilitySize { Divider().frame(height: 30).overlay(.white.opacity(0.08)) }
+                if !typeSize.isAccessibilitySize { Divider().frame(height: 30).overlay(FitTheme.textPrimary.opacity(0.08)) }
                 metric("\(exercises.reduce(0) { $0 + $1.setCount })", title: "Planned sets")
             }
         }
@@ -76,7 +76,7 @@ struct RoutinePlanHero: View {
         .background {
             RoundedRectangle(cornerRadius: 24).fill(FitTheme.surface)
         }
-        .overlay { RoundedRectangle(cornerRadius: 24).strokeBorder(.white.opacity(0.06), lineWidth: 1) }
+        .overlay { RoundedRectangle(cornerRadius: 24).strokeBorder(FitTheme.textPrimary.opacity(0.06), lineWidth: 1) }
     }
 
     private var metricLayout: AnyLayout {
@@ -187,8 +187,8 @@ struct RoutineDayPauseGraphic: View {
     var body: some View {
         VStack(spacing: 18) {
             ZStack {
-                Circle().stroke(.white.opacity(0.04), lineWidth: 1).frame(width: 158, height: 158)
-                Circle().stroke(.white.opacity(0.07), lineWidth: 1).frame(width: 122, height: 122)
+                Circle().stroke(FitTheme.textPrimary.opacity(0.04), lineWidth: 1).frame(width: 158, height: 158)
+                Circle().stroke(FitTheme.textPrimary.opacity(0.07), lineWidth: 1).frame(width: 122, height: 122)
                 Image(systemName: kind == .rest ? "moon.zzz" : "calendar.badge.plus")
                     .font(.system(size: 46, weight: .ultraLight)).foregroundStyle(FitTheme.dashboardAccent)
                     .frame(width: 88, height: 88).dashboardGlass(in: Circle())

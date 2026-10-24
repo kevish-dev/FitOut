@@ -29,7 +29,7 @@ struct RoutineCreationSheet: View {
                                 ForEach(RoutineTemplate.allCases.filter { $0 != .custom }) { template in
                                     choice(template)
                                     if template != RoutineTemplate.allCases.last {
-                                        Divider().overlay(.white.opacity(0.06)).padding(.horizontal, FitTheme.cardInset)
+                                        Divider().overlay(FitTheme.textPrimary.opacity(0.06)).padding(.horizontal, FitTheme.cardInset)
                                     }
                                 }
                             }
@@ -47,12 +47,12 @@ struct RoutineCreationSheet: View {
                 .background(FitTheme.dashboardBackground)
             }
         }
-        .foregroundStyle(.white).tint(FitTheme.dashboardAccent)
+        .foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)
         .presentationDetents([.large])
         .presentationDragIndicator(.visible)
         .presentationCornerRadius(30)
         .presentationBackground(FitTheme.dashboardBackground)
-        .preferredColorScheme(.dark)
+
     }
 
     private var header: some View {
@@ -145,6 +145,7 @@ struct RoutineCreationSheet: View {
                 }
                 .font(FitTheme.button(16)).padding(.horizontal, 18)
                 .frame(maxWidth: .infinity, minHeight: 54)
+                .foregroundStyle(.white)
                 .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 16))
             }
             .buttonStyle(RoutineChoicePressStyle())

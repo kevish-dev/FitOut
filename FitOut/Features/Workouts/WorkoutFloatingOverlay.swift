@@ -13,6 +13,11 @@ import Combine
     private var window: WorkoutPassThroughWindow?
     private weak var previousKeyWindow: UIWindow?
     private var sceneActive = false
+    private var appearance = UIUserInterfaceStyle.dark
+    func setAppearance(_ scheme: ColorScheme?) {
+        appearance = scheme.map { $0 == .dark ? .dark : .light } ?? .unspecified
+        window?.overrideUserInterfaceStyle = appearance
+    }
     init(store: WorkoutStore, gym: GymStore, profile: ProfileStore, defaults: UserDefaults) {
         self.store = store; self.gym = gym; self.profile = profile; self.defaults = defaults
     }
@@ -22,7 +27,8 @@ import Combine
         if window == nil, let scene = UIApplication.shared.connectedScenes.compactMap({ $0 as? UIWindowScene }).first(where: { $0.activationState == .foregroundActive }) {
             let overlay = WorkoutPassThroughWindow(windowScene: scene)
             overlay.backgroundColor = .clear; overlay.windowLevel = UIWindow.Level(rawValue: UIWindow.Level.normal.rawValue + 1)
-            let root = UIHostingController(rootView: WorkoutFloatingRoot(controller: self).preferredColorScheme(.dark))
+            overlay.overrideUserInterfaceStyle = appearance
+            let root = UIHostingController(rootView: WorkoutFloatingRoot(controller: self))
             root.view.backgroundColor = .clear; overlay.rootViewController = root
             window = overlay
         }
@@ -126,7 +132,7 @@ private struct FloatingWorkoutPill: View {
                     .font(.system(size: 15, weight: .medium)).frame(width: 44, height: 52)
             }.buttonStyle(.plain).accessibilityLabel(session.status == .paused ? "Resume workout" : "Pause workout")
         }
-        .padding(.leading, 14).padding(.trailing, 4).foregroundStyle(.white)
+        .padding(.leading, 14).padding(.trailing, 4).foregroundStyle(FitTheme.textPrimary)
         .dashboardGlass(in: Capsule(), highlighted: true, interactive: true)
         .shadow(color: .black.opacity(0.25), radius: 16, y: 5)
         .accessibilityAction(named: Text("Record lap")) { if session.status == .inProgress { store.markLap() } }

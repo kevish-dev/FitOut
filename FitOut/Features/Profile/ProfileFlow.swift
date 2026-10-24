@@ -93,8 +93,8 @@ struct ProfileFlow: View {
                 }
             }
         }
-        .foregroundStyle(.white)
-        .preferredColorScheme(.dark)
+        .foregroundStyle(FitTheme.textPrimary)
+
         .tint(FitTheme.orange)
         .alert("Profile could not be saved", isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
             Button("Retry save") { store.saveDraft() }
@@ -140,7 +140,7 @@ struct ProfileFlow: View {
                             Text(goal.rawValue).font(FitTheme.button(13 * scale))
                                 .lineLimit(2).minimumScaleFactor(0.85)
                         }
-                        .foregroundStyle(selected ? FitTheme.orange : .white)
+                        .foregroundStyle(selected ? FitTheme.orange : FitTheme.textPrimary)
                         .padding(.horizontal, 12).frame(maxWidth: .infinity)
                         .frame(height: 62 * scale).fitSurface(selected: selected, radius: 15)
                     }
@@ -176,7 +176,7 @@ private struct HeightScreen: View {
         VStack(spacing: 0) {
             ScreenHeading(first: "What’s your", accent: "height?", size: 30 * scale)
             Text("Used for better progress tracking.")
-                .font(FitTheme.body(18)).foregroundStyle(.white.opacity(0.6))
+                .font(FitTheme.body(18)).foregroundStyle(FitTheme.textPrimary.opacity(0.6))
                 .padding(.top, 12).padding(.bottom, 30 * scale)
             HeightWheel(heightCM: $heightCM, unit: unit, scale: scale)
                 .id(unit)
@@ -197,7 +197,7 @@ private struct HeightScreen: View {
             UISelectionFeedbackGenerator().selectionChanged()
         } label: {
             Text(title).font(FitTheme.button(17))
-                .foregroundStyle(unit == value ? FitTheme.orange : .white.opacity(0.8))
+                .foregroundStyle(unit == value ? FitTheme.orange : FitTheme.textPrimary.opacity(0.8))
                 .frame(maxWidth: .infinity).frame(height: 42)
                 .fitSurface(selected: unit == value, radius: 12)
         }
@@ -243,10 +243,10 @@ private struct HeightWheel: View {
                             HStack(alignment: .firstTextBaseline, spacing: 7) {
                                 Text(imperial ? (Double(tick) / 10).formatted(.number.precision(.fractionLength(0...1))) : String(tick))
                                     .font(selected ? FitTheme.display(32 * scale) : FitTheme.body(25 * scale))
-                                    .foregroundStyle(selected ? FitTheme.orange : .white.opacity(0.55))
+                                    .foregroundStyle(selected ? FitTheme.orange : FitTheme.textPrimary.opacity(0.55))
                                 if selected {
                                     Text(imperial ? "in" : "cm")
-                                        .font(FitTheme.body(17)).foregroundStyle(.white.opacity(0.6))
+                                        .font(FitTheme.body(17)).foregroundStyle(FitTheme.textPrimary.opacity(0.6))
                                 }
                             }
                             .frame(maxWidth: .infinity).frame(height: rowHeight)
@@ -341,15 +341,20 @@ struct ProfileFields: View {
 
 struct ProfileEditor: View {
     let store: ProfileStore
+    let presentation: AppPresentationPreferences
     @State private var draft: ProfileData
     @Environment(\.dismiss) private var dismiss
-    init(store: ProfileStore) { self.store = store; _draft = State(initialValue: store.draft) }
+    init(store: ProfileStore, presentation: AppPresentationPreferences) { self.store = store; self.presentation = presentation; _draft = State(initialValue: store.draft) }
     var body: some View {
         Form {
+            ProfilePresentationSection(preferences: presentation)
             Section("Primary goal") { Picker("Goal", selection: $draft.primaryGoal) { ForEach(PrimaryGoal.allCases) { Text($0.rawValue).tag(Optional($0)) } } }
             ProfileFields(profile: $draft)
             if let error = store.error { Text(error).foregroundStyle(.red) }
         }.navigationTitle("Edit profile")
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Save") { if store.complete(draft) { dismiss() } } } }
+            .toolbar { ToolbarItem(placement: .confirmationAction) {
+                Button("Save") { if store.complete(draft) { dismiss() } }
+                    .padding(.trailing, presentation.navigationStyle == .topRight ? 68 : 0)
+            } }
     }
 }

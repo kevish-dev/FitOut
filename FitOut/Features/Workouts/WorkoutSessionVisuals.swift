@@ -66,7 +66,7 @@ struct WorkoutSessionHero: View {
         }
         .padding(20).frame(maxWidth: .infinity, alignment: .leading)
         .background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 26))
-        .overlay { RoundedRectangle(cornerRadius: 26).strokeBorder(.white.opacity(0.07), lineWidth: 1) }
+        .overlay { RoundedRectangle(cornerRadius: 26).strokeBorder(FitTheme.textPrimary.opacity(0.07), lineWidth: 1) }
     }
     private var metricLayout: AnyLayout {
         typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 14)) : AnyLayout(HStackLayout(alignment: .top, spacing: 16))
@@ -82,7 +82,7 @@ struct WorkoutSessionHero: View {
             Image("RoutineEquipment").resizable().scaledToFit().frame(width: 140, height: 104).accessibilityHidden(true)
         } else {
             ZStack {
-                Circle().stroke(.white.opacity(0.07), lineWidth: 6)
+                Circle().stroke(FitTheme.textPrimary.opacity(0.07), lineWidth: 6)
                 Circle().trim(from: 0, to: session.setProgress).stroke(FitTheme.dashboardAccent, style: StrokeStyle(lineWidth: 6, lineCap: .round))
                     .rotationEffect(.degrees(-90))
                     .animation(reduceMotion ? nil : .easeInOut(duration: 0.25), value: session.setProgress)
@@ -113,7 +113,7 @@ struct WorkoutRestCard: View {
     var body: some View {
         cardLayout {
             ZStack {
-                Circle().stroke(.white.opacity(0.08), lineWidth: 4)
+                Circle().stroke(FitTheme.textPrimary.opacity(0.08), lineWidth: 4)
                 Circle().trim(from: 0, to: progress).stroke(FitTheme.dashboardAccent, style: StrokeStyle(lineWidth: 4, lineCap: .round)).rotationEffect(.degrees(-90))
                     .animation(reduceMotion || session.status == .paused ? nil : .linear(duration: 1), value: progress)
                 Image(systemName: "timer").font(.system(size: 20)).foregroundStyle(FitTheme.dashboardAccent)
