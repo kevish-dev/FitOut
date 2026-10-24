@@ -56,6 +56,86 @@ final class AppPresentationTests: XCTestCase {
         XCTAssertEqual(Set(AppSection.allCases.map(\.symbol)).count, 5)
     }
 
+    func testFloatingControlStaysInsideSafeEdgesOnCompactAndLandscapeScreens() throws {
+        for viewport in [CGRect(x: 0, y: 0, width: 390, height: 844), CGRect(x: 0, y: 0, width: 844, height: 390)] {
+            let geometry = FloatingWorkoutGeometry(viewport: viewport, safeArea: UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0), size: CGSize(width: 238, height: 60))
+            for center in [CGPoint(x: -500, y: -500), CGPoint(x: 2000, y: 2000)] {
+                let frame = try XCTUnwrap(geometry.frame(near: center))
+                XCTAssertTrue(geometry.region.contains(frame))
+            }
+            for right in [false, true] {
+                let center = geometry.preferredCenter(right: right, fraction: 0.68)
+                XCTAssertEqual(geometry.verticalFraction(for: center), 0.68, accuracy: 0.001)
+            }
+        }
+    }
+
+    func testFloatingControlClearsNativeTabBarAndPinnedComposer() throws {
+        let tabBar = CGRect(x: 0, y: 744, width: 390, height: 100)
+        let composer = CGRect(x: 0, y: 642, width: 390, height: 102)
+        let geometry = FloatingWorkoutGeometry(viewport: CGRect(x: 0, y: 0, width: 390, height: 844),
+            safeArea: UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0), size: CGSize(width: 238, height: 60), obstructions: [tabBar, composer])
+        let frame = try XCTUnwrap(geometry.frame(near: CGPoint(x: 260, y: 800)))
+        XCTAssertLessThanOrEqual(frame.maxY, composer.minY - 12)
+        XCTAssertFalse(frame.intersects(tabBar))
+        XCTAssertFalse(frame.intersects(composer))
+    }
+
+    func testFloatingControlClearsKeyboardAndComposerTogether() throws {
+        let keyboard = CGRect(x: 0, y: 460, width: 390, height: 384)
+        let composer = CGRect(x: 0, y: 354, width: 390, height: 106)
+        let geometry = FloatingWorkoutGeometry(viewport: CGRect(x: 0, y: 0, width: 390, height: 844),
+            safeArea: UIEdgeInsets(top: 59, left: 0, bottom: 34, right: 0), size: CGSize(width: 238, height: 60), obstructions: [keyboard, composer])
+        let frame = try XCTUnwrap(geometry.frame(near: CGPoint(x: 260, y: 600)))
+        XCTAssertLessThanOrEqual(frame.maxY, composer.minY - 12)
+        XCTAssertTrue(geometry.region.contains(frame))
+    }
+
+    func testFloatingControlCanMoveBesideFloatingKeyboard() throws {
+        let keyboard = CGRect(x: 480, y: 600, width: 300, height: 300)
+        let geometry = FloatingWorkoutGeometry(viewport: CGRect(x: 0, y: 0, width: 1024, height: 1366),
+            safeArea: UIEdgeInsets(top: 24, left: 0, bottom: 20, right: 0), size: CGSize(width: 238, height: 60), obstructions: [keyboard])
+        let frame = try XCTUnwrap(geometry.frame(near: CGPoint(x: 600, y: 730)))
+        XCTAssertFalse(frame.intersects(keyboard.insetBy(dx: -12, dy: -12)))
+        XCTAssertTrue(geometry.region.contains(frame))
+    }
+
+    func testFloatingControlHidesWhenAccessibilitySizeAndKeyboardLeaveNoSpace() {
+        var geometry = FloatingWorkoutGeometry(viewport: CGRect(x: 0, y: 0, width: 320, height: 568),
+            safeArea: UIEdgeInsets(top: 20, left: 0, bottom: 0, right: 0), size: CGSize(width: 238, height: 180),
+            obstructions: [CGRect(x: 0, y: 190, width: 320, height: 378)])
+        XCTAssertNil(geometry.frame(near: .zero))
+        geometry.obstructions = []
+        XCTAssertNotNil(geometry.frame(near: .zero))
+    }
+
+    func testFloatingControlRecoversFromInvalidCoordinatesAndRejectsInvalidSize() throws {
+        var geometry = FloatingWorkoutGeometry(viewport: CGRect(x: 0, y: 0, width: 390, height: 844),
+            safeArea: .zero, size: CGSize(width: 238, height: 60))
+        let frame = try XCTUnwrap(geometry.frame(near: CGPoint(x: CGFloat.nan, y: CGFloat.infinity)))
+        XCTAssertTrue(geometry.region.contains(frame))
+        geometry.size.height = .infinity
+        XCTAssertNil(geometry.frame(near: .zero))
+        geometry.size = CGSize(width: 400, height: 60)
+        XCTAssertNil(geometry.frame(near: .zero))
+    }
+
+    @MainActor func testWorkoutEditorVisibilityRefreshesControlWithoutSavingSessionData() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        var visibilityUpdates = 0, sessionWrites = 0
+        store.onEditorVisibilityChange = { visibilityUpdates += 1 }
+        store.onChange = { sessionWrites += 1 }
+        store.editorAppeared(); store.editorAppeared()
+        XCTAssertEqual(store.visibleEditorCount, 2)
+        store.editorDisappeared()
+        XCTAssertEqual(store.visibleEditorCount, 1)
+        store.editorDisappeared(); store.editorDisappeared()
+        XCTAssertEqual(store.visibleEditorCount, 0)
+        XCTAssertEqual(visibilityUpdates, 5)
+        XCTAssertEqual(sessionWrites, 0)
+        XCTAssertTrue(store.sessions.isEmpty)
+    }
+
     @MainActor func testAdaptiveTextAndSurfacesHaveReadableContrastInBothAppearances() {
         func luminance(_ color: Color, style: UIUserInterfaceStyle) -> Double {
             let resolved = UIColor(color).resolvedColor(with: UITraitCollection(userInterfaceStyle: style))

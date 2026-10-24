@@ -78,6 +78,7 @@ struct ExerciseFilterSheet: View {
                 }
                 .buttonStyle(RoutineEditorPressStyle()).accessibilityIdentifier("applyExerciseFilters")
                 .frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity).background(.bar)
+                .workoutControlClearance("exercise.filter.actions")
             }
             .sheet(isPresented: $showMap) {
                 NavigationStack {

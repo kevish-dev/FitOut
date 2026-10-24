@@ -43,7 +43,7 @@ struct RoutineCreationSheet: View {
                     .frame(maxWidth: .infinity)
                 }
                 .scrollBounceBehavior(.basedOnSize)
-                .safeAreaInset(edge: .bottom, spacing: 0) { footer }
+                .safeAreaInset(edge: .bottom, spacing: 0) { footer.workoutControlClearance("routine.creation.actions") }
                 .background(FitTheme.dashboardBackground)
             }
         }

@@ -68,6 +68,7 @@ struct NutritionView: View {
             if store.deletedEntry != nil {
                 HStack { Text("Food entry removed"); Spacer(); Button("Undo") { store.undoDelete() }; Button("Dismiss", systemImage: "xmark") { store.deletedEntry = nil }.labelStyle(.iconOnly) }
                     .font(FitTheme.button(13)).padding(16).dashboardGlass(in: RoundedRectangle(cornerRadius: 16)).padding(.horizontal, FitTheme.pageInset)
+                    .workoutControlClearance("nutrition.undo.actions")
             }
         }
         .sheet(item: $sheet) { route in sheetContent(route) }

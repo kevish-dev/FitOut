@@ -115,12 +115,11 @@ private struct DashboardGlass<S: Shape>: ViewModifier {
                 .background(FitTheme.elevated, in: shape)
                 .overlay { shape.stroke(FitTheme.textPrimary.opacity(highlighted ? 0.28 : 0.18), lineWidth: 1) }
         } else if #available(iOS 26.0, *) {
+            // Native glass owns its edge; an overlay stroke would stay rigid during interaction.
             content.glassEffect(
-                .regular.tint(FitTheme.surface.opacity(highlighted ? 0.5 : 0.4))
-                    .interactive(interactive),
+                .regular.interactive(interactive),
                 in: shape
             )
-            .overlay { shape.stroke(FitTheme.textPrimary.opacity(highlighted ? 0.22 : 0.08), lineWidth: 1) }
         } else {
             content
                 .background(.ultraThinMaterial, in: shape)

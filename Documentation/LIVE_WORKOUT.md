@@ -7,9 +7,22 @@ allowlist; old optional history payloads remain decodable and exportable.
 
 A single draggable glass control keeps an active workout reachable over app
 navigation and sheets. It displays running/paused status, active workout time,
-pause/resume and tap-to-open. It respects the saved appearance, moves above the
-keyboard and hides while a workout editor is visible. Ending the workout removes
-it; Undo can restore the active workout.
+pause/resume and tap-to-open. It lives in a small UIKit view in the app's existing
+window, so its native glass samples the page behind it without a second transparent
+window. Only the capsule's visible bounds intercept touches.
+
+A UIKit pan gesture translates from a fixed start in window coordinates. Content,
+glass and hit area move together, then dock to the nearest edge. The layout clamps
+to safe bounds and avoids the native tab bar, keyboard, Coach composer and pinned
+routine/exercise actions, with 12 pt clearance. When accessibility sizing and the
+keyboard leave no valid position, the control temporarily hides rather than covers
+an input. VoiceOver actions move it up, down or to the other edge. Reduce Motion
+disables the docking animation; Reduce Transparency uses the shared solid fallback.
+
+Opening presents the existing focused workout screen in a native sheet. Minimize
+and interactive dismissal restore the control; editor visibility is reported
+without writing session data. It inherits the saved appearance and hides while any
+workout editor is visible. Ending the workout removes it; Undo can restore it.
 
 ActivityKit compact/minimal layouts show status and elapsed workout time.
 Expanded and Lock Screen layouts add exercise, current set/total sets, inputs,

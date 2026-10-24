@@ -50,7 +50,7 @@ struct CoachView: View {
         }
         .background(FitTheme.dashboardBackground.ignoresSafeArea())
         .foregroundStyle(FitTheme.textPrimary)
-        .safeAreaInset(edge: .bottom, spacing: 0) { composer }
+        .safeAreaInset(edge: .bottom, spacing: 0) { composer.workoutControlClearance("coach.composer") }
         .navigationTitle("AI Coach")
         .toolbar(.hidden, for: .navigationBar)
         .onAppear { store.refreshAvailability() }

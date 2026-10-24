@@ -8,8 +8,9 @@ import Observation
     var error: String?
     var onChange: (() -> Void)?
     private(set) var visibleEditorCount = 0
-    func editorAppeared() { visibleEditorCount += 1 }
-    func editorDisappeared() { visibleEditorCount = max(0, visibleEditorCount - 1) }
+    var onEditorVisibilityChange: (() -> Void)?
+    func editorAppeared() { visibleEditorCount += 1; onEditorVisibilityChange?() }
+    func editorDisappeared() { visibleEditorCount = max(0, visibleEditorCount - 1); onEditorVisibilityChange?() }
     init(container: ModelContainer) throws {
         context = ModelContext(container); context.autosaveEnabled = false; try reload()
         if var active, active.telemetry == nil || active.inputMemoryVersion == nil {

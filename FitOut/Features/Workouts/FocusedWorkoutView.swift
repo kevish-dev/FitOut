@@ -4,6 +4,7 @@ struct ActiveWorkoutView: View {
     let store: WorkoutStore
     let gym: GymStore
     let defaults: UserDefaults
+    let onMinimize: (() -> Void)?
     @State private var model: FocusedWorkoutModel
     @State private var choosingExercises = false
     @State private var showTechnique = false
@@ -17,8 +18,9 @@ struct ActiveWorkoutView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    init(store: WorkoutStore, gym: GymStore, unit: WeightUnit, defaults: UserDefaults) {
+    init(store: WorkoutStore, gym: GymStore, unit: WeightUnit, defaults: UserDefaults, onMinimize: (() -> Void)? = nil) {
         self.store = store; self.gym = gym; self.defaults = defaults
+        self.onMinimize = onMinimize
         _model = State(initialValue: FocusedWorkoutModel(store: store, unit: unit))
     }
     var body: some View {
@@ -64,7 +66,7 @@ struct ActiveWorkoutView: View {
                 }.safeAreaInset(edge: .bottom, spacing: 0) { footer(session) }
             } else {
                 ContentUnavailableView("No active workout", systemImage: "dumbbell", description: Text("Close this screen to start or resume a workout."))
-                    .safeAreaInset(edge: .bottom) { Button("Close") { dismiss() }.frame(minHeight: 54) }
+                    .safeAreaInset(edge: .bottom) { Button("Close", action: minimize).frame(minHeight: 54) }
             }
         }
         .foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent).background(FitTheme.dashboardBackground)
@@ -90,7 +92,7 @@ struct ActiveWorkoutView: View {
             Button("Finish workout") { act(.finish) }
         } message: { Text("Recorded sets are saved. Unfinished sets stay unlogged.") }
         .confirmationDialog("Discard this workout?", isPresented: $discarding, titleVisibility: .visible) {
-            Button("Discard workout", role: .destructive) { if let id = model.sessionID, store.delete(id) { dismiss() } }
+            Button("Discard workout", role: .destructive) { if let id = model.sessionID, store.delete(id) { minimize() } }
         } message: { Text("This deletes this session, its sets and notes. Your saved routine stays available.") }
         .alert("Workout could not be updated", isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
             Button("OK", role: .cancel) { store.error = nil }
@@ -98,7 +100,7 @@ struct ActiveWorkoutView: View {
     }
     private func header(_ session: WorkoutSession) -> some View {
         HStack(alignment: .center, spacing: 12) {
-            Button { keyboardDown(); dismiss() } label: {
+            Button(action: minimize) {
                 Image(systemName: "chevron.down").frame(width: 44, height: 44).dashboardGlass(in: Circle(), interactive: true)
             }.buttonStyle(.plain).accessibilityLabel("Minimize workout").accessibilityIdentifier("minimizeWorkout")
             VStack(alignment: .leading, spacing: 4) {
@@ -253,7 +255,7 @@ struct ActiveWorkoutView: View {
     }
     private func primaryAction() {
         keyboardDown()
-        if model.phase == .workoutCompleted { dismiss(); return }
+        if model.phase == .workoutCompleted { minimize(); return }
         if model.phase == .paused { model.togglePause(); return }
         if model.current == nil { if model.session?.entries.isEmpty == true { choosingExercises = true } else { finishing = true }; return }
         switch model.phase {
@@ -270,6 +272,7 @@ struct ActiveWorkoutView: View {
         if previous != model.session, !defaults.bool(forKey: "haptics.disabled") { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
     }
     private func keyboardDown() { UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) }
+    private func minimize() { keyboardDown(); if let onMinimize { onMinimize() } else { dismiss() } }
     private func openNote(_ entryID: UUID, _ setID: UUID) {
         noteEntryID = entryID; noteSetID = setID; noteText = model.current?.set.note ?? ""; showNote = true
     }

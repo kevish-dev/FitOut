@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F20000000000000000000003 /* WorkoutControlLayoutReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000004; };
+		F20000000000000000000001 /* FloatingWorkoutGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000002; };
 		F19000000000000000000007 /* FocusedWorkoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19000000000000000000008; };
 		F19000000000000000000005 /* FocusedWorkoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19000000000000000000006; };
 		F19000000000000000000003 /* FocusedWorkoutModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F19000000000000000000004; };
@@ -155,6 +157,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F20000000000000000000004 /* WorkoutControlLayoutReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutControlLayoutReader.swift; sourceTree = "<group>"; };
+		F20000000000000000000002 /* FloatingWorkoutGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingWorkoutGeometry.swift; sourceTree = "<group>"; };
 		F19000000000000000000008 /* FocusedWorkoutTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedWorkoutTests.swift; sourceTree = "<group>"; };
 		F19000000000000000000006 /* FocusedWorkoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedWorkoutView.swift; sourceTree = "<group>"; };
 		F19000000000000000000004 /* FocusedWorkoutModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedWorkoutModel.swift; sourceTree = "<group>"; };
@@ -542,6 +546,8 @@
 		D7CB24A5F6FD15559F06C45B /* Workouts */ = {
 			isa = PBXGroup;
 			children = (
+				F20000000000000000000004 /* WorkoutControlLayoutReader.swift */,
+				F20000000000000000000002 /* FloatingWorkoutGeometry.swift */,
 				F19000000000000000000006 /* FocusedWorkoutView.swift */,
 				F19000000000000000000004 /* FocusedWorkoutModel.swift */,
 				F19000000000000000000002 /* WorkoutExecution.swift */,
@@ -758,6 +764,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F20000000000000000000003 /* WorkoutControlLayoutReader.swift in Sources */,
+				F20000000000000000000001 /* FloatingWorkoutGeometry.swift in Sources */,
 				F19000000000000000000005 /* FocusedWorkoutView.swift in Sources */,
 				F19000000000000000000003 /* FocusedWorkoutModel.swift in Sources */,
 				F19000000000000000000001 /* WorkoutExecution.swift in Sources */,

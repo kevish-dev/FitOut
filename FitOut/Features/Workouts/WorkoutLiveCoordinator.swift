@@ -63,11 +63,12 @@ import SwiftUI
     }
     func flush() async { await syncTask?.value }
     func appearanceChanged(_ scheme: ColorScheme?) { floating.setAppearance(scheme) }
+    func overlayChanged() { if enabled { floating.refresh() } }
+    func protectWorkoutControl(_ id: String, frame: CGRect?) { if enabled { floating.protect(id, frame: frame) } }
     @discardableResult func openCurrentWorkout() -> Bool {
         guard enabled, store.active != nil else { return false }
         floating.sceneChanged(active: true)
-        floating.open()
-        return true
+        return floating.open()
     }
     func showLiveActivity() {
         if let id = store.active?.id { defaults.removeObject(forKey: "workout.live.dismissed." + id.uuidString) }

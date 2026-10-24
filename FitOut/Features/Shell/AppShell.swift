@@ -5,7 +5,7 @@ struct AppShell: View {
     let container: AppContainer
     @Binding var widgetDestination: WidgetDestination?
     @State private var tab = 0
-    @State private var navigationRevision = UUID()
+    @State private var navigationRevisions: [Int: UUID] = [:]
     @State private var menuOpen = false
     @State private var widgetSheet: WidgetDestination?
     @State private var widgetError: String?
@@ -14,19 +14,7 @@ struct AppShell: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
-        NavigationStack {
-            Group {
-                switch tab {
-                case 1: GymView(store: container.gym, workouts: container.workouts, unit: container.profile.draft.weightUnit, defaults: container.defaults)
-                case 2: NutritionView(container: container)
-                case 3: HealthConnectionView(service: container.health)
-                case 4: CoachView(store: container.coach, profile: container.profile.draft)
-                case 5: FoundationSettings(container: container)
-                default: HomeView(container: container, tab: $tab)
-                }
-            }
-        }
-        .id("\(tab)-\(navigationRevision)")
+        nativeTabs
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .foregroundStyle(FitTheme.textPrimary)
         .background(FitTheme.dashboardBackground.ignoresSafeArea())
@@ -57,13 +45,11 @@ struct AppShell: View {
                         .transition(.opacity)
                     }
                 }
+                .modifier(NavigationGlassGroup())
                 // Center the 52 pt menu control on the native 44 pt navigation row.
                 .padding(.top, -4)
                 .padding(.trailing, FitTheme.pageInset)
             }
-        }
-        .safeAreaInset(edge: .bottom, spacing: 0) {
-            if container.presentation.navigationStyle == .bottomBar && !keyboardVisible { BottomAppNavigation(selection: tab, select: select) }
         }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillShowNotification)) { _ in keyboardVisible = true }
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardVisible = false }
@@ -107,6 +93,35 @@ struct AppShell: View {
         } message: { Text(widgetError ?? "") }
     }
 
+    @ViewBuilder private var nativeTabs: some View {
+        if #available(iOS 26.0, *) {
+            tabContent.tabBarMinimizeBehavior(.never)
+        } else { tabContent }
+    }
+    private var tabContent: some View {
+        TabView(selection: Binding(get: { tab }, set: select)) {
+            ForEach(AppSection.allCases) { section in
+                NavigationStack { sectionContent(section) }
+                    .id("\(section.rawValue)-\(navigationRevisions[section.rawValue]?.uuidString ?? "root")")
+                    .tabItem { Label(section.title, systemImage: section.symbol) }
+                    .tag(section.rawValue)
+                    .toolbar(container.presentation.navigationStyle == .bottomBar && !keyboardVisible ? .visible : .hidden, for: .tabBar)
+            }
+        }
+        .tabViewStyle(.tabBarOnly)
+        .tint(FitTheme.dashboardAccent)
+        .background(WorkoutControlLayoutReader())
+    }
+    @ViewBuilder private func sectionContent(_ section: AppSection) -> some View {
+        switch section {
+        case .home: HomeView(container: container, tab: $tab)
+        case .gym: GymView(store: container.gym, workouts: container.workouts, unit: container.profile.draft.weightUnit, defaults: container.defaults)
+        case .nutrition: NutritionView(container: container)
+        case .health: HealthConnectionView(service: container.health)
+        case .coach: CoachView(store: container.coach, profile: container.profile.draft)
+        }
+    }
+
     private func openPendingWidget() {
         guard let destination = widgetDestination else { return }
         widgetDestination = nil
@@ -140,7 +155,7 @@ struct AppShell: View {
 
     private func select(_ destination: Int) {
         menuOpen = false
-        if tab == destination { navigationRevision = UUID() }
+        if tab == destination { navigationRevisions[destination] = UUID() }
         else { tab = destination }
     }
 
@@ -183,5 +198,14 @@ struct FoundationSettings: View {
                 LabeledContent("Apple Intelligence", value: container.capabilities.currentCapabilities().foundationModels.explanation)
             }
         }.navigationTitle("Settings")
+    }
+}
+
+/// Adjacent controls share one native material sampling context.
+private struct NavigationGlassGroup: ViewModifier {
+    @ViewBuilder func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            GlassEffectContainer(spacing: 10) { content }
+        } else { content }
     }
 }

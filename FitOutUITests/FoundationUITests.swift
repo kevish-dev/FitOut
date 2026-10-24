@@ -10,21 +10,40 @@ final class FoundationUITests: XCTestCase {
         reveal(settings, in: app); settings.tap()
         app.buttons["editProfileNavigation"].tap()
         app.buttons["navigationStyle-bottomBar"].tap()
-        XCTAssertTrue(app.descendants(matching: .any)["bottomNavigationBar"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 3))
         XCTAssertFalse(app.buttons["navigationMenuButton"].exists)
-        app.buttons["navigate-0"].tap()
+        app.tabBars.buttons["Home"].tap()
         XCTAssertTrue(app.staticTexts["Welcome!"].waitForExistence(timeout: 3))
         app.terminate(); app.launch()
-        XCTAssertTrue(app.descendants(matching: .any)["bottomNavigationBar"].waitForExistence(timeout: 10))
-        for (destination, title) in [(1, "gymTitle"), (4, "coachTitle"), (0, "Welcome!")] {
-            app.buttons["navigate-\(destination)"].tap()
+        XCTAssertTrue(app.tabBars.firstMatch.waitForExistence(timeout: 10))
+        for (destination, title) in [("Gym", "gymTitle"), ("AI Coach", "coachTitle"), ("Home", "Welcome!")] {
+            app.tabBars.buttons[destination].tap()
             XCTAssertTrue(app.staticTexts[title].waitForExistence(timeout: 3))
         }
         reveal(settings, in: app); settings.tap()
         app.buttons["editProfileNavigation"].tap()
         app.buttons["navigationStyle-topRight"].tap()
         XCTAssertTrue(app.buttons["navigationMenuButton"].waitForExistence(timeout: 3))
-        XCTAssertFalse(app.descendants(matching: .any)["bottomNavigationBar"].exists)
+        XCTAssertFalse(app.tabBars.firstMatch.exists)
+    }
+
+    @MainActor func testNativeNavigationLeavesCoachComposerAboveTabBar() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-test-session", UUID().uuidString]
+        app.launch()
+        let settings = app.buttons["Open Settings"]
+        XCTAssertTrue(settings.waitForExistence(timeout: 10))
+        reveal(settings, in: app); settings.tap()
+        app.buttons["editProfileNavigation"].tap()
+        app.buttons["navigationStyle-bottomBar"].tap()
+        let tabs = app.tabBars.firstMatch
+        XCTAssertTrue(tabs.waitForExistence(timeout: 3))
+        tabs.buttons["AI Coach"].tap()
+        let input = app.textFields["coachMessageInput"]
+        let send = app.buttons["coachSendOrStop"]
+        XCTAssertTrue(send.waitForExistence(timeout: 3))
+        XCTAssertLessThanOrEqual(send.frame.maxY, tabs.frame.minY)
+        if input.exists { XCTAssertLessThanOrEqual(input.frame.maxY, tabs.frame.minY) }
     }
 
     @MainActor private func navigate(_ destination: Int, in app: XCUIApplication) {

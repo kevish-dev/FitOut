@@ -70,7 +70,7 @@ struct RoutineEditor: View {
             .scrollBounceBehavior(.basedOnSize)
             .scrollDismissesKeyboard(.interactively)
             .background(FitTheme.dashboardBackground)
-            .safeAreaInset(edge: .bottom, spacing: 0) { footer }
+            .safeAreaInset(edge: .bottom, spacing: 0) { footer.workoutControlClearance("routine.editor.actions") }
             .navigationTitle(isNewRoutine ? "Create routine" : "Edit routine")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {

@@ -59,49 +59,6 @@ extension EnvironmentValues {
     }
 }
 
-struct BottomAppNavigation: View {
-    let selection: Int
-    let select: (Int) -> Void
-    @Environment(\.dynamicTypeSize) private var typeSize
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    var body: some View {
-        HStack(spacing: 10) {
-            HStack(spacing: 0) {
-                ForEach(AppSection.allCases.filter { $0 != .coach }) { destination in item(destination) }
-            }
-            .padding(5)
-            .dashboardGlass(in: Capsule(), interactive: true)
-            item(.coach).frame(width: 64, height: 64)
-                .dashboardGlass(in: Circle(), highlighted: selection == AppSection.coach.rawValue, interactive: true)
-        }
-        .frame(maxWidth: 560).padding(.horizontal, FitTheme.pageInset).padding(.vertical, 8)
-        .frame(maxWidth: .infinity)
-        .accessibilityElement(children: .contain).accessibilityLabel("Main navigation")
-        .accessibilityIdentifier("bottomNavigationBar")
-    }
-    private func item(_ destination: AppSection) -> some View {
-        let selected = selection == destination.rawValue
-        return Button {
-            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.16)) { select(destination.rawValue) }
-        } label: {
-            VStack(spacing: 5) {
-                Image(systemName: destination.symbol).font(.system(size: 19, weight: selected ? .semibold : .regular))
-                    .foregroundStyle(selected ? FitTheme.dashboardAccent : FitTheme.textPrimary)
-                if !typeSize.isAccessibilitySize {
-                    Text(destination.title).font(FitTheme.medium(10)).lineLimit(1).minimumScaleFactor(0.8)
-                        .foregroundStyle(selected ? FitTheme.textPrimary : FitTheme.textSecondary)
-                }
-            }
-            .frame(maxWidth: .infinity, minHeight: 54)
-            .background(selected && destination != .coach ? FitTheme.textPrimary.opacity(0.07) : .clear, in: Capsule())
-            .contentShape(Capsule())
-        }.buttonStyle(.plain)
-            .accessibilityLabel(destination.title).accessibilityAddTraits(selected ? .isSelected : [])
-            .accessibilityIdentifier("navigate-\(destination.rawValue)")
-    }
-}
-
 struct ProfilePresentationSection: View {
     let preferences: AppPresentationPreferences
     var body: some View {
@@ -137,7 +94,7 @@ struct ProfilePresentationSection: View {
         ZStack(alignment: style == .bottomBar ? .bottom : .topTrailing) {
             RoundedRectangle(cornerRadius: 12).fill(FitTheme.dashboardBackground)
             if style == .bottomBar {
-                HStack(spacing: 4) { ForEach(0..<4) { _ in Circle().fill(FitTheme.textSecondary.opacity(0.5)).frame(width: 5, height: 5) } }
+                HStack(spacing: 4) { ForEach(0..<5) { _ in Circle().fill(FitTheme.textSecondary.opacity(0.5)).frame(width: 5, height: 5) } }
                     .frame(width: 40, height: 14).background(FitTheme.elevated, in: Capsule()).padding(6)
             } else {
                 VStack(spacing: 3) {

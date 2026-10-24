@@ -66,6 +66,7 @@ import Observation
         workoutPresentation = WorkoutPresentationCoordinator(store: workouts, gym: gym, profile: profile, defaults: defaults,
             enabled: production && !database.configurations.allSatisfy(\.isStoredInMemoryOnly))
         workouts.onChange = { [weak widgets, weak workoutPresentation] in widgets?.publish(); workoutPresentation?.changed() }
+        workouts.onEditorVisibilityChange = { [weak workoutPresentation] in workoutPresentation?.overlayChanged() }
         presentation.onChange = { [weak presentation, weak workoutPresentation] in workoutPresentation?.appearanceChanged(presentation?.appearance.colorScheme) }
         workoutPresentation.appearanceChanged(presentation.appearance.colorScheme)
     }

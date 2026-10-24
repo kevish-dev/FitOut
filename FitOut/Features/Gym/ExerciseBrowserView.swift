@@ -44,7 +44,7 @@ struct ExerciseBrowser: View {
         .scrollDismissesKeyboard(.interactively).scrollBounceBehavior(.basedOnSize)
         .background(FitTheme.dashboardBackground)
         .safeAreaInset(edge: .top, spacing: 0) { controls }
-        .safeAreaInset(edge: .bottom, spacing: 0) { if mode == .multiple { selectionFooter } }
+        .safeAreaInset(edge: .bottom, spacing: 0) { if mode == .multiple { selectionFooter.workoutControlClearance("exercise.selection.actions") } }
         .navigationTitle(title).navigationBarTitleDisplayMode(.inline)
         .tint(FitTheme.dashboardAccent).foregroundStyle(FitTheme.textPrimary)
         .toolbar {
