@@ -7,6 +7,7 @@ struct ExerciseBrowser: View {
     let title: String
     var mode: ExerciseBrowserMode = .browse
     var selectionHint: String? = nil
+    var previousPerformance: ((ExerciseDefinition) -> String?)? = nil
     var onSelect: (([ExerciseDefinition]) -> Void)? = nil
     @State private var query = ExerciseLibraryQuery()
     @State private var selection = ExercisePickerSelection()
@@ -190,7 +191,12 @@ struct ExerciseBrowser: View {
 
     private func cardLabel(_ exercise: ExerciseDefinition, index: Int?) -> some View {
         HStack(spacing: 8) {
-            ExerciseLibraryRow(exercise: exercise, artworkSize: typeSize.isAccessibilitySize ? 40 : 64)
+            VStack(alignment: .leading, spacing: 4) {
+                ExerciseLibraryRow(exercise: exercise, artworkSize: typeSize.isAccessibilitySize ? 40 : 64)
+                if let previous = previousPerformance?(exercise) {
+                    Text("Last recorded · " + previous).font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
+                }
+            }
             if mode == .multiple {
                 ZStack {
                     Circle().fill(index == nil ? .clear : FitTheme.dashboardAccent)

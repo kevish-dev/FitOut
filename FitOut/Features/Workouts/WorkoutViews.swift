@@ -13,7 +13,7 @@ struct WorkoutsPanel: View {
                 Button("Resume \(active.title)") { showing = true }.accessibilityIdentifier("resumeWorkout")
                 Text("\(active.completedSets.count) sets saved · \(active.status == .paused ? "Paused" : "In progress")").font(FitTheme.body(12))
             } else {
-                Button("Start quick workout") { if store.start(catalogue: gym.exercises) { showing = true } }.accessibilityIdentifier("startQuickWorkout")
+                Button("Configure quick workout") { showing = true }.accessibilityIdentifier("startQuickWorkout")
                 if let routine = gym.activeRoutine, let day = RoutineSchedule.day(in: routine, at: .now), day.kind == .workout {
                     Button("Start \(day.title)") { if store.start(day: day, routineID: routine.id, catalogue: gym.exercises) { showing = true } }
                 }

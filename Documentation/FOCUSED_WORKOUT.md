@@ -2,7 +2,9 @@
 
 Quick workouts and saved routines open the same native SwiftUI screen. Ordered
 exercise definitions and planned sets are copied into a session; routine edits
-cannot rewrite it. Quick workouts add selected exercises to that same snapshot.
+cannot rewrite it. Quick workouts first use the [configuration flow](QUICK_WORKOUT_SETUP.md): users
+select and configure every exercise before Start creates a session. Later additions
+use the same configure-first editor and extend that snapshot without starting a set.
 
 ## Interface
 
@@ -91,8 +93,8 @@ all-skipped completion, Undo before/after finish, later timer cancellation,
 on-disk restoration, invalid/empty data, routine snapshot isolation, Live Activity
 projection and obsolete-task cancellation. Unit tests run in an iOS simulator.
 Unsigned generic-iOS build-for-testing compiles app, extension and test targets.
-The latest simulator run passed all 167 unit tests with zero failures, including
-20 focused-workout tests. Stage regressions cover target-time vs rep-based arcs,
+The arc-screen baseline passed all 167 unit tests with zero failures, including
+20 focused-workout tests. Quick-workout setup adds a dedicated regression suite. Stage regressions cover target-time vs rep-based arcs,
 rest extensions, frozen paused clocks, skipped-set labels and next-action previews
 through the final summary, alongside existing analytics and persistence suites.
 UI-test source is updated for the focused recovery flow, but interactive UI tests

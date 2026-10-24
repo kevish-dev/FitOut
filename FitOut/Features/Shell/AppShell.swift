@@ -79,7 +79,7 @@ struct AppShell: View {
                     Group {
                         switch destination {
                         case .water: HydrationView(store: container.hydration, health: container.health, reminders: container.hydrationReminders)
-                        case .workout: ActiveWorkoutView(store: container.workouts, gym: container.gym, unit: container.profile.draft.weightUnit, defaults: container.defaults)
+                        case .workout: QuickWorkoutFlow(store: container.workouts, gym: container.gym, unit: container.profile.draft.weightUnit, defaults: container.defaults)
                         case .analytics: AnalyticsView(store: container.workouts, gym: container.gym, unit: container.profile.draft.weightUnit)
                         case .history: WorkoutHistory(store: container.workouts, unit: container.profile.draft.weightUnit)
                         default: EmptyView()

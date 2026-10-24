@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F22000000000000000000005 /* QuickWorkoutConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22000000000000000000006; };
+		F22000000000000000000003 /* QuickWorkoutSetupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22000000000000000000004; };
+		F22000000000000000000001 /* QuickWorkoutConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F22000000000000000000002; };
 		F21000000000000000000001 /* FocusedWorkoutStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F21000000000000000000002; };
 		F20000000000000000000003 /* WorkoutControlLayoutReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000004; };
 		F20000000000000000000001 /* FloatingWorkoutGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = F20000000000000000000002; };
@@ -158,6 +161,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F22000000000000000000006 /* QuickWorkoutConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickWorkoutConfigurationTests.swift; sourceTree = "<group>"; };
+		F22000000000000000000004 /* QuickWorkoutSetupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickWorkoutSetupView.swift; sourceTree = "<group>"; };
+		F22000000000000000000002 /* QuickWorkoutConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickWorkoutConfiguration.swift; sourceTree = "<group>"; };
 		F21000000000000000000002 /* FocusedWorkoutStage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FocusedWorkoutStage.swift; sourceTree = "<group>"; };
 		F20000000000000000000004 /* WorkoutControlLayoutReader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutControlLayoutReader.swift; sourceTree = "<group>"; };
 		F20000000000000000000002 /* FloatingWorkoutGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingWorkoutGeometry.swift; sourceTree = "<group>"; };
@@ -307,6 +313,7 @@
 		3EC67EAD137BE1CFEDEA8F7E /* FitOutTests */ = {
 			isa = PBXGroup;
 			children = (
+				F22000000000000000000006 /* QuickWorkoutConfigurationTests.swift */,
 				F19000000000000000000008 /* FocusedWorkoutTests.swift */,
 				F18000000000000000000004 /* AppPresentationTests.swift */,
 				F04000000000000000000007 /* CoachTests.swift */,
@@ -548,6 +555,8 @@
 		D7CB24A5F6FD15559F06C45B /* Workouts */ = {
 			isa = PBXGroup;
 			children = (
+				F22000000000000000000004 /* QuickWorkoutSetupView.swift */,
+				F22000000000000000000002 /* QuickWorkoutConfiguration.swift */,
 				F21000000000000000000002 /* FocusedWorkoutStage.swift */,
 				F20000000000000000000004 /* WorkoutControlLayoutReader.swift */,
 				F20000000000000000000002 /* FloatingWorkoutGeometry.swift */,
@@ -736,6 +745,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F22000000000000000000005 /* QuickWorkoutConfigurationTests.swift in Sources */,
 				F19000000000000000000007 /* FocusedWorkoutTests.swift in Sources */,
 				F18000000000000000000003 /* AppPresentationTests.swift in Sources */,
 				1975EAD2999B084B2337BEE6 /* AnalyticsTests.swift in Sources */,
@@ -767,6 +777,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F22000000000000000000003 /* QuickWorkoutSetupView.swift in Sources */,
+				F22000000000000000000001 /* QuickWorkoutConfiguration.swift in Sources */,
 				F21000000000000000000001 /* FocusedWorkoutStage.swift in Sources */,
 				F20000000000000000000003 /* WorkoutControlLayoutReader.swift in Sources */,
 				F20000000000000000000001 /* FloatingWorkoutGeometry.swift in Sources */,

@@ -47,7 +47,7 @@ struct GymView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar(.hidden, for: .navigationBar)
         .sheet(isPresented: $showingWorkout, onDismiss: { now = .now }) {
-            NavigationStack { ActiveWorkoutView(store: workouts, gym: store, unit: unit, defaults: defaults) }
+            NavigationStack { QuickWorkoutFlow(store: workouts, gym: store, unit: unit, defaults: defaults) }
         }
         .sheet(item: $editing, onDismiss: { now = .now }) { request in
             RoutineEditor(store: store, routine: request.routine, initialWeekday: request.weekday, unit: unit)
@@ -298,7 +298,7 @@ struct GymView: View {
     }
 
     private func startWorkout(day: RoutineDay? = nil) {
-        if workouts.active != nil { showingWorkout = true }
+        if workouts.active != nil || day == nil { showingWorkout = true }
         else if workouts.start(day: day, routineID: day == nil ? nil : store.activeRoutine?.id, catalogue: store.exercises) {
             showingWorkout = true
         }

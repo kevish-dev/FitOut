@@ -178,7 +178,7 @@ struct HomeView: View {
         }
         .sheet(isPresented: $showWorkout) {
             NavigationStack {
-                ActiveWorkoutView(store: container.workouts, gym: container.gym, unit: container.profile.draft.weightUnit, defaults: container.defaults)
+                QuickWorkoutFlow(store: container.workouts, gym: container.gym, unit: container.profile.draft.weightUnit, defaults: container.defaults)
             }
         }
         .sheet(isPresented: $showWater) {
@@ -680,13 +680,7 @@ struct HomeView: View {
     }
 
     // MARK: - Actions
-    private func startQuickWorkout() {
-        if container.workouts.active != nil {
-            showWorkout = true
-        } else if container.workouts.start(catalogue: container.gym.exercises) {
-            showWorkout = true
-        }
-    }
+    private func startQuickWorkout() { showWorkout = true }
 
     private func openTodayWorkout() {
         if case .noRoutine = workout {

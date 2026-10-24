@@ -7,6 +7,8 @@ struct ActiveWorkoutView: View {
     let onMinimize: (() -> Void)?
     @State private var model: FocusedWorkoutModel
     @State private var choosingExercises = false
+    @State private var configuringEntry: WorkoutEntry?
+    @State private var editingPlan = false
     @State private var showTechnique = false
     @State private var showTiming = false
     @State private var showNote = false
@@ -41,6 +43,11 @@ struct ActiveWorkoutView: View {
                                             keyboardDown(); model.togglePause()
                                         }
                                         FocusedWorkoutMetrics(session: session, unit: model.unit, now: { model.now })
+                                        Button { configuringEntry = current.entry } label: {
+                                            Label("Manage \(current.entry.sets.count) sets", systemImage: "slider.horizontal.3")
+                                                .font(FitTheme.button(14)).frame(maxWidth: .infinity, minHeight: 48)
+                                        }.buttonStyle(.plain).dashboardGlass(in: Capsule(), interactive: true)
+                                            .accessibilityIdentifier("manageWorkoutSets")
                                         if [.ready, .activeSet, .exerciseTransition, .paused].contains(model.phase), current.set.status == .pending {
                                             inputs(current.entry, set: current.set)
                                             HStack {
@@ -81,10 +88,23 @@ struct ActiveWorkoutView: View {
         .onChange(of: model.session?.status) { _, _ in model.refresh() }
         .sheet(isPresented: $choosingExercises) {
             NavigationStack {
-                ExerciseBrowser(store: gym, title: "Add exercises", mode: .multiple) { exercises in
-                    if store.add(exercises) { model.refresh(); choosingExercises = false }
+                QuickWorkoutSetupView(store: store, gym: gym, unit: model.unit, defaults: nil, addingToSession: true) { model.refresh(); choosingExercises = false }
+            }
+        }
+        .sheet(item: $configuringEntry) { entry in
+            NavigationStack {
+                WorkoutEntryConfigurationView(entry: entry, unit: model.unit, reference: { edited, set in
+                    WorkoutRecall.reference(for: edited, setID: set.id, current: store.active, history: store.history)
+                }, protectedSetID: model.session?.execution?.setID) { edited in
+                    if store.configureExercise(edited, original: entry) { model.refresh(); configuringEntry = nil }
+                }
+                .safeAreaInset(edge: .bottom) {
+                    if let error = store.error { Text(error).font(FitTheme.body(13)).foregroundStyle(.red).padding() }
                 }
             }
+        }
+        .sheet(isPresented: $editingPlan, onDismiss: { model.refresh() }) {
+            NavigationStack { WorkoutSessionConfigurationView(store: store, gym: gym, unit: model.unit) }
         }
         .sheet(isPresented: $showTiming) { if let session = model.session { WorkoutTimingDetails(session: session, unit: model.unit) } }
         .sheet(isPresented: $showTechnique) { if let exercise = model.current?.entry.exercise { technique(exercise) } }
@@ -114,8 +134,12 @@ struct ActiveWorkoutView: View {
             Menu {
                 if session.isActive {
                     Button(session.status == .paused ? "Resume workout" : "Pause workout", systemImage: session.status == .paused ? "play" : "pause") { model.togglePause() }
+                    Button("Edit workout plan", systemImage: "list.bullet.rectangle") { editingPlan = true }
                     Button("Add exercises", systemImage: "plus") { choosingExercises = true }
-                    if let entry = model.current?.entry { Button("Add set to this exercise", systemImage: "plus.rectangle.on.rectangle") { store.appendSet(entryID: entry.id); model.refresh() } }
+                    if let entry = model.current?.entry {
+                        Button("Edit sets, weight & reps", systemImage: "slider.horizontal.3") { configuringEntry = entry }
+                        Button("Add set to this exercise", systemImage: "plus.rectangle.on.rectangle") { store.appendSet(entryID: entry.id); model.refresh() }
+                    }
                     if let set = model.current?.set, set.status == .pending {
                         Picker("Set type", selection: Binding(get: { model.current?.set.type ?? .working }, set: {
                             var value = model.current?.set ?? set; value.type = $0; model.editSet(value)

@@ -16,7 +16,7 @@ struct QuickWorkoutLaunchCard: View {
             Image("RoutineEquipment").resizable().scaledToFit().frame(width: 90, height: 82).accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 7) {
                 Text(active == nil ? "Quick workout" : "Continue your session").font(FitTheme.section(17))
-                Text(active.map { "\($0.completedSets.count) sets logged · \($0.status == .paused ? "Paused" : "In progress")" } ?? "Pick exercises and log as you go.")
+                Text(active.map { "\($0.completedSets.count) sets logged · \($0.status == .paused ? "Paused" : "In progress")" } ?? "Choose exercises and sets before you start.")
                     .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
             }.frame(maxWidth: .infinity, alignment: .leading)
             Image(systemName: "arrow.up.right").font(.system(size: 17, weight: .medium)).foregroundStyle(FitTheme.dashboardAccent)
