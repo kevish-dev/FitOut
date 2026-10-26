@@ -15,13 +15,16 @@ struct FitOutApp: App {
 }
 
 struct AppRoot: View {
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var container: AppContainer?
     @State private var failure: String?
+    @State private var hasFinishedOpening = false
     @State private var widgetDestination: WidgetDestination?
     @State private var widgetRouteID = UUID()
     var body: some View {
         Group {
-            if let container {
+            if let container, hasFinishedOpening {
                 if container.profile.draft.completedAt != nil {
                     AppShell(container: container, widgetDestination: $widgetDestination)
                         .id(widgetRouteID)
@@ -32,15 +35,45 @@ struct AppRoot: View {
                 } description: {
                     Text("Your saved files are preserved. \(failure)")
                 } actions: { Button("Retry", action: open).buttonStyle(.borderedProminent) }
-            } else { ProgressView("Opening FitOut…").task { open() } }
+            } else if hasFinishedOpening {
+                ProgressView("Opening FitOut…").frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else {
+                Color.clear.ignoresSafeArea()
+            }
         }.preferredColorScheme(container?.presentation.appearance.colorScheme)
         .environment(\.appNavigationStyle, container?.presentation.navigationStyle ?? .topRight)
+        .overlay {
+            if !hasFinishedOpening {
+                AppOpeningView { finishOpening() }
+                    .transition(.opacity)
+                    .zIndex(1)
+            }
+        }
+        .statusBarHidden(!hasFinishedOpening)
+        .task { open() }
+        .onChange(of: scenePhase) { _, phase in
+            // Returning from another app must never replay an unfinished intro.
+            if phase == .background { finishOpening(animated: false) }
+        }
         .onOpenURL { url in
-            if let destination = WidgetDestination(url: url) { widgetDestination = destination; widgetRouteID = UUID() }
+            if let destination = WidgetDestination(url: url) {
+                widgetDestination = destination
+                widgetRouteID = UUID()
+                finishOpening(animated: false)
+            }
+        }
+    }
+    private func finishOpening(animated: Bool = true) {
+        guard !hasFinishedOpening else { return }
+        withAnimation(animated ? .easeOut(duration: reduceMotion ? 0.12 : 0.18) : nil) {
+            hasFinishedOpening = true
         }
     }
     private func open() {
         do { container = try WorkoutRuntime.shared(); failure = nil }
-        catch { failure = error.localizedDescription }
+        catch {
+            failure = error.localizedDescription
+            finishOpening(animated: false)
+        }
     }
 }
