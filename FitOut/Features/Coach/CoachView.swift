@@ -3,14 +3,17 @@ import SwiftUI
 struct CoachView: View {
     @Environment(\.appNavigationStyle) private var navigationStyle
     @Bindable var store: CoachStore
-    let profile: ProfileData
+    let container: AppContainer
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @FocusState private var composerFocused: Bool
     @State private var followsLatest = true
-    @State private var confirmingNewChat = false
+    @State private var sheet: CoachSheet?
 
-    private var context: CoachContext { CoachContext(profile: profile, includeGoal: store.usesProfileGoal) }
+    private enum CoachSheet: String, Identifiable { case context, chats; var id: String { rawValue } }
+    private var context: CoachContext { CoachContextBuilder.build(container: container) }
+
+    init(container: AppContainer) { self.container = container; self.store = container.coach }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -19,10 +22,24 @@ struct CoachView: View {
                 ScrollView {
                     LazyVStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
                         if !store.availability.isAvailable { unavailableNotice }
-                        if store.messages.isEmpty && store.availability.isAvailable { welcome }
+                        if let error = store.storageError {
+                            VStack(alignment: .leading, spacing: 8) {
+                                Label("Chat storage needs attention", systemImage: "externaldrive.badge.exclamationmark").font(FitTheme.section(15))
+                                Text(error).font(FitTheme.body(13))
+                                Button("Retry storage") { store.retryStorage() }.frame(minHeight: 44)
+                            }.padding(FitTheme.cardInset).fitSurface(radius: 16)
+                        }
+                        if store.messages.isEmpty { welcome }
                         ForEach(store.messages) { message in
                             CoachMessageBubble(message: message)
                                 .id(message.id)
+                        }
+                        if store.messages.last?.role == .assistant, store.messages.last?.state == .complete,
+                           store.messages.last?.source == .model, !store.isResponding {
+                            HStack(spacing: 12) {
+                                refinement("More detail", question: "Give me concrete steps and an example for your last answer.")
+                                refinement("Make it simpler", question: "Explain your last answer more simply, with one practical next step.")
+                            }
                         }
                         Color.clear.frame(height: 1).id("coachLatest")
                     }
@@ -59,10 +76,11 @@ struct CoachView: View {
             if phase == .active { store.refreshAvailability() }
             else { store.stop() }
         }
-        .confirmationDialog("Start a new chat?", isPresented: $confirmingNewChat, titleVisibility: .visible) {
-            Button("Clear chat", role: .destructive) { store.clear() }
-        } message: {
-            Text("This removes the messages in this chat.")
+        .sheet(item: $sheet) { destination in
+            switch destination {
+            case .context: CoachSharingView(container: container, store: store)
+            case .chats: CoachHistoryView(store: store)
+            }
         }
     }
 
@@ -87,31 +105,16 @@ struct CoachView: View {
                         .foregroundStyle(FitTheme.textSecondary)
                 }
                 Spacer()
-                Button {
-                    if !store.messages.isEmpty { confirmingNewChat = true }
-                } label: {
-                    Label("New chat", systemImage: "square.and.pencil")
-                        .font(FitTheme.medium(12))
-                        .foregroundStyle(FitTheme.dashboardAccent)
-                        .frame(minHeight: 44)
-                }
-                .buttonStyle(.plain)
-                .disabled(store.messages.isEmpty)
-                .opacity(store.messages.isEmpty ? 0.4 : 1)
+                Button { sheet = .chats } label: { Image(systemName: "clock.arrow.circlepath").frame(width: 44, height: 44) }
+                    .accessibilityLabel("Saved conversations")
+                Button { store.newChat() } label: { Image(systemName: "square.and.pencil").frame(width: 44, height: 44) }
+                .buttonStyle(.plain).disabled(!store.archiveLoaded || store.messages.isEmpty)
+                .accessibilityLabel("New conversation")
                 .accessibilityIdentifier("coachNewChat")
             }
-            if store.availability.isAvailable, profile.primaryGoal != nil {
-                Button { store.usesProfileGoal.toggle() } label: {
-                    Label(store.usesProfileGoal ? "My fitness goal is included" : "Include my fitness goal",
-                          systemImage: store.usesProfileGoal ? "checkmark.circle.fill" : "plus.circle")
-                        .font(FitTheme.medium(12))
-                        .foregroundStyle(store.usesProfileGoal ? FitTheme.dashboardAccent : FitTheme.textSecondary)
-                        .frame(minHeight: 44)
-                }
-                .buttonStyle(.plain)
-                .disabled(store.isResponding)
-                .accessibilityValue(store.usesProfileGoal ? "On" : "Off")
-                .accessibilityIdentifier("coachIncludeGoal")
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) { sharingButton; recordsButton }
+                VStack(alignment: .leading, spacing: 0) { sharingButton; recordsButton }
             }
         }
         .padding(.horizontal, FitTheme.pageInset)
@@ -130,11 +133,11 @@ struct CoachView: View {
             Text("Your next step,\nmade clearer.")
                 .font(FitTheme.display(23))
                 .fixedSize(horizontal: false, vertical: true)
-            Text("Talk through a workout, a meal, or a recovery day. What would you like to work on?")
+            Text("Get specific exercise cues, build a session, or work through a meal. Share your records when you want a personal review.")
                 .font(FitTheme.body(14))
                 .foregroundStyle(FitTheme.textSecondary)
             VStack(spacing: 10) {
-                starter("Plan a 30-minute gym session", symbol: "dumbbell")
+                starter("Plan a 30-minute full-body dumbbell workout with sets, reps and rest", symbol: "dumbbell")
                 starter("What can I eat before training?", symbol: "fork.knife")
                 starter("How do I improve my squat?", symbol: "figure.strengthtraining.traditional")
             }
@@ -163,7 +166,27 @@ struct CoachView: View {
             .fitSurface(radius: 16)
         }
         .buttonStyle(.plain)
-        .disabled(store.isResponding)
+        .disabled(store.isResponding || !store.availability.isAvailable || !store.archiveLoaded)
+    }
+
+    private var sharingButton: some View {
+        Button { sheet = .context } label: {
+            Label(store.permissions.scopes.isEmpty ? "Choose context" : "Context · \(store.permissions.scopes.count) shared", systemImage: "slider.horizontal.3")
+                .font(FitTheme.medium(12)).frame(minHeight: 44)
+        }.accessibilityIdentifier("coachContext")
+    }
+    private var recordsButton: some View {
+        Button {
+            if store.permissions.scopes.isEmpty { sheet = .context }
+            else { followsLatest = true; store.showRecords(context: context) }
+        } label: {
+            Label("My records", systemImage: "chart.bar.doc.horizontal").font(FitTheme.medium(12)).frame(minHeight: 44)
+        }.disabled(store.isResponding || !store.archiveLoaded).accessibilityIdentifier("coachRecords")
+    }
+    private func refinement(_ label: String, question: String) -> some View {
+        Button { store.draft = question; send() } label: {
+            Text(label).font(FitTheme.medium(12)).padding(.horizontal, 14).frame(minHeight: 44).dashboardGlass(in: Capsule(), interactive: true)
+        }.buttonStyle(.plain).disabled(!store.availability.isAvailable || !store.archiveLoaded || store.isResponding)
     }
 
     private var unavailableNotice: some View {
@@ -220,7 +243,7 @@ struct CoachView: View {
                     .focused($composerFocused)
                     .submitLabel(.send)
                     .onSubmit(send)
-                    .disabled(!store.availability.isAvailable)
+                    .disabled(!store.availability.isAvailable || !store.archiveLoaded)
                     .accessibilityLabel("Message your fitness coach")
                     .accessibilityIdentifier("coachMessageInput")
                 Button {
@@ -244,8 +267,8 @@ struct CoachView: View {
                     .font(FitTheme.medium(10))
                     .foregroundStyle(store.draft.count > CoachConversation.maximumMessageLength ? Color.orange : FitTheme.textSecondary)
             }
-            Text("On-device · Uses your units and age group. Chat stays for this app session.")
-                .font(FitTheme.body(10))
+            Text("Saved on this iPhone · You control shared records. Units and age group guide safe answers.")
+                .font(FitTheme.body(11))
                 .foregroundStyle(FitTheme.textSecondary)
         }
         .padding(.horizontal, FitTheme.pageInset)
@@ -268,7 +291,8 @@ private struct CoachMessageBubble: View {
     private var accessibilitySummary: String {
         let content = message.text.isEmpty && message.state == .responding ? "Thinking" : message.text
         let status = message.state == .stopped ? ". Response stopped" : message.state == .failed ? ". Reply incomplete" : ""
-        return "\(message.role == .user ? "You" : "FitOut Coach"): \(content)\(status)"
+        let author = message.role == .user ? "You" : message.source == .records ? "Your records, calculated" : "Coach, on-device AI"
+        return "\(author): \(content)\(status)"
     }
 
     var body: some View {
@@ -276,11 +300,11 @@ private struct CoachMessageBubble: View {
             if message.role == .user { Spacer(minLength: 36) }
             VStack(alignment: .leading, spacing: 8) {
                 if message.role == .assistant {
-                    Text("FITOUT COACH").font(FitTheme.medium(10)).tracking(1.1)
+                    Text(message.source == .records ? "Your records · Calculated" : "Coach · On-device AI").font(FitTheme.medium(11))
                         .foregroundStyle(FitTheme.dashboardAccent)
                 }
                 if !message.text.isEmpty {
-                    Text(message.text)
+                    Text((try? AttributedString(markdown: message.text, options: .init(interpretedSyntax: .inlineOnlyPreservingWhitespace))) ?? AttributedString(message.text))
                         .font(FitTheme.body(15))
                         .lineSpacing(4)
                         .textSelection(.enabled)
@@ -294,6 +318,10 @@ private struct CoachMessageBubble: View {
                     Text(message.state == .stopped ? "Response stopped" : "Reply incomplete")
                         .font(FitTheme.medium(11)).foregroundStyle(FitTheme.textSecondary)
                 }
+                if message.role == .assistant, !message.sharedScopes.isEmpty {
+                    Text("Shared context: " + message.sharedScopes.map(\.title).joined(separator: ", "))
+                        .font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
+                }
             }
             .padding(14)
             .background(message.role == .user ? FitTheme.dashboardAccent.opacity(0.13) : FitTheme.surface,
@@ -303,5 +331,83 @@ private struct CoachMessageBubble: View {
         .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilitySummary)
+        .contextMenu { if !message.text.isEmpty { Button("Copy", systemImage: "doc.on.doc") { UIPasteboard.general.string = message.text } } }
+    }
+}
+
+private struct CoachSharingView: View {
+    let container: AppContainer
+    @Bindable var store: CoachStore
+    @Environment(\.dismiss) private var dismiss
+    var body: some View {
+        NavigationStack {
+            Form {
+                Section {
+                    ForEach(CoachScope.allCases) { scope in
+                        Toggle(isOn: Binding(get: { store.permissions.includes(scope) }, set: { store.setPermission(scope, enabled: $0) })) {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Label(scope.title, systemImage: scope.symbol).font(FitTheme.section(15))
+                                Text(scope.detail).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                            }.padding(.vertical, 4)
+                        }.disabled(!store.archiveLoaded)
+                    }
+                } footer: {
+                    Text("All sharing starts off. Turning a category off removes its previous context from future requests. Existing messages remain visible until you delete their conversation. No data leaves the device through this coach.")
+                }
+                Section("Preview of shared records") {
+                    let facts = CoachContextBuilder.build(container: container).facts
+                    if facts.isEmpty { Text("No app records shared. General fitness chat still works when AI is available.") }
+                    ForEach(facts) { fact in
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(fact.title).font(FitTheme.section(14))
+                            Text(fact.detail).font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
+                        }.padding(.vertical, 4)
+                    }
+                }
+                Section { Text("The coach can read a compact summary of selected records. It cannot change your routine, targets, meals or Health data. Suggestions must be reviewed and entered in the existing editors.").font(FitTheme.body(13)) }
+            }.navigationTitle("Coach context").nutritionForm()
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+        }
+    }
+}
+
+private struct CoachHistoryView: View {
+    @Bindable var store: CoachStore
+    @Environment(\.dismiss) private var dismiss
+    @State private var deleting: UUID?
+    @State private var deletingAll = false
+    var body: some View {
+        NavigationStack {
+            List {
+                Button("New conversation", systemImage: "square.and.pencil") { store.newChat(); dismiss() }.disabled(!store.archiveLoaded)
+                if let error = store.storageError {
+                    Section { Text(error); Button("Retry storage") { store.retryStorage() } }
+                }
+                if store.chats.isEmpty { Text("Your conversations will appear here after the first message.").foregroundStyle(FitTheme.textSecondary) }
+                ForEach(store.orderedChats) { chat in
+                    Button { store.selectChat(chat.id); dismiss() } label: {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 5) {
+                                Text(chat.title).font(FitTheme.section(14)).lineLimit(2)
+                                Text(chat.updatedAt, format: .dateTime.month().day().hour().minute()).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                            }
+                            Spacer()
+                            if store.selectedID == chat.id { Image(systemName: "checkmark").foregroundStyle(FitTheme.dashboardAccent) }
+                        }.frame(minHeight: 44)
+                    }.foregroundStyle(FitTheme.textPrimary)
+                    .swipeActions { Button("Delete", role: .destructive) { deleting = chat.id } }
+                }
+                Section {
+                    Button("Delete all chats & reset sharing", role: .destructive) { deletingAll = true }
+                } footer: { Text("Deletes coach conversations only. Workout, nutrition, profile and Health data stay available.") }
+            }.navigationTitle("Conversations").nutritionForm()
+                .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
+                .confirmationDialog("Delete this conversation?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }), titleVisibility: .visible) {
+                    Button("Delete conversation", role: .destructive) { if let deleting { store.deleteChat(deleting) }; deleting = nil }
+                }
+                .confirmationDialog("Delete all coach history?", isPresented: $deletingAll, titleVisibility: .visible) {
+                    Button("Delete all chats", role: .destructive) { store.clear() }
+                } message: { Text("This removes saved coach conversations from this iPhone and turns context sharing off. It cannot be undone.") }
+        }
     }
 }

@@ -121,7 +121,7 @@ struct AppShell: View {
         case .gym: GymView(store: container.gym, workouts: container.workouts, unit: container.profile.draft.weightUnit, defaults: container.defaults)
         case .nutrition: NutritionView(container: container)
         case .health: HealthConnectionView(service: container.health)
-        case .coach: CoachView(store: container.coach, profile: container.profile.draft)
+        case .coach: CoachView(container: container)
         }
     }
 

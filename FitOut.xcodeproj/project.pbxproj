@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F25000000000000000000001 /* CoachContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = F25000000000000000000002; };
+		F25000000000000000000003 /* CoachPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = F25000000000000000000004; };
+		F25000000000000000000005 /* OnDeviceCoachResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F25000000000000000000006; };
 		F24000000000000000000001 /* AppOpeningView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F24000000000000000000002; };
 		F23000000000000000000005 /* WorkoutStreakTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23000000000000000000006; };
 		F23000000000000000000003 /* WorkoutStreakCelebrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F23000000000000000000004; };
@@ -165,6 +168,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F25000000000000000000002 /* CoachContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachContext.swift; sourceTree = "<group>"; };
+		F25000000000000000000004 /* CoachPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachPersistence.swift; sourceTree = "<group>"; };
+		F25000000000000000000006 /* OnDeviceCoachResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceCoachResponder.swift; sourceTree = "<group>"; };
 		F24000000000000000000002 /* AppOpeningView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppOpeningView.swift; sourceTree = "<group>"; };
 		F23000000000000000000006 /* WorkoutStreakTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutStreakTests.swift; sourceTree = "<group>"; };
 		F23000000000000000000004 /* WorkoutStreakCelebrationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutStreakCelebrationView.swift; sourceTree = "<group>"; };
@@ -304,6 +310,9 @@
 		F04000000000000000000005 /* Coach */ = {
 			isa = PBXGroup;
 			children = (
+				F25000000000000000000002 /* CoachContext.swift */,
+				F25000000000000000000004 /* CoachPersistence.swift */,
+				F25000000000000000000006 /* OnDeviceCoachResponder.swift */,
 				F04000000000000000000002 /* CoachStore.swift */,
 				F04000000000000000000004 /* CoachView.swift */,
 			);
@@ -790,6 +799,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F25000000000000000000001 /* CoachContext.swift in Sources */,
+				F25000000000000000000003 /* CoachPersistence.swift in Sources */,
+				F25000000000000000000005 /* OnDeviceCoachResponder.swift in Sources */,
 				F24000000000000000000001 /* AppOpeningView.swift in Sources */,
 				F23000000000000000000003 /* WorkoutStreakCelebrationView.swift in Sources */,
 				F23000000000000000000001 /* WorkoutStreakStore.swift in Sources */,

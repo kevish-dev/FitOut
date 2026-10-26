@@ -149,7 +149,7 @@ struct HomeView: View {
                 Button("Start Over", role: .destructive) {
                     do {
                         try container.profile.restartForTesting()
-                        container.coach.clear()
+                        container.coach.newChat()
                         container.defaults.removeObject(forKey: "health.explainer.seen")
                     }
                     catch { restartError = error.localizedDescription }

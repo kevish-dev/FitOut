@@ -27,7 +27,6 @@ import Observation
         nutrition = try NutritionStore(container: database)
         self.defaults = defaults
         health = HealthAccessService(capability: capabilities, defaults: defaults)
-        coach = CoachStore(capabilities: capabilities)
         self.database = database
         repository = SwiftDataRepository(container: database)
         presentation = try AppPresentationPreferences(repository: repository, defaults: defaults)
@@ -63,6 +62,10 @@ import Observation
             }
         }
         hydration = HydrationStore(shared: shared, fallback: fallback)
+        let coachRoot = (production ? localRoot.deletingLastPathComponent() : localRoot).appendingPathComponent("Coach", isDirectory: true)
+        let coachPersistence: any CoachPersisting = database.configurations.allSatisfy(\.isStoredInMemoryOnly)
+            ? MemoryCoachPersistence() : FileCoachPersistence(url: coachRoot.appendingPathComponent("conversations.json"))
+        coach = CoachStore(capabilities: capabilities, persistence: coachPersistence)
         hydrationReminders = HydrationReminderStore(defaults: defaults)
         streaks = WorkoutStreakStore(defaults: defaults, sessions: workouts.sessions, routine: gym.activeRoutine)
         widgets = WidgetBridge(shared: shared, gym: gym, workouts: workouts, health: health, profile: profile, hydration: hydration, nutrition: nutrition, streaks: streaks)
