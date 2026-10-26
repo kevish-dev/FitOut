@@ -257,7 +257,7 @@ struct HomeView: View {
     // MARK: - Daily Workout Streak
     private var streakCard: some View {
         TimelineView(.periodic(from: .now, by: 60)) { timeline in
-            let streak = WorkoutAnalytics.dailyStreak(container.workouts.history, now: timeline.date)
+            let streak = container.streaks.snapshot(sessions: container.workouts.history, now: timeline.date)
             GeometryReader { geometry in
                 let narrow = geometry.size.width < 320
                 let compact = geometry.size.width < 380
@@ -284,6 +284,7 @@ struct HomeView: View {
                     .frame(width: leftWidth, height: 68, alignment: .leading)
                     .accessibilityElement(children: .ignore)
                     .accessibilityLabel("\(streak.consecutiveDays) day workout streak")
+                    .accessibilityHint("Planned rest days preserve your streak without adding a workout day.")
 
                     streakDivider(color: FitTheme.textPrimary.opacity(0.15))
 
@@ -301,17 +302,17 @@ struct HomeView: View {
                                         Circle().stroke(day.isCompleted ? accent : FitTheme.textPrimary.opacity(0.25), lineWidth: 1.5)
                                     }
                                     .overlay {
-                                        if day.isCompleted {
-                                            Image(systemName: "checkmark")
+                                        if day.isCompleted || day.isRestDay {
+                                            Image(systemName: day.isCompleted ? "checkmark" : "moon.fill")
                                                 .font(.system(size: narrow ? 8 : compact ? 10 : 11, weight: .bold))
-                                                .foregroundStyle(FitTheme.textPrimary)
+                                                .foregroundStyle(day.isCompleted ? FitTheme.textPrimary : FitTheme.textSecondary)
                                         }
                                     }
                             }
                             .frame(maxWidth: .infinity)
                             .accessibilityElement(children: .ignore)
                             .accessibilityLabel(day.date.formatted(date: .complete, time: .omitted) + ", " +
-                                (day.isCompleted ? "workout completed" : day.date > timeline.date ? "upcoming" : "no completed workout"))
+                                (day.isCompleted ? "workout completed" : day.isRestDay ? "planned rest day, streak protected" : day.date > timeline.date ? "upcoming" : "no completed workout"))
                         }
                     }
                     .frame(maxWidth: .infinity)

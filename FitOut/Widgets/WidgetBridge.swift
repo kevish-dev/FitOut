@@ -37,9 +37,11 @@ import WidgetKit
     private let profile: ProfileStore
     private let hydration: HydrationStore
     private let nutrition: NutritionStore
-    init(shared: WidgetSharedStore?, gym: GymStore, workouts: WorkoutStore, health: HealthAccessService, profile: ProfileStore, hydration: HydrationStore, nutrition: NutritionStore) {
+    private let streaks: WorkoutStreakStore
+    init(shared: WidgetSharedStore?, gym: GymStore, workouts: WorkoutStore, health: HealthAccessService, profile: ProfileStore, hydration: HydrationStore, nutrition: NutritionStore, streaks: WorkoutStreakStore) {
         self.shared = shared; self.gym = gym; self.workouts = workouts; self.health = health; self.profile = profile; self.hydration = hydration
         self.nutrition = nutrition
+        self.streaks = streaks
         gym.onChange = { [weak self] in self?.publish() }
         workouts.onChange = { [weak self] in self?.publish() }
         health.onChange = { [weak self] in self?.publish() }
@@ -48,7 +50,9 @@ import WidgetKit
         publish()
     }
     func publish(at now: Date = .now, calendar: Calendar = .current) {
+        streaks.updateRoutine(gym.activeRoutine, now: now, calendar: calendar)
         var snapshot = FitOutWidgetSnapshot()
+        snapshot.restSchedules = streaks.restSchedules
         snapshot.updatedAt = now
         snapshot.onboarded = profile.draft.completedAt != nil
         snapshot.usesPounds = profile.draft.weightUnit == .lbs
@@ -67,7 +71,7 @@ import WidgetKit
             snapshot.active = WidgetActiveWorkout(title: active.title, paused: active.status == .paused,
                 completedSets: active.completedSets.count, totalSets: active.entries.filter { !$0.skipped }.flatMap(\.sets).count, restUntil: active.restUntil)
         }
-        let completed = workouts.history.filter { $0.status == .completed && ($0.endedAt ?? $0.startedAt) <= now }
+        let completed = workouts.history.filter { $0.status == .completed && $0.startedAt <= ($0.endedAt ?? $0.startedAt) && ($0.endedAt ?? $0.startedAt) <= now }
         snapshot.completedDays = Array(Set(completed.map { $0.endedAt ?? $0.startedAt })).sorted()
         snapshot.volumeWeeks = WorkoutAnalytics.recentWeeklyVolume(workouts.history, now: now, calendar: calendar).weeks.map {
             WidgetVolumeWeek(date: $0.start, kilograms: $0.volumeKG)

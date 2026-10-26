@@ -64,10 +64,10 @@ import Observation
         }
         hydration = HydrationStore(shared: shared, fallback: fallback)
         hydrationReminders = HydrationReminderStore(defaults: defaults)
-        widgets = WidgetBridge(shared: shared, gym: gym, workouts: workouts, health: health, profile: profile, hydration: hydration, nutrition: nutrition)
+        streaks = WorkoutStreakStore(defaults: defaults, sessions: workouts.sessions, routine: gym.activeRoutine)
+        widgets = WidgetBridge(shared: shared, gym: gym, workouts: workouts, health: health, profile: profile, hydration: hydration, nutrition: nutrition, streaks: streaks)
         workoutPresentation = WorkoutPresentationCoordinator(store: workouts, gym: gym, profile: profile, defaults: defaults,
             enabled: production && !database.configurations.allSatisfy(\.isStoredInMemoryOnly))
-        streaks = WorkoutStreakStore(defaults: defaults, sessions: workouts.sessions)
         streakPresentation = WorkoutStreakPresenter(store: streaks, enabled: production && !database.configurations.allSatisfy(\.isStoredInMemoryOnly),
             preferences: { [weak repository] in (try? repository?.loadPreferences()) ?? AppPreferences() })
         workouts.onChange = { [weak widgets, weak workoutPresentation, weak streaks, weak streakPresentation, weak workouts] in

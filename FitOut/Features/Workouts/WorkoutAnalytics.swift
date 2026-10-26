@@ -24,6 +24,7 @@ struct DailyStreakSnapshot {
     struct Day: Identifiable {
         let date: Date
         let isCompleted: Bool
+        var isRestDay = false
         var id: Date { date }
     }
 
@@ -79,34 +80,29 @@ enum WorkoutAnalytics {
         while weeks.contains(week) { streak += 1; week = calendar.date(byAdding: .weekOfYear, value: -1, to: week)! }
         return streak
     }
-    static func dailyStreak(_ sessions: [WorkoutSession], now: Date = .now, calendar: Calendar = .current) -> DailyStreakSnapshot {
+    static func dailyStreak(_ sessions: [WorkoutSession], restSchedules: [StreakRestSchedule] = [],
+                            now: Date = .now, calendar: Calendar = .current) -> DailyStreakSnapshot {
         // The finish date earns the credit, including workouts that cross midnight.
         // Older completed sessions without an end date use their start date.
-        let completedDays = Set(sessions.compactMap { session -> Date? in
+        let completions = sessions.compactMap { session -> Date? in
             guard session.status == .completed else { return nil }
             let completedAt = session.endedAt ?? session.startedAt
             guard session.startedAt <= completedAt, completedAt <= now else { return nil }
-            return calendar.startOfDay(for: completedAt)
-        })
+            return completedAt
+        }
+        let completedDays = Set(completions.map { calendar.startOfDay(for: $0) })
 
         let today = calendar.startOfDay(for: now)
-        var cursor = today
-        if !completedDays.contains(cursor), let yesterday = calendar.date(byAdding: .day, value: -1, to: today) {
-            cursor = calendar.startOfDay(for: yesterday)
-        }
-        var consecutiveDays = 0
-        while completedDays.contains(cursor) {
-            consecutiveDays += 1
-            guard let previous = calendar.date(byAdding: .day, value: -1, to: cursor) else { break }
-            cursor = calendar.startOfDay(for: previous)
-        }
+        let consecutiveDays = WorkoutDayStreak.count(completed: completions, restSchedules: restSchedules,
+                                                     at: now, calendar: calendar)
 
         // Keep the reference's Sunday-to-Saturday order, regardless of locale.
         let sunday = calendar.date(byAdding: .day, value: 1 - calendar.component(.weekday, from: today), to: today) ?? today
         let weekDays = (0..<7).compactMap { offset -> DailyStreakSnapshot.Day? in
             guard let date = calendar.date(byAdding: .day, value: offset, to: sunday) else { return nil }
             let day = calendar.startOfDay(for: date)
-            return .init(date: day, isCompleted: completedDays.contains(day))
+            return .init(date: day, isCompleted: completedDays.contains(day),
+                         isRestDay: WorkoutDayStreak.isRestDay(day, schedules: restSchedules, calendar: calendar))
         }
         return DailyStreakSnapshot(consecutiveDays: consecutiveDays, weekDays: weekDays)
     }

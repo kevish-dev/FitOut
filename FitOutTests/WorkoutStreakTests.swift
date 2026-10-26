@@ -124,6 +124,70 @@ final class WorkoutStreakTests: XCTestCase {
         store.update(sessions: [completed(25), completed(26)], now: date(26, hour: 18), calendar: calendar)
         XCTAssertEqual(store.pending?.snapshot.consecutiveDays, 2)
     }
+    private func routine(rest weekdays: Set<Int>, startsOn: Date? = nil) -> Routine {
+        var value = Routine(name: "Plan", isActive: true, createdAt: date(20), updatedAt: date(20), startsOn: startsOn)
+        for index in value.days.indices { value.days[index].kind = weekdays.contains(index) ? .rest : .workout }
+        return value
+    }
+    @MainActor func testRestPreservesCountWithoutCelebrationAndNextWorkoutEarnsTheNextCredit() throws {
+        let prefs = defaults(); defer { prefs.removeObject(forKey: WorkoutStreakStore.storageKey); prefs.removeObject(forKey: WorkoutStreakStore.restStorageKey) }
+        let sessions = [completed(23), completed(24)]
+        let store = WorkoutStreakStore(defaults: prefs, sessions: sessions, routine: routine(rest: [6]), now: date(25), calendar: calendar)
+        store.update(sessions: sessions, now: date(25), calendar: calendar)
+        XCTAssertEqual(store.snapshot(sessions: sessions, now: date(25), calendar: calendar).consecutiveDays, 2)
+        XCTAssertNil(store.pending)
+        store.update(sessions: sessions + [completed(26)], now: date(26, hour: 18), calendar: calendar)
+        XCTAssertEqual(store.pending?.previousCount, 2)
+        XCTAssertEqual(store.pending?.snapshot.consecutiveDays, 3)
+        let id = try XCTUnwrap(store.pending?.id)
+        store.acknowledge(id)
+        store.update(sessions: sessions + [completed(26), completed(26)], now: date(26, hour: 18), calendar: calendar)
+        XCTAssertNil(store.pending)
+    }
+    @MainActor func testScheduleEditAndRelaunchPreservePastRestWithoutRetroactivelyExcusingMissedDays() {
+        let prefs = defaults(); defer { prefs.removeObject(forKey: WorkoutStreakStore.storageKey); prefs.removeObject(forKey: WorkoutStreakStore.restStorageKey) }
+        let sessions = [completed(23), completed(24)]
+        let store = WorkoutStreakStore(defaults: prefs, sessions: sessions, routine: routine(rest: [6]), now: date(25), calendar: calendar)
+        let noRest = routine(rest: [])
+        store.updateRoutine(noRest, now: date(26), calendar: calendar)
+        let restored = WorkoutStreakStore(defaults: prefs, sessions: sessions, routine: noRest, now: date(26), calendar: calendar)
+        XCTAssertEqual(restored.snapshot(sessions: sessions, now: date(26), calendar: calendar).consecutiveDays, 2)
+        XCTAssertTrue(WorkoutDayStreak.isRestDay(date(25), schedules: restored.restSchedules, calendar: calendar))
+        XCTAssertFalse(WorkoutDayStreak.isRestDay(date(26), schedules: restored.restSchedules, calendar: calendar))
+        // Monday was missed; setting Mondays to rest on Tuesday cannot rewrite it.
+        restored.updateRoutine(routine(rest: [0]), now: date(27), calendar: calendar)
+        XCTAssertEqual(restored.snapshot(sessions: sessions, now: date(27), calendar: calendar).consecutiveDays, 0)
+        XCTAssertNil(restored.pending)
+    }
+    @MainActor func testOnlyActiveSavedRestDaysQualifyAndRoutineStartDateIsRespected() {
+        let sessions = [completed(24)]
+        var inactive = routine(rest: [6]); inactive.isActive = false
+        var archived = routine(rest: [6]); archived.archivedAt = date(25)
+        let flexible = routine(rest: [])
+        for proposal in [inactive, archived, flexible, routine(rest: [6], startsOn: date(26))] {
+            let prefs = defaults(); defer { prefs.removeObject(forKey: WorkoutStreakStore.storageKey); prefs.removeObject(forKey: WorkoutStreakStore.restStorageKey) }
+            let store = WorkoutStreakStore(defaults: prefs, sessions: sessions, routine: proposal, now: date(26), calendar: calendar)
+            XCTAssertEqual(store.snapshot(sessions: sessions, now: date(26), calendar: calendar).consecutiveDays, 0)
+        }
+    }
+    @MainActor func testRestScheduleUpdatesAreIdempotentAndUndoRestoresTheProtectedPreviousCount() throws {
+        let prefs = defaults(); defer { prefs.removeObject(forKey: WorkoutStreakStore.storageKey); prefs.removeObject(forKey: WorkoutStreakStore.restStorageKey) }
+        let plan = routine(rest: [6]), sessions = [completed(24)]
+        let store = WorkoutStreakStore(defaults: prefs, sessions: sessions, routine: plan, now: date(25), calendar: calendar)
+        let baseline = store.restSchedules
+        for _ in 0..<20 { store.updateRoutine(plan, now: date(26), calendar: calendar) }
+        XCTAssertEqual(store.restSchedules, baseline)
+        store.update(sessions: sessions + [completed(26)], now: date(26, hour: 18), calendar: calendar)
+        XCTAssertEqual(store.pending?.snapshot.consecutiveDays, 2)
+        store.update(sessions: sessions, now: date(26, hour: 18), calendar: calendar)
+        XCTAssertNil(store.pending)
+        XCTAssertEqual(store.snapshot(sessions: sessions, now: date(26), calendar: calendar).consecutiveDays, 1)
+        // Repeated changes today replace one version, instead of growing forever.
+        store.updateRoutine(routine(rest: [0, 6]), now: date(26), calendar: calendar)
+        store.updateRoutine(plan, now: date(26), calendar: calendar)
+        XCTAssertEqual(store.restSchedules.count, baseline.count + 1)
+        XCTAssertNil(store.pending)
+    }
     @MainActor func testDaylightSavingUsesCalendarDaysRatherThanTwentyFourHours() {
         let prefs = defaults(); defer { prefs.removeObject(forKey: WorkoutStreakStore.storageKey) }
         var local = Calendar(identifier: .gregorian); local.timeZone = TimeZone(identifier: "America/Los_Angeles")!

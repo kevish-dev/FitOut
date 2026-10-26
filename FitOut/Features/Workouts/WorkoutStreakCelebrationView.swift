@@ -86,12 +86,14 @@ struct WorkoutStreakCelebrationView: View {
                             Image(systemName: "checkmark").font(.system(size: 18, weight: .semibold)).foregroundStyle(.white)
                                 .scaleEffect(!earnedToday || revealed || reduceMotion ? 1 : 0.4)
                                 .opacity(!earnedToday || revealed || reduceMotion ? 1 : 0)
+                        } else if day.isRestDay {
+                            Image(systemName: "moon.fill").font(.system(size: 17)).foregroundStyle(FitTheme.textSecondary)
                         }
                     }.frame(minHeight: 44)
                         .animation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.7).delay(Double(index) * 0.05), value: revealed)
                 }.frame(maxWidth: .infinity)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(day.date.formatted(.dateTime.weekday(.wide)) + (day.isCompleted ? ", workout completed" : ", no completed workout"))
+                    .accessibilityLabel(day.date.formatted(.dateTime.weekday(.wide)) + (day.isCompleted ? ", workout completed" : day.isRestDay ? ", planned rest day, streak protected" : ", no completed workout"))
             }
         }.padding(FitTheme.cardInset).dashboardGlass(in: RoundedRectangle(cornerRadius: 24))
     }

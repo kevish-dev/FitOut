@@ -81,6 +81,54 @@ final class AnalyticsTests: XCTestCase {
         XCTAssertTrue(calendar.isDate(result.weekDays[0].date, inSameDayAs: date(8, 12)))
         XCTAssertTrue(result.weekDays[0].isCompleted)
     }
+    func testRestDaysBridgeWorkoutsWithoutAddingCreditsAndTodayStillHasTimeToTrain() {
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(identifier: "Asia/Kolkata")!
+        func date(_ day: Int) -> Date { calendar.date(from: DateComponents(year: 2026, month: 10, day: day, hour: 12))! }
+        let weekend = StreakRestSchedule(effectiveFrom: date(1), validFrom: date(1), weekdays: [5, 6])
+        let sessions = [22, 23].map { WorkoutSession(title: "Training", startedAt: date($0), status: .completed) }
+        for day in [24, 25, 26] {
+            let result = WorkoutAnalytics.dailyStreak(sessions, restSchedules: [weekend], now: date(day), calendar: calendar)
+            XCTAssertEqual(result.consecutiveDays, 2, "Rest and the next unfinished training day preserve the streak")
+        }
+        let monday = WorkoutSession(title: "Monday", startedAt: date(26), status: .completed)
+        let result = WorkoutAnalytics.dailyStreak(sessions + [monday], restSchedules: [weekend], now: date(26), calendar: calendar)
+        XCTAssertEqual(result.consecutiveDays, 3)
+        XCTAssertEqual(result.completedDaysThisWeek, 1)
+        XCTAssertTrue(result.weekDays[0].isRestDay)
+        XCTAssertFalse(result.weekDays[0].isCompleted)
+        XCTAssertEqual(WorkoutAnalytics.dailyStreak(sessions, restSchedules: [weekend], now: date(27), calendar: calendar).consecutiveDays, 0)
+    }
+    func testRestDoesNotExcuseAnEarlierMissedTrainingDayAndRestOnlyDoesNotEarnAStreak() {
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        func date(_ day: Int) -> Date { calendar.date(from: DateComponents(year: 2026, month: 10, day: day, hour: 12))! }
+        let sunday = StreakRestSchedule(effectiveFrom: date(1), validFrom: nil, weekdays: [6])
+        let friday = WorkoutSession(title: "Friday", startedAt: date(23), status: .completed)
+        XCTAssertEqual(WorkoutAnalytics.dailyStreak([friday], restSchedules: [sunday], now: date(26), calendar: calendar).consecutiveDays, 0)
+        XCTAssertEqual(WorkoutAnalytics.dailyStreak([], restSchedules: [sunday], now: date(25), calendar: calendar).consecutiveDays, 0)
+        let monday = WorkoutSession(title: "Monday", startedAt: date(26), status: .completed)
+        XCTAssertEqual(WorkoutAnalytics.dailyStreak([friday, monday], restSchedules: [sunday], now: date(26), calendar: calendar).consecutiveDays, 1)
+    }
+    func testWorkingOutOnRestDayEarnsOneCreditAndFutureOrInactiveRestRulesDoNotProtectPastDays() {
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        func date(_ day: Int) -> Date { calendar.date(from: DateComponents(year: 2026, month: 10, day: day, hour: 12))! }
+        let sessions = [24, 25, 25, 26].map { WorkoutSession(title: "Training", startedAt: date($0), status: .completed) }
+        let rest = StreakRestSchedule(effectiveFrom: date(1), validFrom: nil, weekdays: [6])
+        let result = WorkoutAnalytics.dailyStreak(sessions, restSchedules: [rest], now: date(26), calendar: calendar)
+        XCTAssertEqual(result.consecutiveDays, 3)
+        XCTAssertTrue(result.weekDays[0].isRestDay && result.weekDays[0].isCompleted)
+        let withoutSunday = sessions.filter { !calendar.isDate($0.startedAt, inSameDayAs: date(25)) }
+        for schedule in [StreakRestSchedule(effectiveFrom: date(1), validFrom: date(26), weekdays: [6]),
+                         StreakRestSchedule(effectiveFrom: date(26), validFrom: nil, weekdays: [6])] {
+            XCTAssertEqual(WorkoutAnalytics.dailyStreak(withoutSunday, restSchedules: [schedule], now: date(26), calendar: calendar).consecutiveDays, 1)
+        }
+    }
+    func testProtectedRestUsesCalendarDaysAcrossDaylightSaving() {
+        var calendar = Calendar(identifier: .gregorian); calendar.timeZone = TimeZone(identifier: "America/Los_Angeles")!
+        func date(_ day: Int) -> Date { calendar.date(from: DateComponents(year: 2026, month: 3, day: day, hour: 12))! }
+        let rest = StreakRestSchedule(effectiveFrom: date(1), validFrom: nil, weekdays: [6])
+        let sessions = [7, 9].map { WorkoutSession(title: "Training", startedAt: date($0), status: .completed) }
+        XCTAssertEqual(WorkoutAnalytics.dailyStreak(sessions, restSchedules: [rest], now: date(9), calendar: calendar).consecutiveDays, 2)
+    }
     func testMuscleAllocationAndCSVQuoting() {
         var exercise = ExerciseCatalogue.all[0]; exercise.muscles = [.chest, .triceps]; exercise.name = "Press, \"test\""
         var session = WorkoutSession(title: "Training", status: .completed)

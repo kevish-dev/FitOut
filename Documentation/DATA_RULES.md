@@ -11,5 +11,6 @@
 - HealthKit request completion is not read authorization. Imported identifiers are deduplicated, and Apple Health nutrition stays visibly separate from manual totals unless an explicit source-selection policy says otherwise.
 - Missing targets/readings are absent values, never fabricated zero measurements. Logged numeric zero is distinguishable from no record.
 - Weekly consistency counts consecutive calendar weeks containing at least one completed session. If the current week is unfinished, the previous week's streak remains visible until week end. Skipped/abandoned records do not count.
+- Daily workout streaks award one credit per completed local finish day. Scheduled rest days bridge the chain without earning credit; a past missed non-rest day breaks it, while today remains available to train. Effective-dated saved rest rules preserve past settings through routine changes. Home, celebrations and widgets share this policy; weekly workout totals never count rest as completion.
 - Historical calendar states come from recorded sessions. Planned/rest/flexible labels from the current routine apply only today and in the future; earlier unlogged days remain “No log.”
 - Muscle volume is allocated equally across a set's primary muscle groups, so summing muscle totals does not multiply compound-exercise volume.

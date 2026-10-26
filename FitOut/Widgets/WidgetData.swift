@@ -80,6 +80,45 @@ struct WidgetNutritionSnapshot: Codable, Equatable, Sendable {
     let incomplete: [String]
     let estimatedEntries: Int
 }
+
+/// Effective-dated rest rules are shared by the app and widget extension.
+/// Weekdays use the routine's Monday=0 ... Sunday=6 convention.
+struct StreakRestSchedule: Codable, Equatable, Sendable {
+    let effectiveFrom: Date
+    let validFrom: Date?
+    let weekdays: Set<Int>
+}
+
+enum WorkoutDayStreak {
+    static func isRestDay(_ date: Date, schedules: [StreakRestSchedule], calendar: Calendar) -> Bool {
+        let day = calendar.startOfDay(for: date)
+        guard let schedule = schedules.filter({ calendar.startOfDay(for: $0.effectiveFrom) <= day })
+            .max(by: { $0.effectiveFrom < $1.effectiveFrom }),
+              schedule.validFrom.map({ day >= calendar.startOfDay(for: $0) }) ?? true else { return false }
+        return schedule.weekdays.contains((calendar.component(.weekday, from: day) + 5) % 7)
+    }
+
+    static func count(completed: [Date], restSchedules: [StreakRestSchedule],
+                      at now: Date, calendar: Calendar) -> Int {
+        let days = Set(completed.filter { $0 <= now }.map { calendar.startOfDay(for: $0) })
+        guard let earliest = days.min() else { return 0 }
+        var cursor = calendar.startOfDay(for: now)
+        // Today is still available to train; yesterday's missed training is not.
+        if !days.contains(cursor) {
+            guard let yesterday = calendar.date(byAdding: .day, value: -1, to: cursor) else { return 0 }
+            cursor = yesterday
+        }
+        var count = 0
+        while cursor >= earliest {
+            if days.contains(cursor) { count += 1 }
+            else if !isRestDay(cursor, schedules: restSchedules, calendar: calendar) { break }
+            guard let previous = calendar.date(byAdding: .day, value: -1, to: cursor) else { break }
+            cursor = previous
+        }
+        return count
+    }
+}
+
 struct FitOutWidgetSnapshot: Codable, Equatable, Sendable {
     var updatedAt: Date?
     var onboarded = false
@@ -92,6 +131,8 @@ struct FitOutWidgetSnapshot: Codable, Equatable, Sendable {
     var weeklyWorkoutGoal = 0
     var usesPounds = false
     var nutrition: WidgetNutritionSnapshot?
+    // Optional so caches written before rest-day protection still decode.
+    var restSchedules: [StreakRestSchedule]?
 }
 struct FitOutWidgetState: Codable, Equatable, Sendable {
     var version = 1
@@ -114,16 +155,11 @@ struct FitOutWidgetState: Codable, Equatable, Sendable {
         snapshot.plans.first { calendar.isDate($0.date, inSameDayAs: date) }
     }
     func streak(at date: Date, calendar: Calendar = .current) -> Int {
-        let days = Set(snapshot.completedDays.filter { $0 <= date }.map { calendar.startOfDay(for: $0) })
-        var cursor = calendar.startOfDay(for: date)
-        if !days.contains(cursor) { cursor = calendar.date(byAdding: .day, value: -1, to: cursor) ?? cursor }
-        var count = 0
-        while days.contains(cursor) {
-            count += 1
-            guard let previous = calendar.date(byAdding: .day, value: -1, to: cursor) else { break }
-            cursor = previous
-        }
-        return count
+        WorkoutDayStreak.count(completed: snapshot.completedDays, restSchedules: snapshot.restSchedules ?? [],
+                              at: date, calendar: calendar)
+    }
+    func isRestDay(_ date: Date, calendar: Calendar = .current) -> Bool {
+        WorkoutDayStreak.isRestDay(date, schedules: snapshot.restSchedules ?? [], calendar: calendar)
     }
     func weekDays(at date: Date, calendar: Calendar = .current) -> [Date] {
         let start = calendar.startOfDay(for: date)

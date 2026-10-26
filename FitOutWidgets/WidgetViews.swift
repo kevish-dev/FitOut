@@ -235,7 +235,7 @@ struct FitOutWidgetView: View {
             let value = currentHealth ? health.sleepHours : nil
             let minutes = Int(((value ?? 0) * 60).rounded())
             return (value == nil ? "—" : "\(minutes / 60)h \(minutes % 60)m", "last night", value, state.goals.sleepHours)
-        case .streak: return ("\(state.streak(at: now))", "consecutive days", Double(state.streak(at: now)), nil)
+        case .streak: return ("\(state.streak(at: now))", "workout days", Double(state.streak(at: now)), nil)
         case .volume:
             let value = state.volume(at: now).map { $0 * (state.snapshot.usesPounds ? 2.2046226218 : 1) }
             return (value.map { $0.formatted(.number.notation(.compactName).precision(.fractionLength(0...1))) } ?? "—", "\(state.snapshot.usesPounds ? "lb" : "kg")·reps this week", value, nil)
@@ -299,7 +299,7 @@ struct FitOutWidgetView: View {
         case .streak:
             let count = state.weekDays(at: now).filter { state.completed(on: $0, through: now) }.count
             Text("\(count) workout days this week").font(WidgetStyle.body(15))
-            Text("Completed workouts · one credit per day").font(WidgetStyle.body(11)).foregroundStyle(.secondary)
+            Text("One credit per workout day · planned rest protects your streak").font(WidgetStyle.body(11)).foregroundStyle(.secondary)
         case .volume:
             WidgetBars(values: (-5...0).map { state.volume(at: now, offset: $0) ?? 0 }, tint: accent).frame(height: family == .systemExtraLarge ? 110 : 80)
             Text("Last 6 weeks · completed weighted working and drop sets").font(WidgetStyle.body(11)).foregroundStyle(.secondary)
@@ -332,12 +332,13 @@ struct FitOutWidgetView: View {
         HStack(spacing: large ? 8 : 3) {
             ForEach(state.weekDays(at: now), id: \.self) { day in
                 let done = state.completed(on: day, through: now)
+                let rest = state.isRestDay(day)
                 VStack(spacing: 4) {
                     if large { Text(day.formatted(.dateTime.weekday(.narrow))).font(WidgetStyle.body(9)).foregroundStyle(.secondary) }
-                    Image(systemName: done ? "checkmark.circle.fill" : "circle")
+                    Image(systemName: done ? "checkmark.circle.fill" : rest ? "moon.circle" : "circle")
                         .font(.system(size: large ? 22 : 12)).foregroundStyle(done ? accent : .secondary)
                 }.frame(maxWidth: .infinity)
-                    .accessibilityLabel("\(day.formatted(date: .abbreviated, time: .omitted)), \(done ? "completed" : "no completed workout")")
+                    .accessibilityLabel("\(day.formatted(date: .abbreviated, time: .omitted)), \(done ? "completed" : rest ? "planned rest day, streak protected" : "no completed workout")")
             }
         }
     }

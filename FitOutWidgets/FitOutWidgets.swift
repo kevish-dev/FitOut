@@ -46,7 +46,7 @@ enum FitOutWidgetType: String, CaseIterable {
         case .steps: "Your latest synced Apple Health steps and optional personal goal."
         case .calories: "Active energy burned from Apple Health, with your optional goal."
         case .sleep: "Your latest synced sleep reading. Larger sizes show the recorded night."
-        case .streak: "Consecutive workout days and your real weekly activity."
+        case .streak: "Workout-day streaks with planned rest protection and your real weekly activity."
         case .volume: "Weighted training volume and recent weekly progression."
         case .overview: "Your day at a glance. Larger sizes add water logging and workout shortcuts."
         case .nutrition: "Actual food calories and optional targets. Larger sizes add protein, carbs and fat."

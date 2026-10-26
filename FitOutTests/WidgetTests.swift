@@ -50,6 +50,24 @@ final class WidgetTests: XCTestCase {
         XCTAssertThrowsError(try app.saveGoals(WidgetGoals(waterML: .nan)))
         XCTAssertEqual(try app.read().goals, goals)
     }
+    func testRestProtectedWidgetStreakMatchesAppAndOldCachesStillDecode() throws {
+        var state = FitOutWidgetState()
+        state.snapshot.completedDays = [date(7), date(9)]
+        state.snapshot.restSchedules = [StreakRestSchedule(effectiveFrom: date(1), validFrom: nil, weekdays: [6])]
+        let sessions = state.snapshot.completedDays.map { WorkoutSession(title: "Training", startedAt: $0, status: .completed) }
+        let app = WorkoutAnalytics.dailyStreak(sessions, restSchedules: state.snapshot.restSchedules!, now: date(9), calendar: calendar)
+        XCTAssertEqual(state.streak(at: date(9), calendar: calendar), 2)
+        XCTAssertEqual(state.streak(at: date(9), calendar: calendar), app.consecutiveDays)
+        XCTAssertTrue(state.isRestDay(date(8), calendar: calendar))
+        XCTAssertFalse(state.completed(on: date(8), through: date(9), calendar: calendar))
+        let data = try JSONEncoder().encode(state)
+        XCTAssertEqual(try JSONDecoder().decode(FitOutWidgetState.self, from: data).streak(at: date(9), calendar: calendar), 2)
+        var old = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        var snapshot = try XCTUnwrap(old["snapshot"] as? [String: Any]); snapshot.removeValue(forKey: "restSchedules"); old["snapshot"] = snapshot
+        let legacy = try JSONDecoder().decode(FitOutWidgetState.self, from: JSONSerialization.data(withJSONObject: old))
+        XCTAssertNil(legacy.snapshot.restSchedules)
+        XCTAssertEqual(legacy.streak(at: date(9), calendar: calendar), 1)
+    }
     func testCorruptOrNewerDataIsNotSilentlyReplaced() throws {
         let directory = FileManager.default.temporaryDirectory.appendingPathComponent("WidgetTests-" + UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: directory) }
