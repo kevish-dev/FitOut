@@ -281,9 +281,7 @@ struct ActiveWorkoutView: View {
     }
     private func act(_ command: WorkoutCommand, expected: UUID? = nil) {
         keyboardDown()
-        let previous = model.session
         model.perform(command, expectedSet: expected)
-        if previous != model.session, !defaults.bool(forKey: "haptics.disabled") { UIImpactFeedbackGenerator(style: .light).impactOccurred() }
     }
     private func keyboardDown() { UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil) }
     private func minimize() { keyboardDown(); if let onMinimize { onMinimize() } else { dismiss() } }

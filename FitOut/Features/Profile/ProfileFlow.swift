@@ -4,6 +4,7 @@ import PhotosUI
 // The reference screens share presentation with the original onboarding, while
 // ProfileStore remains the sole owner of the persisted, canonical profile.
 struct ProfileFlow: View {
+    @Environment(\.fitHaptics) private var haptics
     @Bindable var store: ProfileStore
     @State private var showNameError = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -105,6 +106,7 @@ struct ProfileFlow: View {
     private func advance() {
         if store.draft.step == 1 && (store.draft.trimmedName.isEmpty || store.draft.trimmedName.count > 40) {
             showNameError = true
+            haptics?.play(.warning)
             return
         }
         if store.draft.step == 3 && (!store.draft.heightCM.isFinite || !(80...250).contains(store.draft.heightCM)) {
@@ -134,7 +136,7 @@ struct ProfileFlow: View {
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 16 * scale) {
                 ForEach(PrimaryGoal.allCases) { goal in
                     let selected = store.draft.primaryGoal == goal
-                    Button { store.draft.primaryGoal = goal } label: {
+                    Button { store.draft.primaryGoal = goal; haptics?.play(.selection) } label: {
                         HStack(spacing: 10) {
                             Image(systemName: goal.symbol).font(.system(size: 21 * scale, weight: .semibold))
                             Text(goal.rawValue).font(FitTheme.button(13 * scale))
@@ -168,6 +170,7 @@ private extension PrimaryGoal {
 }
 
 private struct HeightScreen: View {
+    @Environment(\.fitHaptics) private var haptics
     @Binding var heightCM: Double
     @Binding var unit: HeightUnit
     var scale: CGFloat = 1
@@ -194,7 +197,7 @@ private struct HeightScreen: View {
     private func unitButton(_ title: String, value: HeightUnit) -> some View {
         Button {
             unit = value
-            UISelectionFeedbackGenerator().selectionChanged()
+            haptics?.play(.selection)
         } label: {
             Text(title).font(FitTheme.button(17))
                 .foregroundStyle(unit == value ? FitTheme.orange : FitTheme.textPrimary.opacity(0.8))
@@ -208,6 +211,7 @@ private struct HeightScreen: View {
 }
 
 private struct HeightWheel: View {
+    @Environment(\.fitHaptics) private var haptics
     @Binding var heightCM: Double
     let unit: HeightUnit
     let scale: CGFloat
@@ -225,7 +229,7 @@ private struct HeightWheel: View {
         guard let selectedTick else { return }
         let value = imperial ? Double(selectedTick) / 10 * 2.54 : Double(selectedTick)
         let bounded = min(250, max(80, value))
-        if abs(heightCM - bounded) > 0.00001 { heightCM = bounded }
+        if abs(heightCM - bounded) > 0.00001 { heightCM = bounded; haptics?.play(.selection) }
     }
 
     var body: some View {

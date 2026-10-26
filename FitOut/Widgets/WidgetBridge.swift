@@ -6,26 +6,28 @@ import WidgetKit
     private let shared: WidgetSharedStore?
     private(set) var state = FitOutWidgetState()
     var error: String?
+    var onFeedback: ((FitHapticEvent) -> Void)?
     init(shared: WidgetSharedStore?, fallback: WidgetSharedStore? = nil) { self.shared = shared ?? fallback; refresh() }
     func refresh() {
         guard let shared else { return }
         do { state = try shared.read(); error = nil } catch { self.error = error.localizedDescription }
     }
-    func log(_ amount: Int, at date: Date = .now) { change { try $0.logWater(amount, at: date) } }
-    func remove(_ id: UUID) { change { try $0.removeWater(id: id) } }
-    func edit(_ id: UUID, amount: Int, date: Date) { change { try $0.editWater(id: id, milliliters: amount, date: date) } }
-    func displayUnit(_ unit: String) { guard ["ml", "L"].contains(unit) else { return }; change { try $0.update { $0.waterDisplayUnit = unit } } }
-    @discardableResult func clearHistory() -> Bool { change { try $0.update { $0.water = [] } } }
+    func log(_ amount: Int, at date: Date = .now) { change(feedback: .saved) { try $0.logWater(amount, at: date) } }
+    func remove(_ id: UUID) { change(feedback: .saved) { try $0.removeWater(id: id) } }
+    func edit(_ id: UUID, amount: Int, date: Date) { change(feedback: .saved) { try $0.editWater(id: id, milliliters: amount, date: date) } }
+    func displayUnit(_ unit: String) { guard ["ml", "L"].contains(unit) else { return }; change(feedback: .selection) { try $0.update { $0.waterDisplayUnit = unit } } }
+    @discardableResult func clearHistory() -> Bool { change(feedback: .saved) { try $0.update { $0.water = [] } } }
     func publishSnapshot(_ snapshot: FitOutWidgetSnapshot) { change { try $0.update { $0.snapshot = snapshot } } }
-    @discardableResult func saveGoals(_ goals: WidgetGoals) -> Bool { change { try $0.saveGoals(goals) } }
-    @discardableResult private func change(_ action: (WidgetSharedStore) throws -> FitOutWidgetState) -> Bool {
+    @discardableResult func saveGoals(_ goals: WidgetGoals) -> Bool { change(feedback: .saved) { try $0.saveGoals(goals) } }
+    @discardableResult private func change(feedback: FitHapticEvent? = nil, _ action: (WidgetSharedStore) throws -> FitOutWidgetState) -> Bool {
         do {
             guard let shared else { throw WidgetStoreError.appGroupUnavailable }
             state = try action(shared)
             error = nil
             WidgetCenter.shared.reloadAllTimelines()
+            if let feedback { onFeedback?(feedback) }
             return true
-        } catch { self.error = error.localizedDescription; return false }
+        } catch { self.error = error.localizedDescription; if feedback != nil { onFeedback?(.warning) }; return false }
     }
 }
 

@@ -6,6 +6,7 @@ import Observation
     var draft: ProfileData { didSet { if !applying { saveDraft() } } }
     var error: String?
     var onChange: (() -> Void)?
+    var onFeedback: ((FitHapticEvent) -> Void)?
     private var applying = false
     private let context: ModelContext
     init(container: ModelContainer, legacy: OnboardingSnapshot?) throws {
@@ -29,7 +30,7 @@ import Observation
     func saveDraft() { do { try persist(draft); error = nil } catch { self.error = error.localizedDescription } }
     @discardableResult func complete(_ edited: ProfileData? = nil) -> Bool {
         var value = edited ?? draft
-        guard value.validationMessage == nil else { error = value.validationMessage; return false }
+        guard value.validationMessage == nil else { error = value.validationMessage; onFeedback?(.warning); return false }
         value.name = value.trimmedName
         value.completedAt = value.completedAt ?? .now
         do {
@@ -37,8 +38,9 @@ import Observation
             applying = true; draft = value; applying = false
             error = nil
             onChange?()
+            onFeedback?(.saved)
             return true
-        } catch { self.error = error.localizedDescription; return false }
+        } catch { self.error = error.localizedDescription; onFeedback?(.warning); return false }
     }
 
     #if DEBUG

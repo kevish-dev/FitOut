@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct OnboardingView: View {
+    @Environment(\.fitHaptics) private var haptics
     @Bindable var store: OnboardingStore
     @State private var showNameError = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -8,7 +9,7 @@ struct OnboardingView: View {
     private func advance() {
         if store.step == 1 && !store.profile.isNameValid {
             showNameError = true
-            UINotificationFeedbackGenerator().notificationOccurred(.error)
+            haptics?.play(.warning)
             return
         }
         showNameError = false
@@ -73,6 +74,7 @@ struct OnboardingView: View {
 }
 
 struct WelcomeScreen: View {
+    @Environment(\.fitHaptics) private var haptics
     @Environment(\.colorScheme) private var scheme
     let onStart: () -> Void
     @State private var slideOffset: CGFloat = 0
@@ -82,6 +84,7 @@ struct WelcomeScreen: View {
     private func start() {
         guard !started else { return }
         started = true
+        haptics?.play(.navigation)
         onStart()
     }
 

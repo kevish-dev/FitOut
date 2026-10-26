@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F2600000000000000000000A /* HapticTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2600000000000000000000B; };
+		F26000000000000000000001 /* HapticSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = F26000000000000000000002; };
+		F26000000000000000000003 /* HapticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F26000000000000000000004; };
+		F26000000000000000000005 /* WorkoutHaptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = F26000000000000000000006; };
+		F26000000000000000000007 /* HapticSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F26000000000000000000008; };
 		F25000000000000000000001 /* CoachContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = F25000000000000000000002; };
 		F25000000000000000000003 /* CoachPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = F25000000000000000000004; };
 		F25000000000000000000005 /* OnDeviceCoachResponder.swift in Sources */ = {isa = PBXBuildFile; fileRef = F25000000000000000000006; };
@@ -168,6 +173,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F2600000000000000000000B /* HapticTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticTests.swift; sourceTree = "<group>"; };
+		F26000000000000000000002 /* HapticSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticSettings.swift; sourceTree = "<group>"; };
+		F26000000000000000000004 /* HapticService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticService.swift; sourceTree = "<group>"; };
+		F26000000000000000000006 /* WorkoutHaptics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutHaptics.swift; sourceTree = "<group>"; };
+		F26000000000000000000008 /* HapticSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticSettingsView.swift; sourceTree = "<group>"; };
 		F25000000000000000000002 /* CoachContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachContext.swift; sourceTree = "<group>"; };
 		F25000000000000000000004 /* CoachPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoachPersistence.swift; sourceTree = "<group>"; };
 		F25000000000000000000006 /* OnDeviceCoachResponder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnDeviceCoachResponder.swift; sourceTree = "<group>"; };
@@ -307,6 +317,12 @@
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
+		F26000000000000000000009 /* Haptics */ = {isa = PBXGroup; children = (
+			F26000000000000000000002 /* HapticSettings.swift */,
+			F26000000000000000000004 /* HapticService.swift */,
+			F26000000000000000000006 /* WorkoutHaptics.swift */,
+			F26000000000000000000008 /* HapticSettingsView.swift */,
+		); path = Haptics; sourceTree = "<group>"; };
 		F04000000000000000000005 /* Coach */ = {
 			isa = PBXGroup;
 			children = (
@@ -330,6 +346,7 @@
 		3EC67EAD137BE1CFEDEA8F7E /* FitOutTests */ = {
 			isa = PBXGroup;
 			children = (
+				F2600000000000000000000B /* HapticTests.swift */,
 				F23000000000000000000006 /* WorkoutStreakTests.swift */,
 				F22000000000000000000006 /* QuickWorkoutConfigurationTests.swift */,
 				F19000000000000000000008 /* FocusedWorkoutTests.swift */,
@@ -490,6 +507,7 @@
 		96F8D26FDD9965A0BAA0B9E3 /* Core */ = {
 			isa = PBXGroup;
 			children = (
+				F26000000000000000000009 /* Haptics */,
 				525064689C99CE3910D225F1 /* Capabilities */,
 				22D4992F46105A581D769B90 /* Health */,
 				928C96FE7B071CD275D78C13 /* Storage */,
@@ -766,6 +784,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F2600000000000000000000A /* HapticTests.swift in Sources */,
 				F23000000000000000000005 /* WorkoutStreakTests.swift in Sources */,
 				F22000000000000000000005 /* QuickWorkoutConfigurationTests.swift in Sources */,
 				F19000000000000000000007 /* FocusedWorkoutTests.swift in Sources */,
@@ -799,6 +818,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F26000000000000000000001 /* HapticSettings.swift in Sources */,
+				F26000000000000000000003 /* HapticService.swift in Sources */,
+				F26000000000000000000005 /* WorkoutHaptics.swift in Sources */,
+				F26000000000000000000007 /* HapticSettingsView.swift in Sources */,
 				F25000000000000000000001 /* CoachContext.swift in Sources */,
 				F25000000000000000000003 /* CoachPersistence.swift in Sources */,
 				F25000000000000000000005 /* OnDeviceCoachResponder.swift in Sources */,

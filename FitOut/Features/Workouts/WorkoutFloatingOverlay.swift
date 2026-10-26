@@ -9,6 +9,7 @@ import Observation
     let gym: GymStore
     let profile: ProfileStore
     let defaults: UserDefaults
+    private let haptics: HapticService?
     private(set) var presentingWorkout = false
     private weak var window: UIWindow?
     private weak var nativeTabBar: UITabBar?
@@ -24,8 +25,8 @@ import Observation
     private var dragging = false
     private var positioning = false
 
-    init(store: WorkoutStore, gym: GymStore, profile: ProfileStore, defaults: UserDefaults) {
-        self.store = store; self.gym = gym; self.profile = profile; self.defaults = defaults
+    init(store: WorkoutStore, gym: GymStore, profile: ProfileStore, defaults: UserDefaults, haptics: HapticService? = nil) {
+        self.store = store; self.gym = gym; self.profile = profile; self.defaults = defaults; self.haptics = haptics
         super.init()
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardChanged(_:)), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(keyboardHidden(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -72,7 +73,7 @@ import Observation
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         let editor = UIHostingController(rootView: NavigationStack {
             ActiveWorkoutView(store: store, gym: gym, unit: profile.draft.weightUnit, defaults: defaults,
-                onMinimize: { [weak self] in self?.closeEditor() })
+                onMinimize: { [weak self] in self?.closeEditor() }).environment(\.fitHaptics, haptics)
         })
         editor.overrideUserInterfaceStyle = appearance
         editor.modalPresentationStyle = .pageSheet

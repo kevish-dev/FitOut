@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct GenderAgeScreen: View {
+    @Environment(\.fitHaptics) private var haptics
     @Binding var profile: FitnessProfile
     var scale: CGFloat = 1
     var selectedGender: Gender? = nil
@@ -15,7 +16,7 @@ struct GenderAgeScreen: View {
                     Button {
                         if let onGenderSelected { onGenderSelected(gender) }
                         else { profile.gender = gender }
-                        UISelectionFeedbackGenerator().selectionChanged()
+                        haptics?.play(.selection)
                     } label: {
                         VStack(spacing: 2) {
                             Text(gender == .male ? "♂" : "♀")
@@ -41,6 +42,7 @@ struct GenderAgeScreen: View {
 }
 
 struct AgeWheel: View {
+    @Environment(\.fitHaptics) private var haptics
     @Binding var age: Int
     @State private var selectedAge: Int?
     @State private var isScrolling = false
@@ -69,7 +71,7 @@ struct AgeWheel: View {
                     isScrolling = phase != .idle
                     if phase == .idle, let selectedAge, selectedAge != age {
                         age = selectedAge
-                        UISelectionFeedbackGenerator().selectionChanged()
+                        haptics?.play(.selection)
                     }
                 }
                 .onAppear { selectedAge = age }

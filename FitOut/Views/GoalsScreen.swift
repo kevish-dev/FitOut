@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct GoalsScreen: View {
+    @Environment(\.fitHaptics) private var haptics
     @Binding var profile: FitnessProfile
     var scale: CGFloat = 1
     var body: some View {
@@ -27,7 +28,7 @@ struct GoalsScreen: View {
         let selected = profile.goals.contains(goal)
         return Button {
             if selected { profile.goals.remove(goal) } else { profile.goals.insert(goal) }
-            UISelectionFeedbackGenerator().selectionChanged()
+            haptics?.play(.selection)
         } label: {
             HStack(spacing: 12 * scale) {
                 Image(systemName: goal.symbol)

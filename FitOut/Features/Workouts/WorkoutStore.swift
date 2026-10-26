@@ -7,6 +7,7 @@ import Observation
     private(set) var sessions: [WorkoutSession] = []
     var error: String?
     var onChange: (() -> Void)?
+    var onMutation: ((WorkoutSession?, WorkoutSession?, Date) -> Void)?
     private(set) var visibleEditorCount = 0
     var onEditorVisibilityChange: (() -> Void)?
     func editorAppeared() { visibleEditorCount += 1; onEditorVisibilityChange?() }
@@ -237,14 +238,16 @@ import Observation
         }
     }
     @discardableResult func delete(_ id: UUID) -> Bool {
+        let before = sessions.first { $0.id == id }
         do {
             if let record = try context.fetch(FetchDescriptor<FitOutSchemaV4.SessionRecord>()).first(where: { $0.id == id }) { context.delete(record) }
             if let detail = try context.fetch(FetchDescriptor<FitOutSchemaV5.SessionDetails>()).first(where: { $0.id == id }) { context.delete(detail) }
-            try context.save(); try reload(); onChange?(); return true
+            try context.save(); try reload(); onMutation?(before, nil, .now); onChange?(); return true
         }
         catch { context.rollback(); self.error = error.localizedDescription; return false }
     }
     func save(_ input: WorkoutSession, before: WorkoutSession? = nil, at now: Date = .now, origin: WorkoutEventOrigin = .app) -> Bool {
+        let previous = before ?? sessions.first { $0.id == input.id }
         let session = WorkoutTelemetryRecorder.prepare(input, before: before, at: now, origin: origin)
         guard session.entries.flatMap(\.sets).allSatisfy(\.isValid) else { error = "Check reps, load, duration, distance and RPE. Values must be finite and within the supported range."; return false }
         do {
@@ -257,7 +260,7 @@ import Observation
             if let details = try context.fetch(FetchDescriptor<FitOutSchemaV5.SessionDetails>()).first(where: { $0.id == session.id }) {
                 details.payload = payload
             } else { context.insert(FitOutSchemaV5.SessionDetails(id: session.id, payload: payload)) }
-            try context.save(); try reload(); error = nil; onChange?(); return true
+            try context.save(); try reload(); error = nil; onMutation?(previous, session, now); onChange?(); return true
         } catch { context.rollback(); self.error = error.localizedDescription; return false }
     }
 }

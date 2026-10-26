@@ -4,6 +4,7 @@ import UIKit
 @main
 struct FitOutApp: App {
     init() {
+        WorkoutNotificationRouter.shared.install()
         let navigationBar = UINavigationBar.appearance()
         navigationBar.titleTextAttributes = [.font: UIFont(name: "Orbitron-Bold", size: 20) ?? UIFont.boldSystemFont(ofSize: 20)]
         navigationBar.largeTitleTextAttributes = [.font: UIFont(name: "Orbitron-Bold", size: 28) ?? UIFont.boldSystemFont(ofSize: 28)]
@@ -22,6 +23,7 @@ struct AppRoot: View {
     @State private var hasFinishedOpening = false
     @State private var widgetDestination: WidgetDestination?
     @State private var widgetRouteID = UUID()
+    @State private var restNotification = WorkoutNotificationRouter.shared
     var body: some View {
         Group {
             if let container, hasFinishedOpening {
@@ -42,6 +44,7 @@ struct AppRoot: View {
             }
         }.preferredColorScheme(container?.presentation.appearance.colorScheme)
         .environment(\.appNavigationStyle, container?.presentation.navigationStyle ?? .topRight)
+        .environment(\.fitHaptics, container?.haptics)
         .overlay {
             if !hasFinishedOpening {
                 AppOpeningView { finishOpening() }
@@ -50,11 +53,13 @@ struct AppRoot: View {
             }
         }
         .statusBarHidden(!hasFinishedOpening)
-        .task { open() }
+        .task { open(); openRestNotification() }
         .onChange(of: scenePhase) { _, phase in
+            container?.workoutHaptics.sceneChanged(active: phase == .active)
             // Returning from another app must never replay an unfinished intro.
             if phase == .background { finishOpening(animated: false) }
         }
+        .onChange(of: restNotification.openWorkout) { _, _ in openRestNotification() }
         .onOpenURL { url in
             if let destination = WidgetDestination(url: url) {
                 widgetDestination = destination
@@ -70,10 +75,18 @@ struct AppRoot: View {
         }
     }
     private func open() {
-        do { container = try WorkoutRuntime.shared(); failure = nil }
+        do {
+            container = try WorkoutRuntime.shared(); failure = nil
+            container?.workoutHaptics.sceneChanged(active: scenePhase == .active)
+        }
         catch {
             failure = error.localizedDescription
             finishOpening(animated: false)
         }
+    }
+    private func openRestNotification() {
+        guard restNotification.openWorkout, container != nil else { return }
+        restNotification.openWorkout = false
+        widgetDestination = .workout; widgetRouteID = UUID(); finishOpening(animated: false)
     }
 }

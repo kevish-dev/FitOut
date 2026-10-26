@@ -2,6 +2,7 @@ import PhotosUI
 import SwiftUI
 
 struct ProfileScreen: View {
+    @Environment(\.fitHaptics) private var haptics
     @Binding var profile: FitnessProfile
     let showNameError: Bool
     var scale: CGFloat = 1
@@ -123,7 +124,7 @@ struct ProfileScreen: View {
                     profile.usesPhoto = false
                     selectedAvatar = true
                     isNameFocused = false
-                    UISelectionFeedbackGenerator().selectionChanged()
+                    haptics?.play(.selection)
                 } label: {
                     Text(emoji).font(.system(size: 25 * scale))
                         .frame(width: 39 * scale, height: 39 * scale)

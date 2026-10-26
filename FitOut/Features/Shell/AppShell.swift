@@ -21,6 +21,7 @@ struct AppShell: View {
             if container.presentation.navigationStyle == .topRight {
                 VStack(spacing: 10) {
                     Button {
+                        container.haptics.play(.selection)
                         withAnimation(reduceMotion ? nil : .spring(response: 0.35, dampingFraction: 0.85)) { menuOpen.toggle() }
                     } label: {
                         Image(systemName: menuOpen ? "xmark" : "line.3.horizontal")
@@ -54,7 +55,8 @@ struct AppShell: View {
         .onReceive(NotificationCenter.default.publisher(for: UIResponder.keyboardWillHideNotification)) { _ in keyboardVisible = false }
         .onChange(of: container.presentation.navigationStyle) { _, _ in menuOpen = false }
         .accessibilityAction(.escape) { menuOpen = false }
-        .onChange(of: navigation.selected) { _, _ in menuOpen = false }
+        .onChange(of: navigation.selected) { _, _ in menuOpen = false; container.haptics.play(.navigation) }
+        .onChange(of: container.workouts.error) { old, value in if value != nil && value != old { container.haptics.play(.warning) } }
         .task { openPendingWidget() }
         .onChange(of: widgetDestination) { _, _ in openPendingWidget() }
         .onReceive(NotificationCenter.default.publisher(for: .NSCalendarDayChanged)) { _ in
@@ -194,6 +196,8 @@ struct FoundationSettings: View {
             NavigationLink("Apple Health") { HealthConnectionView(service: container.health) }
             NavigationLink("Water intake") { HydrationView(store: container.hydration, health: container.health, reminders: container.hydrationReminders) }
             NavigationLink("Widgets & goals") { WidgetGoalsView(store: container.hydration) }
+            NavigationLink("Haptics & vibration") { HapticSettingsView(haptics: container.haptics, workouts: container.workoutHaptics) }
+                .accessibilityIdentifier("hapticSettings")
             Section("Privacy") { Text("FitOut stores your data on this iPhone. No account, analytics, or external AI service is used.") }
             Section("Device capabilities") {
                 LabeledContent("Apple Health", value: container.capabilities.currentCapabilities().healthKit.explanation)

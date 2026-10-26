@@ -10,6 +10,7 @@ import Observation
     private(set) var savedWorkouts: [SavedWorkout] = []
     var error: String?
     var onChange: (() -> Void)?
+    var onFeedback: ((FitHapticEvent) -> Void)?
     init(container: ModelContainer) throws {
         context = ModelContext(container); context.autosaveEnabled = false
         let existing = Dictionary(uniqueKeysWithValues: try context.fetch(FetchDescriptor<FitOutSchemaV3.ExerciseRecord>()).map { ($0.id, $0) })
@@ -48,7 +49,7 @@ import Observation
         savedWorkouts = try context.fetch(FetchDescriptor<FitOutSchemaV5.SavedWorkoutRecord>()).map { try JSONDecoder().decode(SavedWorkout.self, from: $0.payload) }.sorted { $0.day.title < $1.day.title }
     }
     @discardableResult func save(_ input: Routine, discardDraft: Bool = false) -> Bool {
-        transact {
+        transact(feedback: .saved) {
             if let message = input.validationMessage { throw ValidationError(message: message) }
             let known = Set(exercises.map(\.id))
             guard input.days.flatMap(\.exercises).allSatisfy({ known.contains($0.exerciseID) }) else { throw ValidationError(message: "An exercise is no longer available. Replace it before saving.") }
@@ -89,7 +90,7 @@ import Observation
         transact { if let record = try context.fetch(FetchDescriptor<FitOutSchemaV5.DraftRecord>()).first(where: { $0.id == id }) { context.delete(record) } }
     }
     @discardableResult func saveWorkout(_ day: RoutineDay) -> Bool {
-        transact {
+        transact(feedback: .saved) {
             guard day.kind == .workout, !day.exercises.isEmpty, !day.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
                 throw ValidationError(message: "Name the workout and add exercises before saving it for reuse.")
             }
@@ -102,17 +103,17 @@ import Observation
         }
     }
     @discardableResult func deleteSavedWorkout(_ id: UUID) -> Bool {
-        transact { if let record = try context.fetch(FetchDescriptor<FitOutSchemaV5.SavedWorkoutRecord>()).first(where: { $0.id == id }) { context.delete(record) } }
+        transact(feedback: .saved) { if let record = try context.fetch(FetchDescriptor<FitOutSchemaV5.SavedWorkoutRecord>()).first(where: { $0.id == id }) { context.delete(record) } }
     }
     @discardableResult func deleteRoutine(_ id: UUID) -> Bool {
-        transact {
+        transact(feedback: .saved) {
             if let record = try context.fetch(FetchDescriptor<FitOutSchemaV3.RoutineRecord>()).first(where: { $0.id == id }) { context.delete(record) }
             if let record = try context.fetch(FetchDescriptor<FitOutSchemaV5.RoutineDetails>()).first(where: { $0.id == id }) { context.delete(record) }
             if let record = try context.fetch(FetchDescriptor<FitOutSchemaV5.DraftRecord>()).first(where: { $0.id == id }) { context.delete(record) }
         }
     }
     @discardableResult func saveExercise(_ value: ExerciseDefinition) -> Bool {
-        transact {
+        transact(feedback: .saved) {
             guard !value.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty, !value.muscles.isEmpty else { throw ValidationError(message: "Enter an exercise name and at least one primary muscle.") }
             if let record = try context.fetch(FetchDescriptor<FitOutSchemaV3.ExerciseRecord>()).first(where: { $0.id == value.id }) {
                 record.name = value.name; record.aliases = value.aliases; record.muscles = value.muscles.map(\.rawValue); record.secondary = value.secondary.map(\.rawValue)
@@ -121,14 +122,14 @@ import Observation
         }
     }
     @discardableResult func deleteCustomExercise(_ id: String) -> Bool {
-        transact {
+        transact(feedback: .saved) {
             let referencedDays = routines.flatMap(\.days) + drafts.flatMap { $0.routine.days } + savedWorkouts.map(\.day)
             guard !referencedDays.flatMap(\.exercises).contains(where: { $0.exerciseID == id }) else { throw ValidationError(message: "Remove this exercise from routines, drafts and saved workouts before deleting it.") }
             if let record = try context.fetch(FetchDescriptor<FitOutSchemaV3.ExerciseRecord>()).first(where: { $0.id == id && $0.isCustom }) { context.delete(record) }
         }
     }
-    private func transact(_ action: () throws -> Void) -> Bool {
-        do { try action(); try context.save(); try reload(); error = nil; onChange?(); return true }
-        catch { context.rollback(); self.error = error.localizedDescription; return false }
+    private func transact(feedback: FitHapticEvent? = nil, _ action: () throws -> Void) -> Bool {
+        do { try action(); try context.save(); try reload(); error = nil; onChange?(); if let feedback { onFeedback?(feedback) }; return true }
+        catch { context.rollback(); self.error = error.localizedDescription; onFeedback?(.warning); return false }
     }
 }

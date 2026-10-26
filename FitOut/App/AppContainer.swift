@@ -20,6 +20,8 @@ import Observation
     let presentation: AppPresentationPreferences
     let profile: ProfileStore
     let capabilities: any RuntimeCapabilityProviding
+    let haptics: HapticService
+    let workoutHaptics: WorkoutHapticCoordinator
 
     init(database: ModelContainer, capabilities: any RuntimeCapabilityProviding = SystemCapabilityProvider(), legacyDefaults: UserDefaults? = nil, defaults: UserDefaults = .standard) throws {
         workouts = try WorkoutStore(container: database)
@@ -29,6 +31,9 @@ import Observation
         health = HealthAccessService(capability: capabilities, defaults: defaults)
         self.database = database
         repository = SwiftDataRepository(container: database)
+        let realFeedback = defaults === UserDefaults.standard && !database.configurations.allSatisfy(\.isStoredInMemoryOnly)
+        haptics = HapticService(defaults: defaults, repository: repository, playbackEnabled: realFeedback)
+        workoutHaptics = WorkoutHapticCoordinator(store: workouts, haptics: haptics, enabled: realFeedback)
         presentation = try AppPresentationPreferences(repository: repository, defaults: defaults)
         self.capabilities = capabilities
         if let legacyDefaults { try LegacyOnboardingImporter.importIfNeeded(from: legacyDefaults, into: repository) }
@@ -70,9 +75,16 @@ import Observation
         streaks = WorkoutStreakStore(defaults: defaults, sessions: workouts.sessions, routine: gym.activeRoutine)
         widgets = WidgetBridge(shared: shared, gym: gym, workouts: workouts, health: health, profile: profile, hydration: hydration, nutrition: nutrition, streaks: streaks)
         workoutPresentation = WorkoutPresentationCoordinator(store: workouts, gym: gym, profile: profile, defaults: defaults,
-            enabled: production && !database.configurations.allSatisfy(\.isStoredInMemoryOnly))
+            enabled: production && !database.configurations.allSatisfy(\.isStoredInMemoryOnly), haptics: haptics)
         streakPresentation = WorkoutStreakPresenter(store: streaks, enabled: production && !database.configurations.allSatisfy(\.isStoredInMemoryOnly),
-            preferences: { [weak repository] in (try? repository?.loadPreferences()) ?? AppPreferences() })
+            preferences: { [weak repository] in (try? repository?.loadPreferences()) ?? AppPreferences() }, haptics: haptics)
+        workouts.onMutation = { [weak workoutHaptics] before, after, date in workoutHaptics?.saved(before: before, after: after, at: date) }
+        haptics.onSettingsChange = { [weak workoutHaptics] in workoutHaptics?.settingsChanged() }
+        gym.onFeedback = { [weak haptics] event in haptics?.play(event) }
+        nutrition.onFeedback = { [weak haptics] event in haptics?.play(event) }
+        hydration.onFeedback = { [weak haptics] event in haptics?.play(event) }
+        profile.onFeedback = { [weak haptics] event in haptics?.play(event) }
+        coach.onFeedback = { [weak haptics] event in haptics?.play(event) }
         workouts.onChange = { [weak widgets, weak workoutPresentation, weak streaks, weak streakPresentation, weak workouts] in
             widgets?.publish(); workoutPresentation?.changed()
             if let workouts { streaks?.update(sessions: workouts.sessions) }

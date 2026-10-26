@@ -3,6 +3,7 @@ import SwiftUI
 enum ExerciseBrowserMode: Equatable { case browse, single, multiple }
 
 struct ExerciseBrowser: View {
+    @Environment(\.fitHaptics) private var haptics
     @Bindable var store: GymStore
     let title: String
     var mode: ExerciseBrowserMode = .browse
@@ -170,7 +171,7 @@ struct ExerciseBrowser: View {
                 } else {
                     Button {
                         if mode == .single { searchFocused = false; onSelect?([exercise]) }
-                        else { selection.toggle(exercise.id) }
+                        else { selection.toggle(exercise.id); haptics?.play(.selection) }
                     } label: { cardLabel(exercise, index: index) }
                     .accessibilityIdentifier("pickExercise-\(exercise.id)")
                     .accessibilityValue(index.map { "Selected, position \($0 + 1)" } ?? "Not selected")

@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct WeightScreen: View {
+    @Environment(\.fitHaptics) private var haptics
     @Binding var profile: FitnessProfile
     var scale: CGFloat = 1
     var targetEnabled = true
@@ -47,7 +48,7 @@ struct WeightScreen: View {
                 ForEach(WeightUnit.allCases, id: \.self) { unit in
                     Button {
                         profile.unit = unit
-                        UISelectionFeedbackGenerator().selectionChanged()
+                        haptics?.play(.selection)
                     } label: {
                         Text(unit.rawValue)
                             .font(FitTheme.button(17))
@@ -85,6 +86,7 @@ struct WeightScreen: View {
 }
 
 struct WeightRuler: View {
+    @Environment(\.fitHaptics) private var haptics
     @Binding var kilograms: Double
     let unit: WeightUnit
     var onPreview: ((Double) -> Void)? = nil
@@ -158,7 +160,7 @@ struct WeightRuler: View {
                 isScrolling = phase != .idle
                 if phase == .idle {
                     commitSelection()
-                    UISelectionFeedbackGenerator().selectionChanged()
+                    haptics?.play(.selection)
                 }
             }
             .onDisappear { if isScrolling { commitSelection(updatePreview: false) } }

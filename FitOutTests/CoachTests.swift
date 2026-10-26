@@ -377,7 +377,12 @@ final class CoachTests: XCTestCase {
         let responder = CoachSuspendingResponder()
         let store = CoachStore(capabilities: CoachCapabilityStub(status: .available), responder: responder, timeout: .milliseconds(10))
         store.draft = "How do I squat?"; store.send(context: CoachContext(profile: ProfileData()))
-        try? await Task.sleep(for: .milliseconds(50))
+        // Await the observable outcome, allowing loaded simulator schedulers to
+        // resume the timeout task instead of assuming it wins a 50 ms race.
+        let deadline = ContinuousClock.now.advanced(by: .seconds(2))
+        while store.isResponding && ContinuousClock.now < deadline {
+            try? await Task.sleep(for: .milliseconds(10))
+        }
         XCTAssertFalse(store.isResponding)
         XCTAssertEqual(store.messages.last?.state, .failed)
         XCTAssertTrue(store.errorMessage?.contains("too long") == true)

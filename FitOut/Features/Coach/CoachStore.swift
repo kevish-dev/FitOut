@@ -94,6 +94,7 @@ enum CoachFailure: Error {
     private(set) var storageError: String?
     private(set) var archiveLoaded = false
     var draft = ""
+    var onFeedback: ((FitHapticEvent) -> Void)?
     var usesProfileGoal: Bool {
         get { permissions.includes(.profile) }
         set { setPermission(.profile, enabled: newValue) }
@@ -140,6 +141,7 @@ enum CoachFailure: Error {
         guard canSend else { return }
         let user = CoachMessage(role: .user, text: draft.trimmingCharacters(in: .whitespacesAndNewlines))
         draft = ""; messages.append(user)
+        onFeedback?(.selection)
         beginReply(to: user, context: context)
     }
     func retry(context: CoachContext) {
@@ -157,6 +159,7 @@ enum CoachFailure: Error {
         messages.append(CoachMessage(role: .assistant, text: context.recordsSummary, source: .records,
                                      sharedScopes: context.permissions.scopes.sorted { $0.rawValue < $1.rawValue }))
         retryMessageID = nil; errorMessage = nil; persist()
+        onFeedback?(.selection)
     }
     func stop() {
         guard isResponding else { return }
@@ -234,6 +237,7 @@ enum CoachFailure: Error {
                 guard let accepted else { throw CoachFailure.unhelpfulResponse }
                 guard requestID == id, let index = messages.firstIndex(where: { $0.id == assistant.id }) else { return }
                 messages[index].text = accepted; messages[index].state = .complete
+                onFeedback?(.coachReply)
                 cancelTasks(); persist()
             } catch {
                 guard requestID == id else { return }

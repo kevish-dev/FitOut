@@ -176,9 +176,10 @@ struct StepProgress: View {
 }
 
 struct BackButton: View {
+    @Environment(\.fitHaptics) private var haptics
     let action: () -> Void
     var body: some View {
-        Button(action: action) {
+        Button { haptics?.play(.navigation); action() } label: {
             Image(systemName: "arrow.left")
                 .font(.system(size: 22, weight: .medium))
                 .frame(width: 55, height: 55)
@@ -191,9 +192,10 @@ struct BackButton: View {
 }
 
 struct NextButton: View {
+    @Environment(\.fitHaptics) private var haptics
     let action: () -> Void
     var body: some View {
-        Button(action: action) {
+        Button { haptics?.play(.navigation); action() } label: {
             HStack(spacing: 14) {
                 Text("Next").font(FitTheme.button(18))
                 Image(systemName: "arrow.right").font(.system(size: 20))
@@ -208,6 +210,7 @@ struct NextButton: View {
 }
 
 struct SlideToFinish: View {
+    @Environment(\.fitHaptics) private var haptics
     let enabled: Bool
     let action: () -> Void
     @State private var offset: CGFloat = 0
@@ -217,7 +220,7 @@ struct SlideToFinish: View {
     private func finish() {
         guard enabled, !finished else { return }
         finished = true
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        haptics?.play(.selection)
         action()
         // A failed persistence attempt must allow another slide after retry.
         finished = false

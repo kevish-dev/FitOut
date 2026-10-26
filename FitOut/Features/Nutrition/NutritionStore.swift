@@ -23,6 +23,7 @@ enum NutritionCatalogue {
     var error: String?
     var deletedEntry: FoodLogEntry?
     var onChange: (() -> Void)?
+    var onFeedback: ((FitHapticEvent) -> Void)?
     init(container: ModelContainer, catalogue: [NutritionFood]? = nil) throws {
         context = ModelContext(container); context.autosaveEnabled = false
         self.catalogue = try catalogue ?? NutritionCatalogue.load()
@@ -78,7 +79,7 @@ enum NutritionCatalogue {
         }
     }
     @discardableResult func favorite(_ id: String) -> Bool {
-        transact {
+        transact(feedback: .selection) {
             var value = preferences
             if value.favoriteIDs.contains(id) { value.favoriteIDs.remove(id) } else { value.favoriteIDs.insert(id) }
             try writePreferences(value)
@@ -171,8 +172,8 @@ enum NutritionCatalogue {
         if let record = try context.fetch(FetchDescriptor<FitOutSchemaV6.NutritionSettingsRecord>()).first { record.payload = data }
         else { context.insert(FitOutSchemaV6.NutritionSettingsRecord(payload: data)) }
     }
-    private func transact(_ action: () throws -> Void) -> Bool {
-        do { try action(); try context.save(); try reload(); error = nil; onChange?(); return true }
-        catch { context.rollback(); self.error = error.localizedDescription; return false }
+    private func transact(feedback: FitHapticEvent = .saved, _ action: () throws -> Void) -> Bool {
+        do { try action(); try context.save(); try reload(); error = nil; onChange?(); onFeedback?(feedback); return true }
+        catch { context.rollback(); self.error = error.localizedDescription; onFeedback?(.warning); return false }
     }
 }

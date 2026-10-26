@@ -3,7 +3,7 @@ import UIKit
 
 struct WorkoutStreakCelebrationView: View {
     let store: WorkoutStreakStore
-    let hapticsEnabled: Bool
+    @Environment(\.fitHaptics) private var haptics
     let close: () -> Void
     @State private var revealed = false
     @State private var displayedCount: Int?
@@ -63,7 +63,7 @@ struct WorkoutStreakCelebrationView: View {
             .foregroundStyle(FitTheme.textPrimary).background(FitTheme.dashboardBackground.ignoresSafeArea())
             .accessibilityIdentifier("workoutStreakCelebration")
             .accessibilityAction(.escape, close)
-            .sensoryFeedback(.success, trigger: revealed) { _, value in value && hapticsEnabled }
+            .onChange(of: revealed) { _, value in if value { haptics?.play(.streak) } }
             .task(id: event.id) {
                 displayedCount = reduceMotion ? event.snapshot.consecutiveDays : event.previousCount
                 guard !reduceMotion else { revealed = true; return }
@@ -105,11 +105,12 @@ struct WorkoutStreakCelebrationView: View {
     private let store: WorkoutStreakStore
     private let enabled: Bool
     private let preferences: () -> AppPreferences
+    private let haptics: HapticService?
     private weak var controller: UIViewController?
     private var task: Task<Void, Never>?
     private var active = false
-    init(store: WorkoutStreakStore, enabled: Bool, preferences: @escaping () -> AppPreferences) {
-        self.store = store; self.enabled = enabled; self.preferences = preferences
+    init(store: WorkoutStreakStore, enabled: Bool, preferences: @escaping () -> AppPreferences, haptics: HapticService? = nil) {
+        self.store = store; self.enabled = enabled; self.preferences = preferences; self.haptics = haptics
     }
     func sceneChanged(active: Bool) { self.active = active; refresh() }
     func refresh() {
@@ -138,7 +139,8 @@ struct WorkoutStreakCelebrationView: View {
         guard !(presenter is UIAlertController), !presenter.isBeingDismissed, !presenter.isBeingPresented,
               presenter.transitionCoordinator == nil, presenter.viewIfLoaded?.window != nil else { return false }
         let settings = preferences()
-        let host = UIHostingController(rootView: WorkoutStreakCelebrationView(store: store, hapticsEnabled: settings.hapticsEnabled) { [weak self] in self?.close() }
+        let host = UIHostingController(rootView: WorkoutStreakCelebrationView(store: store) { [weak self] in self?.close() }
+            .environment(\.fitHaptics, haptics)
             .preferredColorScheme(settings.appearance.colorScheme))
         host.modalPresentationStyle = .overFullScreen
         host.modalTransitionStyle = .crossDissolve

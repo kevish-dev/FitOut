@@ -35,9 +35,9 @@ import SwiftUI
     private(set) var liveActivityMessage: String?
     private struct Request { var session: WorkoutSession?; var unit: WeightUnit; var allowStart: Bool }
 
-    init(store: WorkoutStore, gym: GymStore, profile: ProfileStore, defaults: UserDefaults, enabled: Bool) {
+    init(store: WorkoutStore, gym: GymStore, profile: ProfileStore, defaults: UserDefaults, enabled: Bool, haptics: HapticService? = nil) {
         self.store = store; self.profile = profile; self.defaults = defaults; self.enabled = enabled
-        floating = WorkoutFloatingController(store: store, gym: gym, profile: profile, defaults: defaults)
+        floating = WorkoutFloatingController(store: store, gym: gym, profile: profile, defaults: defaults, haptics: haptics)
     }
     func changed() {
         guard enabled else { return }
