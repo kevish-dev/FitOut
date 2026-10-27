@@ -2,6 +2,112 @@ import XCTest
 @testable import FitOut
 
 final class FocusedWorkoutTests: XCTestCase {
+    @MainActor func testLiveRestShowsUpcomingSetAndNeverKeepsTheCompletedSetTimer() throws {
+        var session = fixture(rest: 90)
+        try WorkoutExecutionEngine.apply(.startSet, to: &session, at: at(1))
+        try WorkoutExecutionEngine.apply(.completeSet, to: &session, at: at(10))
+        let state = WorkoutPresentationCoordinator.content(for: session, unit: .kg, now: at(20))
+        XCTAssertEqual(state.phase, "resting")
+        XCTAssertEqual(state.setIndex, 2)
+        XCTAssertEqual(state.exerciseIndex, 1)
+        XCTAssertEqual(state.exerciseSetCount, 2)
+        XCTAssertEqual(state.exerciseCount, 2)
+        XCTAssertEqual(state.restStartedAt, at(10))
+        XCTAssertNil(state.setTimerStart)
+        XCTAssertNil(state.setTimerElapsed)
+        XCTAssertTrue(state.target.hasPrefix("Set 2/2"))
+        let display = WorkoutLivePresentation(state: state, now: at(20))
+        XCTAssertEqual(display.status, "Rest")
+        XCTAssertEqual(display.primaryTitle, "Skip rest")
+        XCTAssertEqual(display.primaryAction, .endRest)
+        XCTAssertFalse(display.setTimerVisible)
+    }
+    @MainActor func testLiveRestBetweenExercisesProjectsTheNextExerciseAndItsOwnFirstSet() throws {
+        var session = fixture(rest: 90)
+        session.entries[0].sets = [session.entries[0].sets[0]]
+        WorkoutExecutionEngine.prepare(&session, at: at(0))
+        try WorkoutExecutionEngine.apply(.startSet, to: &session, at: at(1))
+        try WorkoutExecutionEngine.apply(.completeSet, to: &session, at: at(10))
+        let state = WorkoutPresentationCoordinator.content(for: session, unit: .kg, now: at(20))
+        XCTAssertEqual(state.exercise, session.entries[1].exercise.name)
+        XCTAssertEqual(state.exerciseIndex, 2)
+        XCTAssertEqual(state.setIndex, 1)
+        XCTAssertEqual(state.exerciseSetCount, session.entries[1].sets.count)
+        XCTAssertEqual(WorkoutLivePresentation(state: state, now: at(20)).exerciseProgress, "2/2")
+    }
+    @MainActor func testExpiredOrStaleRestOffersContinueRatherThanExtendingAnExpiredTimer() throws {
+        var session = fixture(rest: 90)
+        try WorkoutExecutionEngine.apply(.startSet, to: &session, at: at(1))
+        try WorkoutExecutionEngine.apply(.completeSet, to: &session, at: at(10))
+        let state = WorkoutPresentationCoordinator.content(for: session, unit: .kg, now: at(20))
+        for display in [WorkoutLivePresentation(state: state, stale: true, now: at(20)), WorkoutLivePresentation(state: state, now: at(101))] {
+            XCTAssertTrue(display.restFinished)
+            XCTAssertEqual(display.status, "Rest finished")
+            XCTAssertEqual(display.primaryTitle, "Continue")
+            XCTAssertEqual(display.primaryAction, .endRest)
+        }
+        // The existing end-rest command also remains safe after the deadline.
+        try WorkoutExecutionEngine.apply(.skipRest, to: &session, at: at(101))
+        XCTAssertEqual(session.execution?.phase, .ready)
+        XCTAssertEqual(session.execution?.setID, session.entries[0].sets[1].id)
+    }
+    @MainActor func testPausedRestKeepsFrozenRemainingAndResumeActionWithoutSetTimer() throws {
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        var session = fixture(rest: 90)
+        try WorkoutExecutionEngine.apply(.startSet, to: &session, at: at(1))
+        try WorkoutExecutionEngine.apply(.completeSet, to: &session, at: at(10))
+        XCTAssertTrue(store.save(session, at: at(10)))
+        XCTAssertTrue(store.pause(now: at(20)))
+        let paused = try XCTUnwrap(store.active)
+        let state = WorkoutPresentationCoordinator.content(for: paused, unit: .kg, now: at(200))
+        XCTAssertEqual(state.pausedRest, 80)
+        XCTAssertEqual(state.setIndex, 2)
+        XCTAssertNil(state.setTimerElapsed)
+        let display = WorkoutLivePresentation(state: state, stale: true, now: at(200))
+        XCTAssertEqual(display.status, "Rest paused")
+        XCTAssertFalse(display.restFinished)
+        XCTAssertEqual(display.primaryAction, .open)
+    }
+    @MainActor func testLiveProjectionAddsSafeUnicodeProgressAndOlderPayloadsStillDecode() throws {
+        var session = fixture(rest: 0)
+        session.title = String(repeating: "🏋🏽‍♂️", count: 100)
+        session.entries[0].exercise.name = String(repeating: "👩🏽‍🚀", count: 100)
+        let state = WorkoutPresentationCoordinator.content(for: session, unit: .kg, now: at(1))
+        XCTAssertFalse(state.title.contains("\u{FFFD}"))
+        XCTAssertFalse(state.exercise.contains("\u{FFFD}"))
+        XCTAssertLessThanOrEqual(state.title.utf8.count, 160)
+        let data = try JSONEncoder().encode(state)
+        XCTAssertLessThan(data.count, 4096)
+        var old = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [String: Any])
+        for key in ["exerciseIndex", "exerciseCount", "setIndex", "exerciseSetCount", "prescription", "restStartedAt"] { old.removeValue(forKey: key) }
+        let decoded = try JSONDecoder().decode(WorkoutLiveAttributes.ContentState.self, from: JSONSerialization.data(withJSONObject: old))
+        XCTAssertNil(decoded.exerciseIndex)
+        XCTAssertFalse(WorkoutLivePresentation(state: decoded, now: at(1)).setProgress.isEmpty)
+        XCTAssertEqual(WorkoutLivePresentation(state: decoded, now: at(1)).secondaryDetail, state.target)
+    }
+    @MainActor func testLiveReadyActiveTransitionAndEmptyActionsAreUnambiguous() throws {
+        var session = fixture(rest: 0)
+        var state = WorkoutPresentationCoordinator.content(for: session, unit: .kg, now: at(1))
+        XCTAssertEqual(WorkoutLivePresentation(state: state, now: at(1)).primaryAction, .startSet)
+        try WorkoutExecutionEngine.apply(.startSet, to: &session, at: at(1))
+        state = WorkoutPresentationCoordinator.content(for: session, unit: .kg, now: at(3))
+        XCTAssertEqual(WorkoutLivePresentation(state: state, now: at(3)).status, "In set")
+        XCTAssertTrue(WorkoutLivePresentation(state: state, now: at(3)).setTimerVisible)
+        XCTAssertEqual(WorkoutLivePresentation(state: state, now: at(3)).primaryAction, .open)
+        state.phase = "exerciseTransition"
+        XCTAssertEqual(WorkoutLivePresentation(state: state).primaryTitle, "Start exercise")
+        state.totalSets = 0; state.loggedSets = 0; state.phase = "ready"
+        XCTAssertEqual(WorkoutLivePresentation(state: state).status, "Set up workout")
+        XCTAssertEqual(WorkoutLivePresentation(state: state).primaryAction, .open)
+    }
+    func testLiveClockFormattingBoundsInvalidAndLongDurations() {
+        XCTAssertEqual(WorkoutLivePresentation.clock(65), "01:05")
+        XCTAssertEqual(WorkoutLivePresentation.clock(3601), "1:00:01")
+        XCTAssertEqual(WorkoutLivePresentation.clock(3601, compact: true), "1h")
+        XCTAssertEqual(WorkoutLivePresentation.clock(-1), "00:00")
+        XCTAssertEqual(WorkoutLivePresentation.clock(.nan), "00:00")
+        XCTAssertEqual(WorkoutLivePresentation.clock(.infinity), "00:00")
+    }
     @MainActor func testLiveProjectionShowsCurrentSetAndPersistedWeightUnitWithoutLaps() throws {
         var session = fixture(rest: 0)
         try WorkoutExecutionEngine.apply(.skipSet, to: &session, at: at(1))

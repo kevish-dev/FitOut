@@ -24,9 +24,10 @@ and interactive dismissal restore the control; editor visibility is reported
 without writing session data. It inherits the saved appearance and hides while any
 workout editor is visible. Ending the workout removes it; Undo can restore it.
 
-ActivityKit compact/minimal layouts show status and elapsed workout time.
-Expanded and Lock Screen layouts add exercise, current set/total sets, inputs,
-completed/skipped counts, active-set timing and rest countdown. Quick actions
+ActivityKit compact/minimal layouts show status; compact time switches from total
+workout time to remaining rest while resting. Expanded and Lock Screen layouts
+prioritize the current/upcoming exercise, current set, prescription, active-set
+timing and rest countdown. Quick actions
 pause/resume, start a ready set, extend rest by 15 seconds or skip rest. Recording
 actual completed sets remains an explicit action in the app. No lap action is
 exposed. Session IDs, revision checks and receipts reject stale or duplicate
@@ -48,3 +49,6 @@ Simulator unit tests cover execution, interruption recovery, stale commands and
 projection. Generic-iOS unsigned build-for-testing checks the app and extension.
 Physical-device Dynamic Island, Lock Screen interaction and visual checks remain
 necessary; no interactive UI automation is performed as part of this change.
+
+See [the layout repair notes](LIVE_ACTIVITY_LAYOUT.md) for the compact three-row
+Lock Screen design, expanded Island hierarchy and regression coverage.

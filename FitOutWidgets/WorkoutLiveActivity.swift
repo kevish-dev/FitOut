@@ -2,135 +2,225 @@ import SwiftUI
 import WidgetKit
 import ActivityKit
 
+private enum LiveStyle {
+    static let accent = Color(red: 1, green: 77.0 / 255, blue: 0)
+    static let background = Color(red: 0.045, green: 0.045, blue: 0.055)
+    static let secondary = Color.white.opacity(0.7)
+    static let workoutURL = URL(string: "fitout://widget/workout")!
+}
+
 struct FitOutWorkoutLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: WorkoutLiveAttributes.self) { context in
-            WorkoutLiveLockScreen(context: context)
-                .activityBackgroundTint(Color(red: 0.045, green: 0.045, blue: 0.055))
+            WorkoutLiveLockScreen(state: context.state, sessionID: context.attributes.sessionID, stale: context.isStale)
+                .activityBackgroundTint(LiveStyle.background)
                 .activitySystemActionForegroundColor(.white)
-                .widgetURL(URL(string: "fitout://widget/workout"))
+                .widgetURL(LiveStyle.workoutURL)
         } dynamicIsland: { context in
-            DynamicIsland {
+            let presentation = WorkoutLivePresentation(state: context.state, stale: context.isStale)
+            return DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    Label(context.state.paused ? "Paused" : "Workout", systemImage: context.state.paused ? "pause.fill" : "dumbbell.fill")
-                        .font(.caption).foregroundStyle(.orange)
+                    Label(presentation.status, systemImage: presentation.symbol)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(LiveStyle.accent).lineLimit(1)
+                        .padding(.leading, 4)
                 }
-                DynamicIslandExpandedRegion(.trailing) { WorkoutLiveClock(state: context.state).font(.headline).frame(maxWidth: 100) }
-                DynamicIslandExpandedRegion(.center) {
-                    Text(context.state.exercise).font(.caption).lineLimit(1).privacySensitive()
+                DynamicIslandExpandedRegion(.trailing) {
+                    WorkoutLiveClock(state: context.state, kind: .workout)
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .frame(width: 76, alignment: .trailing)
+                        .foregroundStyle(.white).padding(.trailing, 4)
                 }
+                // No competing center region: the exercise gets the full width
+                // below the camera rather than squeezing between two clocks.
                 DynamicIslandExpandedRegion(.bottom) {
-                    VStack(alignment: .leading, spacing: 9) {
-                        HStack {
-                            Text("\(context.state.loggedSets) done · \(context.state.skippedSets ?? 0) skipped / \(context.state.totalSets)")
-                            Spacer(minLength: 4)
-                            WorkoutLiveRest(state: context.state, stale: context.isStale)
-                        }.font(.caption2).foregroundStyle(.secondary)
-                        if !context.state.target.isEmpty { Text(context.state.target).font(.caption2).lineLimit(1).privacySensitive() }
-                        WorkoutLiveSplit(state: context.state).font(.caption2).foregroundStyle(.secondary)
-                        WorkoutLiveActions(sessionID: context.attributes.sessionID, state: context.state)
-                    }
+                    VStack(spacing: 8) {
+                        LiveExerciseHeading(state: context.state, presentation: presentation, lockScreen: false)
+                        LiveCurrentWork(state: context.state, presentation: presentation, compact: true)
+                        WorkoutLiveActions(sessionID: context.attributes.sessionID, state: context.state, presentation: presentation)
+                    }.padding(.horizontal, 4).padding(.bottom, 2)
                 }
             } compactLeading: {
-                Image(systemName: context.state.paused ? "pause.fill" : "dumbbell.fill").foregroundStyle(.orange)
+                Image(systemName: presentation.symbol)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(LiveStyle.accent)
+                    .frame(width: 22, height: 24)
+                    .accessibilityLabel(presentation.status)
             } compactTrailing: {
-                WorkoutLiveClock(state: context.state).font(.caption2).frame(width: 66)
+                WorkoutLiveClock(state: context.state, kind: presentation.resting ? .rest : .workout, compact: true)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundStyle(presentation.resting ? LiveStyle.accent : .white)
+                    .frame(width: 44, height: 24)
+                    .minimumScaleFactor(0.65)
             } minimal: {
-                Image(systemName: context.state.paused ? "pause.fill" : "dumbbell.fill").foregroundStyle(.orange)
+                Image(systemName: presentation.symbol)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(LiveStyle.accent)
+                    .accessibilityLabel("FitOut · " + presentation.status)
             }
-            .widgetURL(URL(string: "fitout://widget/workout"))
-            .keylineTint(.orange)
+            .widgetURL(LiveStyle.workoutURL)
+            .keylineTint(LiveStyle.accent)
         }
     }
 }
 
+/// Three compact rows; no redundant last-set row or unlabeled competing clocks.
 private struct WorkoutLiveLockScreen: View {
-    let context: ActivityViewContext<WorkoutLiveAttributes>
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: 5) {
-                    Label(context.state.title, systemImage: "dumbbell.fill").font(.headline).lineLimit(1)
-                    Text(context.state.exercise).font(.subheadline).foregroundStyle(.secondary).lineLimit(1)
-                }.privacySensitive()
-                Spacer(minLength: 8)
-                WorkoutLiveClock(state: context.state).font(.title2.bold()).frame(maxWidth: 120)
-            }
-            HStack {
-                Text("\(context.state.loggedSets)/\(context.state.totalSets) sets")
-                Text("\(context.state.skippedSets ?? 0) skipped")
-                Spacer(minLength: 4)
-                WorkoutLiveRest(state: context.state, stale: context.isStale)
-            }.font(.caption).foregroundStyle(.secondary)
-            if !context.state.lastSet.isEmpty {
-                Text("Last: \(context.state.lastSet)").font(.caption).lineLimit(1).privacySensitive()
-            }
-            WorkoutLiveSplit(state: context.state).font(.caption).foregroundStyle(.secondary)
-            WorkoutLiveActions(sessionID: context.attributes.sessionID, state: context.state)
-        }.padding(16).foregroundStyle(.white)
-    }
-}
-private struct WorkoutLiveSplit: View {
     let state: WorkoutLiveAttributes.ContentState
-    var body: some View {
-        HStack(spacing: 6) {
-            if let elapsed = state.setTimerElapsed {
-                Image(systemName: "stopwatch")
-                Text("Set")
-                if let start = state.setTimerStart { Text(start, style: .timer).monospacedDigit() }
-                else { Text(liveClock(elapsed)).monospacedDigit() }
-            }
-        }
-    }
-}
-
-private struct WorkoutLiveClock: View {
-    let state: WorkoutLiveAttributes.ContentState
-    var body: some View {
-        Group {
-            if state.paused { Text(liveClock(state.elapsed)) }
-            else { Text(state.clockStart, style: .timer) }
-        }.monospacedDigit().contentTransition(.numericText())
-            .accessibilityLabel(state.paused ? "Paused at \(liveClock(state.elapsed))" : "Workout elapsed time")
-    }
-}
-private struct WorkoutLiveRest: View {
-    let state: WorkoutLiveAttributes.ContentState
+    let sessionID: UUID
     let stale: Bool
+    private var presentation: WorkoutLivePresentation { .init(state: state, stale: stale) }
     var body: some View {
-        if state.paused && state.pausedRest > 0 { Text("Rest paused · \(liveClock(state.pausedRest))") }
-        else if let deadline = state.restUntil {
-            if stale { Text("Rest complete") }
-            else {
-                HStack(spacing: 3) {
-                    Image(systemName: "timer")
-                    Text(timerInterval: min(Date.now, deadline)...deadline, countsDown: true).monospacedDigit().frame(maxWidth: 65)
+        VStack(spacing: 8) {
+            HStack(alignment: .center, spacing: 10) {
+                Image(systemName: presentation.symbol)
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(LiveStyle.accent)
+                    .frame(width: 34, height: 34)
+                    .background(LiveStyle.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+                    .accessibilityHidden(true)
+                LiveExerciseHeading(state: state, presentation: presentation, lockScreen: true)
+                VStack(alignment: .trailing, spacing: 2) {
+                    Text("Total").font(.system(size: 10, weight: .medium)).foregroundStyle(LiveStyle.secondary)
+                    WorkoutLiveClock(state: state, kind: .workout)
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .frame(width: 78, alignment: .trailing)
                 }
             }
+            LiveCurrentWork(state: state, presentation: presentation)
+            WorkoutLiveActions(sessionID: sessionID, state: state, presentation: presentation)
+        }
+        .padding(.horizontal, 16).padding(.vertical, 12)
+        .foregroundStyle(.white)
+    }
+}
+
+private struct LiveExerciseHeading: View {
+    let state: WorkoutLiveAttributes.ContentState
+    let presentation: WorkoutLivePresentation
+    let lockScreen: Bool
+    var body: some View {
+        HStack(alignment: .center, spacing: 8) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(state.exercise)
+                    .font(.system(size: lockScreen ? 15 : 14, weight: .semibold))
+                    .lineLimit(1).truncationMode(.tail)
+                if lockScreen {
+                    Text(state.title).font(.system(size: 11)).foregroundStyle(LiveStyle.secondary).lineLimit(1)
+                }
+            }.frame(maxWidth: .infinity, alignment: .leading).privacySensitive()
+            if !lockScreen, let progress = presentation.exerciseProgress {
+                Text(progress).font(.system(size: 11, weight: .medium)).foregroundStyle(LiveStyle.secondary)
+                    .accessibilityLabel("Exercise " + progress.replacingOccurrences(of: "/", with: " of "))
+            }
         }
     }
 }
+
+private struct LiveCurrentWork: View {
+    let state: WorkoutLiveAttributes.ContentState
+    let presentation: WorkoutLivePresentation
+    var compact = false
+    var body: some View {
+        HStack(alignment: .center, spacing: 12) {
+            HStack(alignment: .firstTextBaseline, spacing: 6) {
+                if presentation.restFinished || !presentation.resting && !presentation.setTimerVisible {
+                    Text(state.paused ? "Paused" : presentation.restFinished ? "Ready" : state.phase == "exerciseTransition" ? "Next" : "Ready")
+                        .font(.system(size: compact ? 19 : 22, weight: .semibold, design: .rounded))
+                } else {
+                    WorkoutLiveClock(state: state, kind: presentation.resting ? .rest : presentation.setTimerVisible ? .set : .workout)
+                        .font(.system(size: compact ? 23 : 25, weight: .semibold, design: .rounded))
+                        .frame(width: compact ? 88 : 100, alignment: .leading)
+                }
+                if presentation.resting || presentation.setTimerVisible {
+                    Text(presentation.resting ? (state.paused ? "paused" : "rest") : "set")
+                        .font(.system(size: 11, weight: .medium)).foregroundStyle(LiveStyle.secondary)
+                }
+            }.foregroundStyle(presentation.resting ? LiveStyle.accent : .white)
+                .fixedSize(horizontal: false, vertical: true)
+
+            VStack(alignment: .trailing, spacing: 3) {
+                Text(presentation.setProgress).font(.system(size: 12, weight: .semibold)).lineLimit(1)
+                Text(presentation.secondaryDetail).font(.system(size: 12)).foregroundStyle(LiveStyle.secondary).lineLimit(1)
+            }.frame(maxWidth: .infinity, alignment: .trailing).privacySensitive()
+        }.frame(minHeight: 34)
+        .accessibilityElement(children: .combine)
+    }
+}
+
+private enum LiveClockKind { case workout, set, rest }
+
+/// System-rendered timer text has bounded width and a stable interval. A rest
+/// countdown ends at zero; it never becomes an increasing overtime timer.
+private struct WorkoutLiveClock: View {
+    let state: WorkoutLiveAttributes.ContentState
+    let kind: LiveClockKind
+    var compact = false
+    var body: some View {
+        text
+            .monospacedDigit().lineLimit(1).minimumScaleFactor(0.65)
+            .multilineTextAlignment(.trailing)
+            .accessibilityLabel(kind == .rest ? "Rest time remaining" : kind == .set ? "Current set elapsed time" : "Total workout time")
+            .accessibilityValue(text)
+    }
+    private var text: Text {
+        switch kind {
+            case .rest:
+                if state.paused { return Text(WorkoutLivePresentation.clock(state.pausedRest, compact: compact)) }
+                else if let end = state.restUntil {
+                    let start = min(state.restStartedAt ?? end.addingTimeInterval(-3600), end)
+                    return Text(timerInterval: start...end, countsDown: true, showsHours: !compact)
+                } else { return Text("00:00") }
+            case .set:
+                if state.paused || state.setTimerStart == nil {
+                    return Text(WorkoutLivePresentation.clock(state.setTimerElapsed ?? 0, compact: compact))
+                }
+                return Text(state.setTimerStart ?? state.clockStart, style: .timer)
+            case .workout:
+                if state.paused { return Text(WorkoutLivePresentation.clock(state.elapsed, compact: compact)) }
+                else { return Text(state.clockStart, style: .timer) }
+        }
+    }
+}
+
 private struct WorkoutLiveActions: View {
     let sessionID: UUID
     let state: WorkoutLiveAttributes.ContentState
+    let presentation: WorkoutLivePresentation
     var body: some View {
-        HStack(spacing: 10) {
-            action(state.paused ? "Resume" : "Pause", symbol: state.paused ? "play.fill" : "pause.fill", operation: state.paused ? "resume" : "pause")
-            if state.restUntil != nil {
-                action("+15s", symbol: "plus", operation: "extendRest").disabled(state.paused)
-                action("Skip rest", symbol: "forward.end", operation: "endRest").disabled(state.paused)
+        HStack(spacing: 8) {
+            action(state.paused ? "Resume workout" : "Pause workout", symbol: state.paused ? "play.fill" : "pause.fill", operation: state.paused ? "resume" : "pause", iconOnly: true)
+                .frame(width: 44)
+            if presentation.resting && !state.paused && !presentation.restFinished {
+                action("+15 sec", symbol: "plus", operation: "extendRest")
+                    .frame(width: 76)
             }
-            else if !state.paused && ["ready", "exerciseTransition"].contains(state.phase ?? "") { action("Start set", symbol: "play", operation: "startSet") }
-            else { Link(destination: URL(string: "fitout://widget/workout")!) { Image(systemName: "arrow.up.forward").frame(minWidth: 36, minHeight: 36) }.accessibilityLabel("Open workout") }
-        }.buttonStyle(.bordered).tint(.orange)
-    }
-    private func action(_ title: String, symbol: String, operation: String) -> some View {
-        Button(intent: WorkoutLiveIntent(sessionID: sessionID, commandID: state.revision, operation: operation)) {
-            Label(title, systemImage: symbol).font(.caption).frame(minHeight: 32)
+            switch presentation.primaryAction {
+            case .open:
+                Link(destination: LiveStyle.workoutURL) {
+                    actionLabel("Open workout", symbol: "arrow.up.right", primary: true)
+                }.accessibilityLabel("Open current workout in FitOut")
+            case .startSet:
+                action(presentation.primaryTitle, symbol: "play.fill", operation: "startSet", primary: true)
+            case .endRest:
+                action(presentation.primaryTitle, symbol: "forward.end.fill", operation: "endRest", primary: true)
+            }
         }
+        .buttonStyle(.plain)
     }
-}
-private func liveClock(_ seconds: TimeInterval) -> String {
-    let value = Int(max(0, seconds))
-    return value >= 3600 ? String(format: "%d:%02d:%02d", value / 3600, value / 60 % 60, value % 60) : String(format: "%02d:%02d", value / 60, value % 60)
+    private func action(_ title: String, symbol: String, operation: String, primary: Bool = false, iconOnly: Bool = false) -> some View {
+        Button(intent: WorkoutLiveIntent(sessionID: sessionID, commandID: state.revision, operation: operation)) {
+            actionLabel(title, symbol: symbol, primary: primary, iconOnly: iconOnly)
+        }.accessibilityLabel(title)
+    }
+    private func actionLabel(_ title: String, symbol: String, primary: Bool, iconOnly: Bool = false) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: symbol).font(.system(size: 12, weight: .semibold))
+            if !iconOnly { Text(title).font(.system(size: 13, weight: .semibold)).lineLimit(1).minimumScaleFactor(0.8) }
+        }
+        .frame(maxWidth: .infinity, minHeight: 44)
+        .foregroundStyle(primary ? Color.black : Color.white)
+        .background(primary ? LiveStyle.accent : Color.white.opacity(0.12), in: Capsule())
+        .contentShape(Capsule())
+    }
 }

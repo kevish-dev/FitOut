@@ -129,16 +129,33 @@ import SwiftUI
     }
     static func content(for session: WorkoutSession, unit: WeightUnit, now: Date = .now) -> WorkoutLiveAttributes.ContentState {
         let unit = session.execution?.preferredUnit ?? unit
-        func bounded(_ text: String) -> String { String(decoding: text.utf8.prefix(200), as: UTF8.self) }
-        let focus = session.focusedWork
+        func bounded(_ text: String) -> String {
+            // Whole-character truncation avoids broken emoji/replacement characters.
+            var result = ""
+            for character in text.split(whereSeparator: \.isWhitespace).joined(separator: " ") {
+                guard result.utf8.count + String(character).utf8.count <= 160 else { break }
+                result.append(character)
+            }
+            return result
+        }
+        let resting = session.execution?.phase == .resting || session.execution?.resumePhase == .resting || session.restUntil != nil
+        let next = session.pendingWork.first
+        let upcoming: (entry: WorkoutEntry, set: WorkoutSet)? = next.flatMap { reference in
+            guard let entry = session.entries.first(where: { $0.id == reference.entryID }),
+                  let set = entry.sets.first(where: { $0.id == reference.setID }) else { return nil }
+            return (entry, set)
+        }
+        let focus = resting ? upcoming : session.focusedWork
         func values(_ set: WorkoutSet, kind: ExerciseKind) -> String {
             if kind == .duration { return "\(set.seconds.formatted()) sec" }
             return "\(set.reps) reps" + (kind == .weighted ? " · \(unit.display(set.loadKG).formatted()) \(unit.rawValue)" : "")
         }
         let completed = session.entries.flatMap { entry in entry.sets.filter { $0.completedAt != nil }.map { (entry.exercise, $0) } }
             .max { ($0.1.completedAt ?? .distantPast) < ($1.1.completedAt ?? .distantPast) }
-        let setElapsed = focus.flatMap { session.setElapsed($0.set, at: now) }
-        let setRunning = focus?.set.startedAt != nil && focus?.set.timedActiveSeconds == nil && session.status == .inProgress
+        let setElapsed = resting ? nil : focus.flatMap { session.setElapsed($0.set, at: now) }
+        let setRunning = !resting && focus?.set.startedAt != nil && focus?.set.timedActiveSeconds == nil && session.status == .inProgress
+        let entries = session.entries.filter { !$0.skipped }
+        let phase = session.execution?.phase ?? (!session.isActive ? .workoutCompleted : session.status == .paused ? .paused : resting ? .resting : setRunning ? .activeSet : .ready)
         return WorkoutLiveAttributes.ContentState(revision: session.telemetry?.revision ?? session.id,
             title: bounded(session.title), exercise: bounded(focus?.entry.exercise.name ?? (session.entries.isEmpty ? "Choose exercises in FitOut" : "All remaining sets logged")),
             target: bounded(focus.map { work in "Set \((work.entry.sets.firstIndex { $0.id == work.set.id } ?? 0) + 1)/\(work.entry.sets.count) · " + values(work.set, kind: work.entry.exercise.kind) } ?? ""),
@@ -147,6 +164,10 @@ import SwiftUI
             elapsed: session.duration(at: now), loggedSets: session.completedSets.count, totalSets: session.trackedSetCount,
             laps: 0, lastLap: nil,
             setTimerStart: setRunning ? setElapsed.map { now.addingTimeInterval(-$0) } : nil, setTimerElapsed: setElapsed,
-            restUntil: session.restUntil, pausedRest: session.restRemaining(at: now), phase: session.execution?.phase.rawValue, skippedSets: session.skippedSets.count)
+            restUntil: session.restUntil, pausedRest: session.restRemaining(at: now), phase: phase.rawValue, skippedSets: session.skippedSets.count,
+            exerciseIndex: focus.flatMap { work in entries.firstIndex { $0.id == work.entry.id }.map { $0 + 1 } },
+            exerciseCount: entries.count, setIndex: focus.flatMap { work in work.entry.sets.firstIndex { $0.id == work.set.id }.map { $0 + 1 } },
+            exerciseSetCount: focus?.entry.sets.count, prescription: focus.map { bounded(values($0.set, kind: $0.entry.exercise.kind)) },
+            restStartedAt: resting ? completed?.1.completedAt : nil)
     }
 }
