@@ -193,6 +193,8 @@ struct FoundationSettings: View {
                 NavigationLink("Edit profile & navigation") { ProfileEditor(store: container.profile, presentation: container.presentation) }
                     .accessibilityIdentifier("editProfileNavigation")
             }
+            NavigationLink("Units") { UnitSettingsView(profile: container.profile, hydration: container.hydration) }
+                .accessibilityIdentifier("unitSettings")
             NavigationLink("Apple Health") { HealthConnectionView(service: container.health) }
             NavigationLink("Water intake") { HydrationView(store: container.hydration, health: container.health, reminders: container.hydrationReminders) }
             NavigationLink("Widgets & goals") { WidgetGoalsView(store: container.hydration) }

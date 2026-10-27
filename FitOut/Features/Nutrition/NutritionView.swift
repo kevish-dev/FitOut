@@ -31,7 +31,7 @@ struct NutritionView: View {
     private var summary: NutritionDaySummary { store.summary(on: date) }
     private var target: NutritionValues { store.target(on: date) }
     private var today: Bool { Calendar.current.isDateInToday(date) }
-    private var waterUnit: String { container.hydration.state.waterDisplayUnit == "ml" ? "ml" : "L" }
+    private var waterUnit: String { container.hydration.waterDisplayUnit }
     private var waterTotal: Double {
         today ? container.hydration.state.totalWater(at: .now) : Double(container.hydration.state.localWater(at: Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: date))!.addingTimeInterval(-1)))
     }

@@ -645,7 +645,7 @@ struct HomeView: View {
 
             LazyVGrid(columns: [GridItem(.flexible(), spacing: FitTheme.sectionSpacing), GridItem(.flexible(), spacing: FitTheme.sectionSpacing)], spacing: FitTheme.sectionSpacing) {
                 Button { showWater = true } label: {
-                    HealthOverviewTile(kind: .water, series: healthOverview.waterMilliliters, isLoading: isLoadingHealth, waterUnit: container.hydration.state.waterDisplayUnit)
+                    HealthOverviewTile(kind: .water, series: healthOverview.waterMilliliters, isLoading: isLoadingHealth, waterUnit: container.hydration.waterDisplayUnit)
                 }.buttonStyle(.fitPlain).accessibilityHint("Opens water logging")
                 HealthOverviewTile(kind: .steps, series: healthOverview.steps, isLoading: isLoadingHealth)
                 HealthOverviewTile(kind: .calories, series: healthOverview.activeCalories, isLoading: isLoadingHealth)

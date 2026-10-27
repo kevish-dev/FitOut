@@ -32,9 +32,10 @@ arc as the view compresses or animates. Reduce Motion disables interpolation.
 
 The compact row under the stage shows sets logged, valid training volume in the
 selected unit, and total workout time. These come from the persisted session;
-there are no sample heart-rate, calorie or step readings. Editable weight, kg/lb
-units and reps remain below, using previous performance recall, numeric inputs and
-+/- controls. Duration exercises have a target and optional distance; actual time
+there are no sample heart-rate, calorie or step readings. Editable weight and reps
+remain below, using previous performance recall and vertical number wheels. Weight
+units come from Settings → Units, with no inline kg/lb switch. Duration exercises
+have a target and optional distance; actual time
 comes from the running timer. Validation prevents bad typed values from silently
 completing a set with saved defaults. Effort/rest use a disclosure; applying inputs
 to remaining sets is explicit. Skip Set and Add Note remain available. Recorded
@@ -57,9 +58,12 @@ photo assets, dependencies or persistence schema changes are needed.
 `WorkoutExecutionEngine` is a pure explicit state machine: ready, activeSet,
 resting, paused, exerciseTransition and workoutCompleted. `FocusedWorkoutModel`
 is observable and owns screen transitions, validation and the cancellable rest
-deadline task. State, cursor, unit preference, last Undo, set skips, input targets,
+deadline task. State, cursor, legacy unit metadata, last Undo, set skips, input targets,
 actual records and notes persist in the existing V5 JSON supplement. Historical
 SwiftData schemas are unchanged. Old sessions normalize into the focused flow.
+The profile preference controls current display units; historical session unit
+overrides never take priority over Settings. Preference changes update display
+without mutating recorded sessions or timer state.
 
 Start snapshots current inputs and starts the set clock. Complete validates and
 saves actual load/reps/measured duration immediately. If work remains, configured

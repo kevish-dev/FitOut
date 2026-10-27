@@ -23,7 +23,7 @@ struct WorkoutExecution: Codable, Equatable {
     var resumePhase: WorkoutPhase?
     var entryID: UUID?
     var setID: UUID?
-    var preferredUnit: WeightUnit?
+    var preferredUnit: WeightUnit? // Legacy session metadata; Settings owns display units.
     var undo: WorkoutUndo?
 }
 enum WorkoutCommand { case startSet, completeSet, skipSet, skipRest, extendRest, finish, undo }

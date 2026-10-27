@@ -53,7 +53,7 @@ struct WorkoutClockAnchor {
     var session: WorkoutSession? { store.sessions.first { $0.id == sessionID } }
     var phase: WorkoutPhase { session?.execution?.phase ?? .ready }
     var current: (entry: WorkoutEntry, set: WorkoutSet)? { session?.executingWork }
-    var unit: WeightUnit { session?.execution?.preferredUnit ?? defaultUnit }
+    var unit: WeightUnit { store.displayWeightUnit ?? defaultUnit }
     var now: Date { anchor.now }
     var next: WorkoutEntry? {
         guard let session else { return nil }
@@ -67,7 +67,11 @@ struct WorkoutClockAnchor {
         if inputSetID != current?.set.id { inputSetID = current?.set.id; inputErrors = [:]; editingInputs = [] }
         scheduleRest()
     }
-    func selectUnit(_ value: WeightUnit) { store.update { $0.execution?.preferredUnit = value } }
+    func editDisplayedLoad(_ number: Double, unit inputUnit: WeightUnit, setID: UUID) {
+        guard inputUnit == unit, var value = current?.set, value.id == setID else { return }
+        value.loadKG = inputUnit.kilograms(number)
+        editSet(value, field: .load)
+    }
     func perform(_ command: WorkoutCommand, expectedSet: UUID? = nil) {
         guard let sessionID else { return }
         if command == .completeSet {

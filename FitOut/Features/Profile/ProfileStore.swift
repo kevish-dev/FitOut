@@ -28,6 +28,18 @@ import Observation
         }
     }
     func saveDraft() { do { try persist(draft); error = nil } catch { self.error = error.localizedDescription } }
+    @discardableResult func setUnits(weight: WeightUnit? = nil, height: HeightUnit? = nil) -> Bool {
+        var value = draft
+        if let weight { value.weightUnit = weight }
+        if let height { value.heightUnit = height }
+        guard value != draft else { error = nil; return true }
+        do {
+            // Preferences never convert canonical measurements or finish onboarding.
+            try persist(value)
+            applying = true; draft = value; applying = false
+            error = nil; onChange?(); onFeedback?(.selection); return true
+        } catch { self.error = error.localizedDescription; onFeedback?(.warning); return false }
+    }
     @discardableResult func complete(_ edited: ProfileData? = nil) -> Bool {
         var value = edited ?? draft
         guard value.validationMessage == nil else { error = value.validationMessage; onFeedback?(.warning); return false }

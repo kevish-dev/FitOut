@@ -46,8 +46,10 @@ The active set and quick/setup set editors now use vertical snapping number whee
 styled like onboarding's age picker: a highlighted center row, faded neighbors
 and orange side marks. Reps move by 1; weight moves by 0.5 kg or 1 lb. Enter exact
 opens a native numeric sheet for fractional increments and direct entry, validating
-the value before Save. Unit changes only convert display values; canonical data
-remains kilograms. Recalled off-grid weights are retained until deliberately
+the value before Save. Units are selected in Settings → Units rather than on the
+session/setup page. Unit changes only convert display values; canonical data
+remains kilograms. Callbacks from a wheel using the previous unit are rejected.
+Recalled off-grid weights are retained until deliberately
 changed; loading a wheel does not round and save them.
 
 The LazyVStack virtualizes rows. A wheel saves when scrolling settles, not on every

@@ -44,25 +44,6 @@ struct WeightScreen: View {
                 .id("\(isTarget)-\(profile.unit.rawValue)")
                 .frame(height: 88 * scale)
                 .padding(.bottom, 20 * scale)
-            HStack(spacing: 0) {
-                ForEach(WeightUnit.allCases, id: \.self) { unit in
-                    Button {
-                        profile.unit = unit
-                        haptics?.play(.selection)
-                    } label: {
-                        Text(unit.rawValue)
-                            .font(FitTheme.button(17))
-                            .foregroundStyle(unit == profile.unit ? FitTheme.orange : FitTheme.textPrimary.opacity(0.8))
-                            .frame(maxWidth: .infinity).frame(height: 42)
-                            .fitSurface(selected: unit == profile.unit, radius: 12)
-                    }
-                    .buttonStyle(.fitPlain)
-                    .accessibilityLabel(unit == .kg ? "Kilograms" : "Pounds")
-                    .accessibilityAddTraits(unit == profile.unit ? .isSelected : [])
-                }
-            }
-            .fitSurface(radius: 12)
-            .frame(width: 156 * scale)
         }
         .onChange(of: targetEnabled) { _, enabled in if !enabled { isTarget = false } }
         .onChange(of: isTarget) { _, _ in previewKG = nil }

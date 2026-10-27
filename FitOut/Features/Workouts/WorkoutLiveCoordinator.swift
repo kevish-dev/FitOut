@@ -131,7 +131,6 @@ import SwiftUI
         }
     }
     static func content(for session: WorkoutSession, unit: WeightUnit, now: Date = .now) -> WorkoutLiveAttributes.ContentState {
-        let unit = session.execution?.preferredUnit ?? unit
         func bounded(_ text: String) -> String {
             // Whole-character truncation avoids broken emoji/replacement characters.
             var result = ""

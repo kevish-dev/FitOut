@@ -108,13 +108,15 @@ final class FocusedWorkoutTests: XCTestCase {
         XCTAssertEqual(WorkoutLivePresentation.clock(.nan), "00:00")
         XCTAssertEqual(WorkoutLivePresentation.clock(.infinity), "00:00")
     }
-    @MainActor func testLiveProjectionShowsCurrentSetAndPersistedWeightUnitWithoutLaps() throws {
+    @MainActor func testLiveProjectionUsesSettingsUnitInsteadOfLegacySessionOverrideWithoutLaps() throws {
         var session = fixture(rest: 0)
         try WorkoutExecutionEngine.apply(.skipSet, to: &session, at: at(1))
         session.execution?.preferredUnit = .lbs
         let state = WorkoutPresentationCoordinator.content(for: session, unit: .kg, now: at(2))
         XCTAssertTrue(state.target.hasPrefix("Set 2/2"))
-        XCTAssertTrue(state.target.contains("lbs"))
+        XCTAssertTrue(state.target.contains("kg"))
+        XCTAssertFalse(state.target.contains("lbs"))
+        XCTAssertTrue(WorkoutPresentationCoordinator.content(for: session, unit: .lbs, now: at(2)).target.contains("lbs"))
         XCTAssertEqual(state.skippedSets, 1)
         XCTAssertEqual(state.phase, WorkoutPhase.ready.rawValue)
         XCTAssertNil(state.lastLap)

@@ -187,11 +187,6 @@ struct ActiveWorkoutView: View {
     private func inputs(_ entry: WorkoutEntry, set: WorkoutSet) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(set.type.rawValue).font(FitTheme.medium(11)).foregroundStyle(FitTheme.textSecondary)
-            if entry.exercise.kind == .weighted {
-                Picker("Weight unit", selection: Binding(get: { model.unit }, set: { model.selectUnit($0) })) {
-                    Text("kg").tag(WeightUnit.kg); Text("lb").tag(WeightUnit.lbs)
-                }.pickerStyle(.segmented).frame(maxWidth: 180).disabled(!model.editingInputs.isEmpty).accessibilityIdentifier("workoutWeightUnit")
-            }
             if let previous = store.reference(entryID: entry.id, setID: set.id) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(previous.isCurrentWorkout ? "Previous set" : "Last time · " + previous.date.formatted(date: .abbreviated, time: .omitted)).font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
@@ -229,12 +224,12 @@ struct ActiveWorkoutView: View {
     }
     @ViewBuilder private func fields(_ kind: ExerciseKind, set: WorkoutSet) -> some View {
         if kind == .weighted {
-            WorkoutNumberWheel(title: "Weight · \(model.unit.rawValue)", value: Binding(get: { model.unit.display(model.current?.set.id == set.id ? model.current?.set.loadKG ?? set.loadKG : set.loadKG) }, set: {
-                guard var value = model.current?.set, value.id == set.id else { return }
-                value.loadKG = model.unit.kilograms($0); model.editSet(value, field: .load)
-            }), step: model.unit == .kg ? 0.5 : 1, maximum: model.unit.display(1000), editingChanged: { active in
+            let inputUnit = model.unit
+            WorkoutNumberWheel(title: "Weight · \(inputUnit.rawValue)", value: Binding(get: { inputUnit.display(model.current?.set.id == set.id ? model.current?.set.loadKG ?? set.loadKG : set.loadKG) }, set: {
+                model.editDisplayedLoad($0, unit: inputUnit, setID: set.id)
+            }), step: inputUnit == .kg ? 0.5 : 1, maximum: inputUnit.display(1000), editingChanged: { active in
                 if active { model.editingInputs.insert(.load) } else { model.editingInputs.remove(.load) }
-            }).id("\(set.id)-load-\(model.unit.rawValue)")
+            }).id("\(set.id)-load-\(inputUnit.rawValue)")
         }
         if kind != .duration {
             WorkoutNumberWheel(title: "Actual reps", value: Binding(get: { Double(model.current?.set.id == set.id ? model.current?.set.reps ?? set.reps : set.reps) }, set: {

@@ -38,6 +38,7 @@ import Observation
         self.capabilities = capabilities
         if let legacyDefaults { try LegacyOnboardingImporter.importIfNeeded(from: legacyDefaults, into: repository) }
         profile = try ProfileStore(container: database, legacy: repository.loadSnapshot())
+        workouts.setDisplayWeightUnit(profile.draft.weightUnit)
         // UI-test suites and injected test defaults never write production widget data.
         let shared = defaults === UserDefaults.standard ? try? WidgetSharedStore.live() : nil
         let production = defaults === UserDefaults.standard
@@ -91,6 +92,10 @@ import Observation
             streakPresentation?.refresh()
         }
         workouts.onEditorVisibilityChange = { [weak workoutPresentation] in workoutPresentation?.overlayChanged() }
+        profile.onChange = { [weak profile, weak workouts, weak widgets, weak workoutPresentation] in
+            if let profile { workouts?.setDisplayWeightUnit(profile.draft.weightUnit) }
+            widgets?.publish(); workoutPresentation?.changed()
+        }
         presentation.onChange = { [weak presentation, weak workoutPresentation] in workoutPresentation?.appearanceChanged(presentation?.appearance.colorScheme) }
         workoutPresentation.appearanceChanged(presentation.appearance.colorScheme)
     }

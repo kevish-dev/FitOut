@@ -4,7 +4,8 @@ import Charts
 struct AnalyticsView: View {
     let store: WorkoutStore
     let gym: GymStore
-    let unit: WeightUnit
+    private let defaultUnit: WeightUnit
+    private var unit: WeightUnit { store.displayWeightUnit ?? defaultUnit }
     @State private var since = Calendar.current.date(byAdding: .month, value: -3, to: .now)!
     @State private var until = Date()
     @State private var exerciseID = ""
@@ -14,7 +15,7 @@ struct AnalyticsView: View {
     init(store: WorkoutStore, gym: GymStore, unit: WeightUnit, initialExerciseID: String = "") {
         self.store = store
         self.gym = gym
-        self.unit = unit
+        defaultUnit = unit
         _exerciseID = State(initialValue: initialExerciseID)
     }
     private var filtered: [WorkoutSession] { store.history.filter { $0.startedAt >= Calendar.current.startOfDay(for: since) && $0.startedAt < Calendar.current.date(byAdding: .day, value: 1, to: Calendar.current.startOfDay(for: until))! && (exerciseID.isEmpty || $0.entries.contains { $0.exercise.id == exerciseID }) } }

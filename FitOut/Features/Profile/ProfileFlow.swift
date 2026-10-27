@@ -6,7 +6,9 @@ import PhotosUI
 struct ProfileFlow: View {
     @Environment(\.fitHaptics) private var haptics
     @Bindable var store: ProfileStore
+    var hydration: HydrationStore? = nil
     @State private var showNameError = false
+    @State private var showingUnits = false
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private var referenceProfile: Binding<FitnessProfile> {
@@ -95,7 +97,21 @@ struct ProfileFlow: View {
             }
         }
         .foregroundStyle(FitTheme.textPrimary)
-
+        .overlay(alignment: .topTrailing) {
+            if store.draft.step > 0 {
+                Button { showingUnits = true } label: {
+                    Image(systemName: "gearshape").frame(width: 44, height: 44)
+                        .dashboardGlass(in: Circle(), interactive: true)
+                }.buttonStyle(.fitPlain).accessibilityLabel("Unit settings")
+                    .padding(.trailing, FitTheme.pageInset).padding(.top, 8)
+            }
+        }
+        .sheet(isPresented: $showingUnits) {
+            NavigationStack {
+                UnitSettingsView(profile: store, hydration: hydration)
+                    .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { showingUnits = false } } }
+            }
+        }
         .tint(FitTheme.orange)
         .alert("Profile could not be saved", isPresented: Binding(get: { store.error != nil }, set: { if !$0 { store.error = nil } })) {
             Button("Retry save") { store.saveDraft() }
@@ -170,7 +186,6 @@ private extension PrimaryGoal {
 }
 
 private struct HeightScreen: View {
-    @Environment(\.fitHaptics) private var haptics
     @Binding var heightCM: Double
     @Binding var unit: HeightUnit
     var scale: CGFloat = 1
@@ -185,28 +200,7 @@ private struct HeightScreen: View {
                 .id(unit)
                 .frame(width: 230 * scale, height: 300 * scale)
                 .padding(.bottom, 30 * scale)
-            HStack(spacing: 0) {
-                unitButton("cm", value: .cm)
-                unitButton("in", value: .feet)
-            }
-            .fitSurface(radius: 12)
-            .frame(width: 156 * scale)
         }
-    }
-
-    private func unitButton(_ title: String, value: HeightUnit) -> some View {
-        Button {
-            unit = value
-            haptics?.play(.selection)
-        } label: {
-            Text(title).font(FitTheme.button(17))
-                .foregroundStyle(unit == value ? FitTheme.orange : FitTheme.textPrimary.opacity(0.8))
-                .frame(maxWidth: .infinity).frame(height: 42)
-                .fitSurface(selected: unit == value, radius: 12)
-        }
-        .buttonStyle(.fitPlain)
-        .accessibilityLabel(value == .cm ? "Centimeters" : "Inches")
-        .accessibilityAddTraits(unit == value ? .isSelected : [])
     }
 }
 
@@ -289,6 +283,34 @@ private struct HeightWheel: View {
     }
 }
 
+struct UnitSettingsView: View {
+    let profile: ProfileStore
+    var hydration: HydrationStore? = nil
+    var body: some View {
+        Form {
+            Section {
+                Picker("Weight", selection: Binding(get: { profile.draft.weightUnit }, set: { _ = profile.setUnits(weight: $0) })) {
+                    Text("Kilograms (kg)").tag(WeightUnit.kg)
+                    Text("Pounds (lb)").tag(WeightUnit.lbs)
+                }.accessibilityIdentifier("settingsWeightUnit")
+                Picker("Height", selection: Binding(get: { profile.draft.heightUnit }, set: { _ = profile.setUnits(height: $0) })) {
+                    Text("Centimeters (cm)").tag(HeightUnit.cm)
+                    Text("Feet & inches (ft/in)").tag(HeightUnit.feet)
+                }.accessibilityIdentifier("settingsHeightUnit")
+                if let hydration {
+                    Picker("Water display", selection: Binding(get: { hydration.waterDisplayUnit }, set: { hydration.displayUnit($0) })) {
+                        Text("Milliliters (ml)").tag("ml")
+                        Text("Liters (L)").tag("L")
+                    }.accessibilityIdentifier("settingsWaterUnit")
+                }
+            } header: { Text("Measurement units") }
+            footer: { Text("Changes save immediately and apply across FitOut. Your recorded measurements, weights and workout timers stay unchanged.") }
+            if let error = profile.error { Section { Text(error).foregroundStyle(.red) } }
+            if let error = hydration?.error { Section { Text(error).foregroundStyle(.red) } }
+        }.nutritionForm().navigationTitle("Units").navigationBarTitleDisplayMode(.inline)
+    }
+}
+
 struct ProfileFields: View {
     @Binding var profile: ProfileData
     @State private var picker: PhotosPickerItem?
@@ -304,9 +326,7 @@ struct ProfileFields: View {
             }
             Text("Gender is optional profile information. It is not used to infer health conditions.").font(FitTheme.body(12)).foregroundStyle(.secondary)
         }
-        Section("Units and measurements") {
-            Picker("Weight units", selection: $profile.weightUnit) { ForEach(WeightUnit.allCases, id: \.self) { Text($0.rawValue).tag($0) } }
-            Picker("Height units", selection: $profile.heightUnit) { Text("cm").tag(HeightUnit.cm); Text("ft/in").tag(HeightUnit.feet) }
+        Section("Measurements") {
             if profile.heightUnit == .cm { numeric("Height (cm)", value: $profile.heightCM) }
             else {
                 let parts = ProfileData.feetAndInches(profile.heightCM)
@@ -357,7 +377,11 @@ struct ProfileEditor: View {
             if let error = store.error { Text(error).foregroundStyle(.red) }
         }.navigationTitle("Edit profile")
             .toolbar { ToolbarItem(placement: .confirmationAction) {
-                Button("Save") { if store.complete(draft) { dismiss() } }
+                Button("Save") {
+                    var edited = draft
+                    edited.weightUnit = store.draft.weightUnit; edited.heightUnit = store.draft.heightUnit
+                    if store.complete(edited) { dismiss() }
+                }
                     .padding(.trailing, presentation.navigationStyle == .topRight ? 68 : 0)
             } }
     }

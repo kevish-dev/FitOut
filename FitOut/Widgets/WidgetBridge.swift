@@ -7,6 +7,7 @@ import WidgetKit
     private(set) var state = FitOutWidgetState()
     var error: String?
     var onFeedback: ((FitHapticEvent) -> Void)?
+    var waterDisplayUnit: String { state.waterDisplayUnit == "L" ? "L" : "ml" }
     init(shared: WidgetSharedStore?, fallback: WidgetSharedStore? = nil) { self.shared = shared ?? fallback; refresh() }
     func refresh() {
         guard let shared else { return }

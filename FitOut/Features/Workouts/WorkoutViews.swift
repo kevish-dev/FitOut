@@ -39,7 +39,7 @@ struct WorkoutSummary: View {
         snapshot = session; self.unit = unit; self.history = history; self.store = store; self.showsLastSetActions = showsLastSetActions
     }
     var body: some View {
-        let unit = session.execution?.preferredUnit ?? self.unit
+        let unit = store?.displayWeightUnit ?? self.unit
         ScrollView {
             LazyVStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
                 WorkoutSessionHero(session: session, unit: unit, now: session.endedAt ?? .now)

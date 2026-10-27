@@ -17,12 +17,11 @@ struct HydrationView: View {
     private var today: Bool { Calendar.current.isDate(date, inSameDayAs: now) }
     private var logs: [WidgetWaterLog] { store.state.water.filter { $0.date <= now && Calendar.current.isDate($0.date, inSameDayAs: date) }.sorted { $0.date > $1.date } }
     private var total: Double { today ? store.state.totalWater(at: now) : Double(logs.reduce(0) { $0 + $1.milliliters }) }
-    private var liters: Bool { store.state.waterDisplayUnit == "L" }
+    private var liters: Bool { store.waterDisplayUnit == "L" }
     var body: some View {
         List {
             Section {
                 DatePicker("Water history date", selection: $date, in: ...Date(), displayedComponents: .date)
-                Picker("Display unit", selection: Binding(get: { store.state.waterDisplayUnit ?? "ml" }, set: { store.displayUnit($0) })) { Text("ml").tag("ml"); Text("L").tag("L") }.pickerStyle(.segmented)
                 Text("\((liters ? total / 1_000 : total).formatted(.number.precision(.fractionLength(0...(liters ? 2 : 0))))) \(liters ? "L" : "ml")")
                     .font(FitTheme.metric(30)).foregroundStyle(FitTheme.dashboardAccent)
                     .contentTransition(.numericText()).animation(FitMotion.change(reduceMotion: reduceMotion), value: total)

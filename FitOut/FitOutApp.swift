@@ -30,7 +30,7 @@ struct AppRoot: View {
                 if container.profile.draft.completedAt != nil {
                     AppShell(container: container, widgetDestination: $widgetDestination)
                         .id(widgetRouteID)
-                } else { ProfileFlow(store: container.profile) }
+                } else { ProfileFlow(store: container.profile, hydration: container.hydration) }
             } else if let failure {
                 ContentUnavailableView {
                     Label("Your data could not be opened", systemImage: "externaldrive.badge.exclamationmark")

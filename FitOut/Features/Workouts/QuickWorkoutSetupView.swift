@@ -23,7 +23,8 @@ struct QuickWorkoutFlow: View {
 struct QuickWorkoutSetupView: View {
     let store: WorkoutStore
     let gym: GymStore
-    @State private var unit: WeightUnit
+    private let defaultUnit: WeightUnit
+    private var unit: WeightUnit { store.displayWeightUnit ?? defaultUnit }
     @State private var saved: QuickWorkoutDraftStore
     var addingToSession = false
     var onAdded: (() -> Void)?
@@ -36,7 +37,7 @@ struct QuickWorkoutSetupView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     init(store: WorkoutStore, gym: GymStore, unit: WeightUnit, defaults: UserDefaults?, addingToSession: Bool = false, onAdded: (() -> Void)? = nil, onStarted: (() -> Void)? = nil) {
         self.store = store; self.gym = gym; self.addingToSession = addingToSession; self.onAdded = onAdded; self.onStarted = onStarted
-        _unit = State(initialValue: unit)
+        defaultUnit = unit
         _saved = State(initialValue: QuickWorkoutDraftStore(defaults: addingToSession ? nil : defaults))
         _originalSessionID = State(initialValue: addingToSession ? store.active?.id : nil)
     }
@@ -52,14 +53,8 @@ struct QuickWorkoutSetupView: View {
                     TextField("Workout name", text: $saved.draft.title).font(FitTheme.section(17))
                         .padding(14).fitSurface(radius: 14).accessibilityIdentifier("quickWorkoutName")
                 }
-                HStack {
-                    Text("\(saved.draft.entries.count) exercises · \(saved.draft.entries.flatMap(\.sets).count) sets")
-                        .font(FitTheme.medium(13)).foregroundStyle(FitTheme.textSecondary)
-                    Spacer()
-                    Picker("Weight unit", selection: $unit) {
-                        Text("kg").tag(WeightUnit.kg); Text("lb").tag(WeightUnit.lbs)
-                    }.pickerStyle(.segmented).frame(maxWidth: 125)
-                }
+                Text("\(saved.draft.entries.count) exercises · \(saved.draft.entries.flatMap(\.sets).count) sets")
+                    .font(FitTheme.medium(13)).foregroundStyle(FitTheme.textSecondary)
                 if saved.draft.entries.isEmpty {
                     VStack(spacing: 16) {
                         Image("RoutineEquipment").resizable().scaledToFit().frame(height: 130).accessibilityHidden(true)

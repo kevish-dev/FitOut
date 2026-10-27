@@ -5,6 +5,10 @@ import Observation
 @MainActor @Observable final class WorkoutStore {
     private let context: ModelContext
     private(set) var sessions: [WorkoutSession] = []
+    // Runtime projection of the persisted profile preference. Unit changes never
+    // write session snapshots, actuals, timer anchors or plan targets.
+    private(set) var displayWeightUnit: WeightUnit?
+    func setDisplayWeightUnit(_ unit: WeightUnit) { displayWeightUnit = unit }
     var error: String?
     var onChange: (() -> Void)?
     var onMutation: ((WorkoutSession?, WorkoutSession?, Date) -> Void)?
