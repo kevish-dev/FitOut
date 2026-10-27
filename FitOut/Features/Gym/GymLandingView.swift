@@ -46,7 +46,7 @@ struct GymView: View {
                 RoutineCreationSheet(store: store, unit: unit, initialWeekday: weekday, useAsActive: active)
             case .summary(let session):
                 NavigationStack {
-                    WorkoutSummary(session: session, unit: unit, history: workouts.history)
+                    WorkoutSummary(session: session, unit: unit, history: workouts.history, store: workouts)
                         .navigationTitle("Workout summary")
                         .toolbar { Button("Close") { navigation.dismiss() } }
                 }

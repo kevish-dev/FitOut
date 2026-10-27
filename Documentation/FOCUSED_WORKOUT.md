@@ -37,7 +37,8 @@ units and reps remain below, using previous performance recall, numeric inputs a
 +/- controls. Duration exercises have a target and optional distance; actual time
 comes from the running timer. Validation prevents bad typed values from silently
 completing a set with saved defaults. Effort/rest use a disclosure; applying inputs
-to remaining sets is explicit. Skip Set, Add Note and Undo remain available.
+to remaining sets is explicit. Skip Set and Add Note remain available. Recorded
+sets now have separate Edit last set and Restart last set controls.
 
 The safe-area bottom dock previews the next set/exercise beside a circular orange
 action. Its visible title explicitly describes Start set, Complete Set, Skip Rest,
@@ -77,13 +78,24 @@ foreground recovery reanchors to saved timestamps. Pause freezes set and rest
 timing; resume shifts rest deadlines. Obsolete deadline tasks cancel on state,
 deadline, visibility or scene changes. No per-second database writes occur.
 
-One persisted Undo restores a completed/skipped set to ready, clears its timer
-and actual record, and retains inputs. Rewinding stops a later running set timer.
-Undo after automatic finish reopens the same session and excludes the closed gap
-from workout time. It cannot replace another active workout. History summaries
-offer the last-set Undo; the restored session becomes available via the floating
-control. Legacy lap payloads are retained only for decoding/export, with no new
-lap action or UI.
+Edit last set opens a local correction sheet for recorded weight/reps (or duration
+and distance), set type, RPE and note. Saving corrects the existing record and its
+actual performance while retaining timestamps, measured clocks, completed/skipped
+status, current focus, rest, plan snapshots and pending sets. It never reopens a
+finished workout. Skipped sets remain excluded from volume. Summaries read live
+store data so volume, records and edited rows refresh; their individual recorded
+sets also offer Edit. Historical corrections work while another workout runs.
+
+Restart last set requires confirmation, clears the recorded result, retains its
+latest inputs and starts a fresh set timer. A paused workout stays paused and
+waits for Resume/Start. Restart stops a later running set timer and ends rest;
+after a completed workout it reopens the same session, excluding the closed gap
+from workout time. Another active workout blocks historical restart. Both actions
+resolve the latest recorded set by completion/skip time and reject stale records;
+repeat deliveries cannot overwrite newer edits or restart a different set. They
+use the existing atomic store/telemetry path without schema changes. The internal
+Undo command remains an engine primitive; it is no longer the user-facing action.
+Legacy lap payloads remain for decoding/export, with no new lap action or UI.
 
 ## Validation
 

@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F28000000000000000000005 /* WorkoutRecordedSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28000000000000000000006; };
+		F28000000000000000000001 /* WorkoutRecordedSetEditing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28000000000000000000002; };
+		F28000000000000000000003 /* WorkoutRecordedSetEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28000000000000000000004; };
 		F27000000000000000000007 /* WorkoutSessionEditingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27000000000000000000008; };
 		F27000000000000000000001 /* WorkoutSessionEditing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27000000000000000000002; };
 		F27000000000000000000003 /* WorkoutNumberWheel.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27000000000000000000004; };
@@ -177,6 +180,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F28000000000000000000006 /* WorkoutRecordedSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecordedSetTests.swift; sourceTree = "<group>"; };
+		F28000000000000000000002 /* WorkoutRecordedSetEditing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecordedSetEditing.swift; sourceTree = "<group>"; };
+		F28000000000000000000004 /* WorkoutRecordedSetEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecordedSetEditor.swift; sourceTree = "<group>"; };
 		F27000000000000000000008 /* WorkoutSessionEditingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionEditingTests.swift; sourceTree = "<group>"; };
 		F27000000000000000000002 /* WorkoutSessionEditing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionEditing.swift; sourceTree = "<group>"; };
 		F27000000000000000000004 /* WorkoutNumberWheel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutNumberWheel.swift; sourceTree = "<group>"; };
@@ -355,6 +361,7 @@
 			isa = PBXGroup;
 			children = (
 				F27000000000000000000008 /* WorkoutSessionEditingTests.swift */,
+				F28000000000000000000006 /* WorkoutRecordedSetTests.swift */,
 				F2600000000000000000000B /* HapticTests.swift */,
 				F23000000000000000000006 /* WorkoutStreakTests.swift */,
 				F22000000000000000000006 /* QuickWorkoutConfigurationTests.swift */,
@@ -601,6 +608,8 @@
 		D7CB24A5F6FD15559F06C45B /* Workouts */ = {
 			isa = PBXGroup;
 			children = (
+				F28000000000000000000002 /* WorkoutRecordedSetEditing.swift */,
+				F28000000000000000000004 /* WorkoutRecordedSetEditor.swift */,
 				F27000000000000000000002 /* WorkoutSessionEditing.swift */,
 				F27000000000000000000004 /* WorkoutNumberWheel.swift */,
 				F27000000000000000000006 /* WorkoutSessionManager.swift */,
@@ -797,6 +806,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F27000000000000000000007 /* WorkoutSessionEditingTests.swift in Sources */,
+				F28000000000000000000005 /* WorkoutRecordedSetTests.swift in Sources */,
 				F2600000000000000000000A /* HapticTests.swift in Sources */,
 				F23000000000000000000005 /* WorkoutStreakTests.swift in Sources */,
 				F22000000000000000000005 /* QuickWorkoutConfigurationTests.swift in Sources */,
@@ -831,6 +841,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F28000000000000000000001 /* WorkoutRecordedSetEditing.swift in Sources */,
+				F28000000000000000000003 /* WorkoutRecordedSetEditor.swift in Sources */,
 				F27000000000000000000001 /* WorkoutSessionEditing.swift in Sources */,
 				F27000000000000000000003 /* WorkoutNumberWheel.swift in Sources */,
 				F27000000000000000000005 /* WorkoutSessionManager.swift in Sources */,

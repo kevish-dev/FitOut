@@ -52,7 +52,7 @@ struct AnalyticsView: View {
                     }
                 }
             }
-            Section("Matching workouts") { ForEach(filtered) { session in NavigationLink(session.title + " · " + session.startedAt.formatted(date: .abbreviated, time: .omitted)) { WorkoutSummary(session: session, unit: unit, history: store.history) } } }
+            Section("Matching workouts") { ForEach(filtered) { session in NavigationLink(session.title + " · " + session.startedAt.formatted(date: .abbreviated, time: .omitted)) { WorkoutSummary(session: session, unit: unit, history: store.history, store: store) } } }
             Section("Export filtered history") {
                 Button("Prepare JSON export") { export(json: true) }
                 Button("Prepare CSV export") { export(json: false) }

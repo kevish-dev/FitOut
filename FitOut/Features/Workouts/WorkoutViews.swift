@@ -26,12 +26,18 @@ struct WorkoutsPanel: View {
     }
 }
 struct WorkoutSummary: View {
-    let session: WorkoutSession
+    private let snapshot: WorkoutSession
     let unit: WeightUnit
     var history: [WorkoutSession] = []
     var store: WorkoutStore? = nil
+    var showsLastSetActions = true
     @State private var showTiming = false
-    private var records: [String] { Array(Set(WorkoutAnalytics.newRecords(in: session, history: history))).sorted() }
+    @State private var editing: WorkoutRecordedSet?
+    private var session: WorkoutSession { store?.sessions.first { $0.id == snapshot.id } ?? snapshot }
+    private var records: [String] { Array(Set(WorkoutAnalytics.newRecords(in: session, history: store?.history ?? history))).sorted() }
+    init(session: WorkoutSession, unit: WeightUnit, history: [WorkoutSession] = [], store: WorkoutStore? = nil, showsLastSetActions: Bool = true) {
+        snapshot = session; self.unit = unit; self.history = history; self.store = store; self.showsLastSetActions = showsLastSetActions
+    }
     var body: some View {
         let unit = session.execution?.preferredUnit ?? self.unit
         ScrollView {
@@ -39,10 +45,8 @@ struct WorkoutSummary: View {
                 WorkoutSessionHero(session: session, unit: unit, now: session.endedAt ?? .now)
                 Label("\(session.completedSets.count) completed · \(session.skippedSets.count) skipped · \(session.remainingSetCount) unfinished", systemImage: "checklist")
                     .font(FitTheme.medium(13))
-                if let store, session.execution?.undo != nil {
-                    Button(store.active?.id == session.id ? "Restored to current workout" : "Undo last set", systemImage: "arrow.uturn.backward") {
-                        store.performFocused(.undo, sessionID: session.id)
-                    }.disabled(store.active?.id == session.id).frame(minHeight: 44)
+                if let store, showsLastSetActions {
+                    WorkoutLastSetActions(store: store, sessionID: session.id, unit: unit)
                     if let error = store.error { Text(error).font(FitTheme.body(12)).foregroundStyle(.red) }
                 }
                 Label(session.startedAt.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
@@ -74,6 +78,14 @@ struct WorkoutSummary: View {
                         let completed = entry.sets.filter { $0.status != .pending }
                         if !completed.isEmpty { Divider().overlay(FitTheme.textPrimary.opacity(0.06)) }
                         ForEach(completed) { set in
+                            if store != nil, let reference = session.recordedSet(entryID: entry.id, setID: set.id) {
+                                HStack {
+                                    Text("Set \(reference.number)").font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
+                                    Spacer()
+                                    Button { editing = reference } label: { Label("Edit", systemImage: "pencil").font(FitTheme.medium(12)).frame(minHeight: 44) }
+                                        .buttonStyle(.plain).accessibilityLabel("Edit \(entry.exercise.name), set \(reference.number)")
+                                }
+                            }
                             if set.status == .skipped {
                                 Label("Set \((entry.sets.firstIndex { $0.id == set.id } ?? 0) + 1) · Skipped", systemImage: "forward.end")
                                     .font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
@@ -112,6 +124,9 @@ struct WorkoutSummary: View {
         .background(FitTheme.dashboardBackground).foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)
         .navigationTitle("Workout summary").navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showTiming) { WorkoutTimingDetails(session: session, unit: unit) }
+        .sheet(item: $editing) { reference in
+            if let store { NavigationStack { WorkoutRecordedSetEditor(store: store, reference: reference, unit: unit) } }
+        }
     }
 }
 

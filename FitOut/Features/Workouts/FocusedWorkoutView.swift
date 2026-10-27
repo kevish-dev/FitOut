@@ -31,7 +31,7 @@ struct ActiveWorkoutView: View {
                 VStack(spacing: 0) {
                     header(session)
                     if model.phase == .workoutCompleted {
-                        WorkoutSummary(session: session, unit: model.unit, history: store.history)
+                        WorkoutSummary(session: session, unit: model.unit, history: store.history, store: store, showsLastSetActions: false)
                     } else {
                         GeometryReader { viewport in
                             ScrollView {
@@ -70,11 +70,6 @@ struct ActiveWorkoutView: View {
                                         WorkoutEmptyState()
                                         Text(session.entries.isEmpty ? "Choose exercises to begin. Each set saves as soon as you complete or skip it." : "Your sets are recorded. Finish when you're ready.")
                                             .font(FitTheme.body(14)).foregroundStyle(FitTheme.textSecondary)
-                                    }
-                                    if let undo = session.execution?.undo {
-                                        Button("Undo last \(undo.before.status == .pending ? "set action" : "action")", systemImage: "arrow.uturn.backward") { act(.undo) }
-                                            .font(FitTheme.medium(13)).frame(minHeight: 44).accessibilityIdentifier("undoWorkoutSet")
-                                        Text("Undo restores the inputs and resets that set's timer.").font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
                                     }
                                 }.frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity)
                             }.scrollIndicators(.hidden).scrollDismissesKeyboard(.interactively)
@@ -258,7 +253,9 @@ struct ActiveWorkoutView: View {
         let expectedSet = model.current?.set.id
         return VStack(spacing: 8) {
             if model.phase == .resting { Button("+15 seconds rest", systemImage: "plus") { act(.extendRest) }.font(FitTheme.medium(13)).frame(minHeight: 44) }
-            if model.phase == .workoutCompleted, session.execution?.undo != nil { Button("Undo last set", systemImage: "arrow.uturn.backward") { act(.undo) }.frame(minHeight: 44) }
+            if session.lastRecordedSet != nil {
+                WorkoutLastSetActions(store: store, sessionID: session.id, unit: model.unit)
+            }
             Button { if model.phase == expectedPhase && model.current?.set.id == expectedSet { primaryAction() } } label: {
                 HStack(spacing: 16) {
                     VStack(alignment: .leading, spacing: 6) {
