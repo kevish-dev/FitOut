@@ -79,12 +79,19 @@ import Observation
         return nil
     }
     @discardableResult func saveDraft(_ input: RoutineDraft) -> Bool {
-        transact {
+        if let saved = drafts.first(where: { $0.id == input.id }), saved.hasSameContent(as: input) { error = nil; return true }
+        do {
             var draft = input; draft.updatedAt = .now
             let payload = try JSONEncoder().encode(draft)
             if let record = try context.fetch(FetchDescriptor<FitOutSchemaV5.DraftRecord>()).first(where: { $0.id == draft.id }) { record.payload = payload }
             else { context.insert(FitOutSchemaV5.DraftRecord(id: draft.id, payload: payload)) }
-        }
+            try context.save()
+            // Autosaving an editor does not change the committed plan or widget
+            // readings. Avoid reloading the catalogue/history and publishing them.
+            var updated = drafts.filter { $0.id != draft.id }; updated.append(draft)
+            drafts = updated.sorted { $0.updatedAt > $1.updatedAt }
+            error = nil; return true
+        } catch { context.rollback(); self.error = error.localizedDescription; return false }
     }
     @discardableResult func discardDraft(_ id: UUID) -> Bool {
         transact { if let record = try context.fetch(FetchDescriptor<FitOutSchemaV5.DraftRecord>()).first(where: { $0.id == id }) { context.delete(record) } }

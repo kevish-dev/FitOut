@@ -87,9 +87,10 @@ struct RoutineExerciseCard: View {
                 }
                 Label("Set targets", systemImage: "slider.horizontal.3")
                     .font(FitTheme.section(14)).padding(.top, 4)
-                ForEach(targets) { $target in
+                ForEach(plan.setTargets ?? []) { target in
+                    let targetBinding = targets.identifiedElement(id: target.id, fallback: target)
                     let index = (plan.setTargets ?? []).firstIndex { $0.id == target.id } ?? 0
-                    PlannedSetRow(target: $target, number: index + 1, kind: definition?.kind ?? .weighted, unit: unit,
+                    PlannedSetRow(target: targetBinding, number: index + 1, kind: definition?.kind ?? .weighted, unit: unit,
                         duplicate: { duplicate(target.id) },
                         remove: { plan.setTargets?.removeAll { $0.id == target.id } },
                         move: { offset in moveSet(target.id, by: offset) },
@@ -275,7 +276,7 @@ struct RoutineDayDestinationSheet: View {
                 Section {
                     Text(moving ? "The two days swap places, keeping both workouts." : "Copies are independent. Editing one day will not change another.")
                         .font(FitTheme.body(13)).foregroundStyle(.secondary)
-                    ForEach(routine.days.sorted { $0.weekday < $1.weekday }.filter { $0.weekday != source }) { day in
+                    ForEach(routine.days.sorted { $0.weekday < $1.weekday }.filter { $0.weekday != source && RoutineSchedule.weekdays.indices.contains($0.weekday) }) { day in
                         Button {
                             if !moving && !day.exercises.isEmpty { replacing = day.weekday }
                             else { onSelect(day.weekday) }

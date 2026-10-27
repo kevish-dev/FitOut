@@ -58,6 +58,17 @@ extension PrimitiveButtonStyle where Self == FitPlainButtonStyle {
     static var fitPlain: FitPlainButtonStyle { FitPlainButtonStyle() }
 }
 
+extension Binding {
+    /// Collection offsets can go stale while SwiftUI removes/reorders a focused
+    /// row. Resolve identity on every access and ignore writes to removed rows.
+    func identifiedElement<Element: Identifiable & Sendable>(id: Element.ID, fallback: Element) -> Binding<Element> where Value == [Element], Element.ID: Sendable {
+        Binding<Element>(get: { wrappedValue.first { $0.id == id } ?? fallback }, set: { value in
+            guard value.id == id, let index = wrappedValue.firstIndex(where: { $0.id == id }) else { return }
+            var values = wrappedValue; values[index] = value; wrappedValue = values
+        })
+    }
+}
+
 struct Surface: ViewModifier {
     var selected = false
     var radius: CGFloat = 16

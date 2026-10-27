@@ -1,5 +1,8 @@
 # Gym routing and rest-day regression
 
+The routine editor's scroll lifecycle, draft-only autosave and stable-ID editing
+follow-up is documented in [Routine editor stability](ROUTINE_EDITOR_STABILITY.md).
+
 Weekly Plan opens the complete Schedule stage, even when today is Rest/Open or a
 saved draft last opened on Review. A calendar-day tap explicitly opens that day's
 Workouts editor, including rest/open days, where its kind can be changed. Resuming

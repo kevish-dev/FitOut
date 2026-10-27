@@ -15,10 +15,12 @@ struct RoutineEditor: View {
     @State private var message: String?
     @State private var issue: String?
     @State private var sheet: RoutineBuilderSheet?
-    @State private var pendingCopy: RoutineDay?
-    @State private var pendingReuse: RoutineDay?
+    @State private var pendingCopy: RoutineDayReplacement?
+    @State private var pendingReuse: RoutineDayReplacement?
     @State private var discard = false
     @State private var keyboardIsVisible = false
+    @State private var contentPosition = ScrollPosition(edge: .top)
+    @State private var visibleWeekday: Int?
     @FocusState private var nameFocused: Bool
     @Environment(\.dismiss) private var dismiss
     @Environment(\.scenePhase) private var scenePhase
@@ -26,15 +28,14 @@ struct RoutineEditor: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private var draft: RoutineDraft { RoutineDraft(routine: routine, stage: stage, weekday: weekday, updatedAt: .distantPast) }
-    private var dayIndex: Int { routine.days.firstIndex { $0.weekday == weekday } ?? 0 }
-    private var day: RoutineDay { routine.days[dayIndex] }
+    private var selectedDay: RoutineDay? { routine.days.first { $0.weekday == weekday } }
     private var scheduleIsReady: Bool {
         !routine.name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !routine.trainingDays.isEmpty
     }
     private var isNewRoutine: Bool { !store.routines.contains { $0.id == routine.id } }
     private var draftIsStored: Bool {
         guard let saved = store.drafts.first(where: { $0.id == routine.id }) else { return false }
-        return saved.routine == routine && saved.stage == stage && saved.weekday == weekday
+        return saved.hasSameContent(as: draft)
     }
 
     var body: some View {
@@ -60,7 +61,7 @@ struct RoutineEditor: View {
                 .padding(FitTheme.pageInset)
                 .frame(maxWidth: .infinity)
             }
-            .id(stage)
+            .scrollPosition($contentPosition)
             .safeAreaInset(edge: .top, spacing: 0) {
                 RoutineStageBar(selection: $stage)
                     .padding(.horizontal, FitTheme.pageInset).padding(.vertical, 10)
@@ -102,17 +103,25 @@ struct RoutineEditor: View {
         .onDisappear { if loaded && !finished { persistDraft() } }
         .onChange(of: scenePhase) { _, value in if value != .active && loaded && !finished { persistDraft() } }
         .onChange(of: stage) { _, value in
-            issue = nil; message = nil; nameFocused = false
+            issue = nil; message = nil; dismissKeyboard()
+            contentPosition.scrollTo(edge: .top)
+            visibleWeekday = weekday
             if value == .schedule { synchronizeOtherDays() }
         }
+        .onChange(of: weekday) { _, value in visibleWeekday = value; dismissKeyboard() }
         .interactiveDismissDisabled(loaded && !finished && !draftIsStored)
         .sheet(item: $sheet, onDismiss: {
             if let source = pendingReuse { pendingCopy = source; pendingReuse = nil }
         }) { route in builderSheet(route) }
         .confirmationDialog("Replace this day’s workout?", isPresented: Binding(get: { pendingCopy != nil }, set: { if !$0 { pendingCopy = nil } }), titleVisibility: .visible) {
-            Button("Replace workout", role: .destructive) { if let source = pendingCopy { RoutineSchedule.copy(source, to: weekday, in: &routine) }; pendingCopy = nil }
+            Button("Replace workout", role: .destructive) {
+                if let request = pendingCopy, let target = routine.days.first(where: { $0.id == request.targetID }) {
+                    RoutineSchedule.copy(request.source, to: target.weekday, in: &routine)
+                }
+                pendingCopy = nil
+            }
             Button("Cancel", role: .cancel) { pendingCopy = nil }
-        } message: { Text("The workout on \(RoutineSchedule.weekdays[weekday]) will be replaced. Saved history is kept.") }
+        } message: { Text("The selected day's workout will be replaced. Saved history is kept.") }
         .confirmationDialog("Discard this draft?", isPresented: $discard, titleVisibility: .visible) {
             Button("Discard draft", role: .destructive) {
                 if store.discardDraft(routine.id) { finished = true; dismiss() }
@@ -237,38 +246,48 @@ struct RoutineEditor: View {
 
     private var workout: some View {
         VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 8) {
-                        ForEach(0..<7, id: \.self) { index in
-                            Button {
-                                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) { weekday = index; message = nil; issue = nil }
-                            } label: {
-                                VStack(spacing: 8) {
-                                    Text(String(RoutineSchedule.weekdays[index].prefix(3))).font(FitTheme.medium(12))
-                                    Image(systemName: (routine.days.first { $0.weekday == index }?.kind ?? .flexible).editorSymbol)
-                                        .font(.system(size: 16, weight: .medium))
-                                }
-                                .frame(minWidth: 50, minHeight: 68)
-                                .foregroundStyle(weekday == index ? FitTheme.dashboardAccent : FitTheme.textSecondary)
-                                .dashboardGlass(in: RoundedRectangle(cornerRadius: 16), highlighted: weekday == index, interactive: true)
-                            }.buttonStyle(RoutineEditorPressStyle()).accessibilityIdentifier("routineEditDay-\(index)").id(index)
-                                .accessibilityLabel(RoutineSchedule.weekdays[index])
-                                .accessibilityAddTraits(weekday == index ? .isSelected : [])
-                        }
-                    }.padding(.vertical, 2)
-                }
-                .onAppear { proxy.scrollTo(weekday, anchor: .center) }
-                .onChange(of: weekday) { _, value in proxy.scrollTo(value, anchor: .center) }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(0..<7, id: \.self) { index in
+                        Button {
+                            guard weekday != index else { return }
+                            dismissKeyboard(); weekday = index; message = nil; issue = nil
+                        } label: {
+                            VStack(spacing: 8) {
+                                Text(String(RoutineSchedule.weekdays[index].prefix(3))).font(FitTheme.medium(12))
+                                Image(systemName: (routine.days.first { $0.weekday == index }?.kind ?? .flexible).editorSymbol)
+                                    .font(.system(size: 16, weight: .medium))
+                            }
+                            .frame(minWidth: 50, minHeight: 68)
+                            .foregroundStyle(weekday == index ? FitTheme.dashboardAccent : FitTheme.textSecondary)
+                            .dashboardGlass(in: RoundedRectangle(cornerRadius: 16), highlighted: weekday == index, interactive: true)
+                        }.buttonStyle(RoutineEditorPressStyle()).accessibilityIdentifier("routineEditDay-\(index)").id(index)
+                            .accessibilityLabel(RoutineSchedule.weekdays[index])
+                            .accessibilityAddTraits(weekday == index ? .isSelected : [])
+                    }
+                }.scrollTargetLayout().padding(.vertical, 2)
             }
+            .scrollPosition(id: $visibleWeekday, anchor: .center)
+            if let day = selectedDay {
+                workoutDay(day).id(day.id)
+            } else {
+                ContentUnavailableView("Day unavailable", systemImage: "calendar.badge.exclamationmark",
+                    description: Text("This draft has no entry for the selected day. Choose another day or close the editor; your saved routine is preserved."))
+            }
+        }
+    }
+
+    private func workoutDay(_ day: RoutineDay) -> some View {
+        let selected = $routine.days.identifiedElement(id: day.id, fallback: day)
+        return VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
             HStack {
-                Text(RoutineSchedule.weekdays[weekday]).font(FitTheme.section(23))
+                Text(RoutineSchedule.weekdays[day.weekday]).font(FitTheme.section(23))
                 Spacer()
                 Menu {
-                    Button("Use a saved workout", systemImage: "square.stack") { sheet = .reuse }
+                    Button("Use a saved workout", systemImage: "square.stack") { openSheet(.reuse, dayID: day.id) }
                     if day.kind == .workout {
-                        Button("Copy to another day", systemImage: "doc.on.doc") { sheet = .copy }
-                        Button("Move to another day", systemImage: "arrow.left.arrow.right") { sheet = .move }
+                        Button("Copy to another day", systemImage: "doc.on.doc") { openSheet(.copy, dayID: day.id) }
+                        Button("Move to another day", systemImage: "arrow.left.arrow.right") { openSheet(.move, dayID: day.id) }
                         Button("Save workout for reuse", systemImage: "bookmark") {
                             if store.saveWorkout(day) { message = "Saved to reusable workouts" } else { issue = store.error }
                         }
@@ -276,15 +295,16 @@ struct RoutineEditor: View {
                 } label: { Image(systemName: "ellipsis").frame(width: 44, height: 44).dashboardGlass(in: Circle(), interactive: true) }
                 .accessibilityLabel("Workout options")
             }
-            RoutineDayKindControl(selection: $routine.days[dayIndex].kind)
-                .onChange(of: day.kind) { _, kind in
-                    if kind == .workout && day.title.isEmpty { routine.days[dayIndex].title = "\(RoutineSchedule.weekdays[weekday]) workout" }
-                }
+            RoutineDayKindControl(selection: Binding(get: { selected.wrappedValue.kind }, set: { kind in
+                var value = selected.wrappedValue; value.kind = kind
+                if kind == .workout && value.title.isEmpty { value.title = "\(RoutineSchedule.weekdays[value.weekday]) workout" }
+                selected.wrappedValue = value
+            }))
             if day.kind == .workout {
                 VStack(alignment: .leading, spacing: 8) {
                     Text("Workout name").font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
                     HStack(spacing: 10) {
-                        TextField("e.g. Chest & triceps", text: $routine.days[dayIndex].title)
+                        TextField("e.g. Chest & triceps", text: selected.title)
                             .font(FitTheme.section(19)).accessibilityIdentifier("routineWorkoutName")
                         Image(systemName: "pencil").font(.system(size: 14)).foregroundStyle(FitTheme.textSecondary).accessibilityHidden(true)
                     }.padding(FitTheme.cardInset)
@@ -298,22 +318,25 @@ struct RoutineEditor: View {
                             .font(FitTheme.medium(11)).foregroundStyle(FitTheme.textSecondary)
                     }.padding(.top, 4)
                 }
-                ForEach($routine.days[dayIndex].exercises) { $plan in
-                    RoutineExerciseCard(plan: $plan, definition: store.exercise(plan.exerciseID), unit: unit,
-                        canMoveUp: day.exercises.first?.id != plan.id, canMoveDown: day.exercises.last?.id != plan.id,
-                        replace: { sheet = .replace(plan.id) },
-                        remove: { routine.days[dayIndex].exercises.removeAll { $0.id == plan.id } },
-                        move: { offset in moveExercise(plan.id, by: offset) })
-                    .draggable(plan.id.uuidString)
-                    .dropDestination(for: String.self) { ids, _ in
-                        guard let id = ids.first.flatMap(UUID.init(uuidString:)),
-                              let from = day.exercises.firstIndex(where: { $0.id == id }),
-                              let to = day.exercises.firstIndex(where: { $0.id == plan.id }), from != to else { return false }
-                        routine.days[dayIndex].exercises.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
-                        return true
+                LazyVStack(spacing: FitTheme.sectionSpacing) {
+                    ForEach(day.exercises) { plan in
+                        RoutineExerciseCard(plan: selected.exercises.identifiedElement(id: plan.id, fallback: plan), definition: store.exercise(plan.exerciseID), unit: unit,
+                            canMoveUp: day.exercises.first?.id != plan.id, canMoveDown: day.exercises.last?.id != plan.id,
+                            replace: { openSheet(.replace(plan.id), dayID: day.id) },
+                            remove: { selected.wrappedValue.exercises.removeAll { $0.id == plan.id } },
+                            move: { offset in moveExercise(plan.id, in: day.id, by: offset) })
+                        .draggable(plan.id.uuidString)
+                        .dropDestination(for: String.self) { ids, _ in
+                            guard let dayIndex = routine.days.firstIndex(where: { $0.id == day.id }),
+                                  let id = ids.first.flatMap(UUID.init(uuidString:)),
+                                  let from = routine.days[dayIndex].exercises.firstIndex(where: { $0.id == id }),
+                                  let to = routine.days[dayIndex].exercises.firstIndex(where: { $0.id == plan.id }), from != to else { return false }
+                            routine.days[dayIndex].exercises.move(fromOffsets: IndexSet(integer: from), toOffset: to > from ? to + 1 : to)
+                            return true
+                        }
                     }
                 }
-                Button { sheet = .add } label: {
+                Button { openSheet(.add, dayID: day.id) } label: {
                     VStack(spacing: 12) {
                         if day.exercises.isEmpty {
                             Image("RoutineEquipment").resizable().scaledToFit().frame(height: 120).accessibilityHidden(true)
@@ -329,12 +352,12 @@ struct RoutineEditor: View {
                 }.buttonStyle(RoutineEditorPressStyle()).accessibilityIdentifier("routineAddExercises")
                 DisclosureGroup("Workout details") {
                     VStack(alignment: .leading, spacing: 14) {
-                        TextField("Notes (optional)", text: Binding(get: { day.notes ?? "" }, set: { routine.days[dayIndex].notes = $0 }), axis: .vertical)
-                        Toggle("Duration target", isOn: Binding(get: { day.durationMinutes != nil }, set: { routine.days[dayIndex].durationMinutes = $0 ? 45 : nil }))
+                        TextField("Notes (optional)", text: Binding(get: { selected.wrappedValue.notes ?? "" }, set: { selected.wrappedValue.notes = $0 }), axis: .vertical)
+                        Toggle("Duration target", isOn: Binding(get: { selected.wrappedValue.durationMinutes != nil }, set: { selected.wrappedValue.durationMinutes = $0 ? 45 : nil }))
                         if day.durationMinutes != nil {
-                            Stepper("\(day.durationMinutes ?? 45) minutes", value: Binding(get: { day.durationMinutes ?? 45 }, set: { routine.days[dayIndex].durationMinutes = $0 }), in: 1...600, step: 5)
+                            Stepper("\(day.durationMinutes ?? 45) minutes", value: Binding(get: { selected.wrappedValue.durationMinutes ?? 45 }, set: { selected.wrappedValue.durationMinutes = $0 }), in: 1...600, step: 5)
                         }
-                        Button { sheet = .muscles } label: {
+                        Button { openSheet(.muscles, dayID: day.id) } label: {
                             Label(day.muscles.isEmpty ? "Choose focus muscles" : day.muscles.map(\.title).joined(separator: ", "), systemImage: "figure.strengthtraining.traditional")
                         }
                     }.padding(.top, 12)
@@ -433,36 +456,56 @@ struct RoutineEditor: View {
         UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 
+    private func openSheet(_ action: RoutineBuilderSheet.Action, dayID: UUID) {
+        guard sheet == nil, routine.days.contains(where: { $0.id == dayID }) else { return }
+        dismissKeyboard()
+        sheet = RoutineBuilderSheet(dayID: dayID, action: action)
+    }
+
     @ViewBuilder private func builderSheet(_ route: RoutineBuilderSheet) -> some View {
-        switch route {
-        case .add, .replace:
-            RoutineExercisePicker(store: store, multiple: route == .add) { selected in
-                if case .replace(let id) = route, let exercise = selected.first,
-                   let index = day.exercises.firstIndex(where: { $0.id == id }) {
-                    let previousKind = store.exercise(day.exercises[index].exerciseID)?.kind
-                    routine.days[dayIndex].exercises[index].exerciseID = exercise.id
-                    if previousKind != exercise.kind { routine.days[dayIndex].exercises[index].setTargets = PlannedExercise.make(for: exercise).resolvedSets }
-                } else {
-                    routine.days[dayIndex].exercises.append(contentsOf: selected.map { PlannedExercise.make(for: $0) })
+        if let day = route.targetDay(in: routine) {
+            switch route.action {
+            case .add, .replace:
+                RoutineExercisePicker(store: store, multiple: route.action == .add) { selected in
+                    defer { sheet = nil }
+                    guard let dayIndex = routine.days.firstIndex(where: { $0.id == route.dayID }) else { return }
+                    if case .replace(let id) = route.action {
+                        guard let exercise = selected.first,
+                              let index = routine.days[dayIndex].exercises.firstIndex(where: { $0.id == id }) else {
+                            issue = "This exercise changed. Reopen it before replacing it."; return
+                        }
+                        let previousKind = store.exercise(routine.days[dayIndex].exercises[index].exerciseID)?.kind
+                        routine.days[dayIndex].exercises[index].exerciseID = exercise.id
+                        if previousKind != exercise.kind { routine.days[dayIndex].exercises[index].setTargets = PlannedExercise.make(for: exercise).resolvedSets }
+                    } else {
+                        routine.days[dayIndex].exercises.append(contentsOf: selected.map { PlannedExercise.make(for: $0) })
+                    }
                 }
-                sheet = nil
+            case .reuse:
+                RoutineReuseSheet(store: store) { source in
+                    defer { sheet = nil }
+                    guard let target = route.targetDay(in: routine) else { return }
+                    if !target.exercises.isEmpty { pendingReuse = RoutineDayReplacement(source: source, targetID: route.dayID) }
+                    else { RoutineSchedule.copy(source, to: target.weekday, in: &routine) }
+                }
+            case .copy, .move:
+                RoutineDayDestinationSheet(routine: routine, source: day.weekday, moving: route.action == .move) { target in
+                    defer { sheet = nil }
+                    guard let source = route.targetDay(in: routine) else { return }
+                    if route.action == .move { RoutineSchedule.move(dayID: source.id, to: target, in: &routine); weekday = target }
+                    else { RoutineSchedule.copy(source, to: target, in: &routine) }
+                }
+            case .muscles:
+                NavigationStack {
+                    MuscleMapView(selection: $routine.days.identifiedElement(id: day.id, fallback: day).muscles)
+                        .toolbar { Button("Done") { sheet = nil } }
+                }
             }
-        case .reuse:
-            RoutineReuseSheet(store: store) { source in
-                if !day.exercises.isEmpty { pendingReuse = source }
-                else { RoutineSchedule.copy(source, to: weekday, in: &routine) }
-                sheet = nil
-            }
-        case .copy, .move:
-            RoutineDayDestinationSheet(routine: routine, source: weekday, moving: route == .move) { target in
-                if route == .move { RoutineSchedule.move(dayID: day.id, to: target, in: &routine); weekday = target }
-                else { RoutineSchedule.copy(day, to: target, in: &routine) }
-                sheet = nil
-            }
-        case .muscles:
+        } else {
             NavigationStack {
-                MuscleMapView(selection: $routine.days[dayIndex].muscles)
-                    .toolbar { Button("Done") { sheet = nil } }
+                ContentUnavailableView("Day unavailable", systemImage: "calendar.badge.exclamationmark",
+                    description: Text("Close this panel and choose an available day. Your changes are preserved."))
+                    .toolbar { Button("Close") { sheet = nil } }
             }
         }
     }
@@ -479,6 +522,7 @@ struct RoutineEditor: View {
         let entry = RoutineEditorEntry.resolve(isSaved: store.routines.contains(where: { $0.id == routine.id }), draft: saved,
             initialWeekday: initialWeekday, initialStage: initialStage)
         stage = entry.stage; weekday = entry.weekday
+        visibleWeekday = weekday
         synchronizeOtherDays()
         loaded = true
     }
@@ -513,8 +557,10 @@ struct RoutineEditor: View {
         let kinds = Set(routine.days.filter { $0.kind != .workout }.map(\.kind))
         otherDays = kinds.count == 1 ? kinds.first : nil
     }
-    private func moveExercise(_ id: UUID, by offset: Int) {
-        guard let from = day.exercises.firstIndex(where: { $0.id == id }), day.exercises.indices.contains(from + offset) else { return }
+    private func moveExercise(_ id: UUID, in dayID: UUID, by offset: Int) {
+        guard let dayIndex = routine.days.firstIndex(where: { $0.id == dayID }),
+              let from = routine.days[dayIndex].exercises.firstIndex(where: { $0.id == id }),
+              routine.days[dayIndex].exercises.indices.contains(from + offset) else { return }
         routine.days[dayIndex].exercises.swapAt(from, from + offset)
     }
     private func status(_ text: String, symbol: String) -> some View {
@@ -524,9 +570,17 @@ struct RoutineEditor: View {
     }
 }
 
-private enum RoutineBuilderSheet: Hashable, Identifiable {
-    case add, replace(UUID), reuse, copy, move, muscles
+struct RoutineBuilderSheet: Hashable, Identifiable {
+    enum Action: Hashable { case add, replace(UUID), reuse, copy, move, muscles }
+    let dayID: UUID
+    let action: Action
     var id: Self { self }
+    func targetDay(in routine: Routine) -> RoutineDay? { routine.days.first { $0.id == dayID } }
+}
+
+private struct RoutineDayReplacement {
+    let source: RoutineDay
+    let targetID: UUID
 }
 
 extension View {

@@ -2,7 +2,7 @@ import Foundation
 
 struct ValidationError: LocalizedError { let message: String; var errorDescription: String? { message } }
 
-struct PlannedSet: Identifiable, Codable, Equatable {
+struct PlannedSet: Identifiable, Codable, Equatable, Sendable {
     var id = UUID()
     var type: SetType = .working
     var repMin = 8
@@ -91,6 +91,9 @@ struct RoutineDraft: Identifiable, Codable, Equatable {
     var weekday = 0
     var updatedAt = Date()
     var id: UUID { routine.id }
+    func hasSameContent(as other: RoutineDraft) -> Bool {
+        routine == other.routine && stage == other.stage && weekday == other.weekday
+    }
 }
 struct SavedWorkout: Identifiable, Codable, Equatable {
     var id = UUID()

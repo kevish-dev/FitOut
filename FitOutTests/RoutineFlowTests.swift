@@ -1,8 +1,130 @@
 import XCTest
 import SwiftData
+import SwiftUI
 @testable import FitOut
 
 final class RoutineFlowTests: XCTestCase {
+    @MainActor func testRapidStageAndDayAutosavesDoNotPublishCommittedPlanChangesOrRewriteIdenticalDrafts() throws {
+        let gym = try GymStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        let routine = RoutineTemplate.fullBody.make()
+        XCTAssertTrue(gym.save(routine))
+        let committed = gym.routines, catalogue = gym.exercises
+        var published = 0; gym.onChange = { published += 1 }
+        for stage in RoutineEditorStage.allCases {
+            for weekday in 0..<7 {
+                var draft = RoutineDraft(routine: routine, stage: stage, weekday: weekday)
+                XCTAssertTrue(gym.saveDraft(draft))
+                let stored = try XCTUnwrap(gym.drafts.first)
+                draft.updatedAt = .distantFuture
+                XCTAssertTrue(gym.saveDraft(draft))
+                XCTAssertEqual(gym.drafts.first, stored)
+                XCTAssertEqual(gym.drafts.count, 1)
+                XCTAssertEqual(gym.drafts.first?.stage, stage)
+                XCTAssertEqual(gym.drafts.first?.weekday, weekday)
+            }
+        }
+        XCTAssertEqual(published, 0)
+        XCTAssertEqual(gym.routines, committed)
+        XCTAssertEqual(gym.exercises, catalogue)
+        XCTAssertTrue(gym.savedWorkouts.isEmpty)
+    }
+    @MainActor func testDraftOnlyAutosaveSurvivesDiskReopenWithoutChangingSavedRoutine() throws {
+        let folder = FileManager.default.temporaryDirectory.appendingPathComponent("DraftStability-" + UUID().uuidString)
+        defer { try? FileManager.default.removeItem(at: folder) }
+        let url = folder.appendingPathComponent("gym.store")
+        var saved: Routine!, draft: RoutineDraft!
+        do {
+            let gym = try GymStore(container: PersistenceFactory.makeContainer(at: url))
+            XCTAssertTrue(gym.save(RoutineTemplate.fullBody.make())); saved = gym.activeRoutine
+            var editing = try XCTUnwrap(saved); editing.days.reverse()
+            editing.days[0].title = "Unsaved title"
+            XCTAssertTrue(gym.saveDraft(RoutineDraft(routine: editing, stage: .workouts, weekday: 6)))
+            draft = gym.drafts.first
+        }
+        let reopened = try GymStore(container: PersistenceFactory.makeContainer(at: url))
+        XCTAssertEqual(reopened.activeRoutine, saved)
+        XCTAssertEqual(reopened.drafts.first, draft)
+    }
+    @MainActor func testFocusedDayBindingStillEditsItsOriginalDayAfterOrderAndWeekdayChange() {
+        let fixture = RoutineBindingFixture()
+        let original = fixture.routine.days[0], other = fixture.routine.days[1]
+        let binding = fixture.binding.days.identifiedElement(id: original.id, fallback: original)
+        RoutineSchedule.move(dayID: original.id, to: 2, in: &fixture.routine)
+        fixture.routine.days.reverse()
+        binding.title.wrappedValue = "Original day, edited"
+        XCTAssertEqual(fixture.routine.days.first { $0.id == original.id }?.title, "Original day, edited")
+        XCTAssertEqual(fixture.routine.days.first { $0.id == original.id }?.weekday, 2)
+        XCTAssertEqual(fixture.routine.days.first { $0.id == other.id }, other)
+    }
+    @MainActor func testRemovedExerciseBindingCannotWriteIntoAnotherExerciseAtTheSameOffset() {
+        let fixture = RoutineBindingFixture()
+        let day = fixture.routine.days[0], plan = day.exercises[0]
+        let binding = fixture.binding.days.identifiedElement(id: day.id, fallback: day)
+            .exercises.identifiedElement(id: plan.id, fallback: plan)
+        fixture.routine.days[0].exercises.removeFirst()
+        let before = fixture.routine
+        binding.notes.wrappedValue = "Late keyboard commit"
+        XCTAssertEqual(fixture.routine, before)
+        XCTAssertEqual(binding.wrappedValue, plan)
+    }
+    @MainActor func testSetBindingSurvivesReorderAndIgnoresLateInputAfterDeletion() {
+        let fixture = RoutineBindingFixture()
+        fixture.routine.days[0].exercises[0].setTargets = [PlannedSet(loadKG: 20), PlannedSet(loadKG: 30)]
+        let day = fixture.routine.days[0], plan = day.exercises[0], target = plan.setTargets![0]
+        let planBinding = fixture.binding.days.identifiedElement(id: day.id, fallback: day)
+            .exercises.identifiedElement(id: plan.id, fallback: plan)
+        let targets = Binding(get: { planBinding.wrappedValue.setTargets ?? [] }, set: { planBinding.wrappedValue.setTargets = $0 })
+        let binding = targets.identifiedElement(id: target.id, fallback: target)
+        fixture.routine.days[0].exercises[0].setTargets?.reverse()
+        binding.loadKG.wrappedValue = 45
+        XCTAssertEqual(fixture.routine.days[0].exercises[0].setTargets?.last?.loadKG, 45)
+        XCTAssertEqual(fixture.routine.days[0].exercises[0].setTargets?.first?.loadKG, 30)
+        fixture.routine.days[0].exercises[0].setTargets?.removeAll { $0.id == target.id }
+        let before = fixture.routine
+        binding.repMin.wrappedValue = 99
+        XCTAssertEqual(fixture.routine, before)
+        var changedID = target; changedID.id = UUID()
+        binding.wrappedValue = changedID
+        XCTAssertEqual(fixture.routine, before)
+    }
+    @MainActor func testNestedBindingCannotResurrectADeletedParentDay() {
+        let fixture = RoutineBindingFixture()
+        let day = fixture.routine.days[0], plan = day.exercises[0]
+        let binding = fixture.binding.days.identifiedElement(id: day.id, fallback: day)
+            .exercises.identifiedElement(id: plan.id, fallback: plan)
+        fixture.routine.days.removeAll { $0.id == day.id }
+        let before = fixture.routine
+        binding.restSeconds.wrappedValue = 300
+        XCTAssertEqual(fixture.routine, before)
+        XCTAssertEqual(binding.wrappedValue, plan)
+    }
+    @MainActor func testEveryRestAndOpenDayCanBeEditedWithoutDependingOnItsArrayOffset() {
+        let fixture = RoutineBindingFixture()
+        fixture.routine.days.reverse()
+        for weekday in 0..<7 {
+            let day = fixture.routine.days.first { $0.weekday == weekday }!
+            let binding = fixture.binding.days.identifiedElement(id: day.id, fallback: day)
+            let otherDays = fixture.routine.days.filter { $0.id != day.id }
+            binding.kind.wrappedValue = weekday.isMultiple(of: 2) ? .rest : .flexible
+            binding.notes.wrappedValue = "Day \(weekday)"
+            XCTAssertEqual(fixture.routine.days.filter { $0.id != day.id }, otherDays)
+            XCTAssertEqual(fixture.routine.days.first { $0.weekday == weekday }?.notes, "Day \(weekday)")
+        }
+    }
+    func testPickerRouteRetainsOriginalDayAfterMoveAndRejectsRemovedDay() {
+        var routine = RoutineTemplate.fullBody.make()
+        let original = routine.days[0]
+        let route = RoutineBuilderSheet(dayID: original.id, action: .add)
+        let other = RoutineBuilderSheet(dayID: routine.days[1].id, action: .add)
+        XCTAssertNotEqual(route.id, other.id)
+        RoutineSchedule.move(dayID: original.id, to: 4, in: &routine)
+        routine.days.reverse()
+        XCTAssertEqual(route.targetDay(in: routine)?.id, original.id)
+        XCTAssertEqual(route.targetDay(in: routine)?.weekday, 4)
+        routine.days.removeAll { $0.id == original.id }
+        XCTAssertNil(route.targetDay(in: routine))
+        XCTAssertNotNil(other.targetDay(in: routine))
+    }
     func testTemplatesAreEditableAndHaveValidIndependentDays() {
         for template in RoutineTemplate.allCases where template != .custom {
             let routine = template.make()
@@ -170,4 +292,9 @@ final class RoutineFlowTests: XCTestCase {
         XCTAssertEqual(try WorkoutStore(container: database).history[0].id, oldSession.id)
         XCTAssertTrue(gym.drafts.isEmpty)
     }
+}
+
+@MainActor private final class RoutineBindingFixture {
+    var routine = RoutineTemplate.fullBody.make()
+    var binding: Binding<Routine> { Binding(get: { self.routine }, set: { self.routine = $0 }) }
 }

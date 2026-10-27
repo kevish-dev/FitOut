@@ -1,7 +1,7 @@
 import Foundation
 
 enum SessionStatus: String, Codable, CaseIterable { case inProgress, paused, completed, skipped, abandoned }
-enum SetType: String, Codable, CaseIterable { case warmup = "Warm-up", working = "Working", drop = "Drop set" }
+enum SetType: String, Codable, CaseIterable, Sendable { case warmup = "Warm-up", working = "Working", drop = "Drop set" }
 struct WorkoutSet: Identifiable, Codable, Equatable {
     var id = UUID()
     var type: SetType = .working

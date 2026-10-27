@@ -9,6 +9,7 @@ struct GymView: View {
     @State private var navigation = GymNavigation()
     @State private var weekOffset = 0
     @State private var now = Date()
+    @State private var visibleWeekday: Int? = RoutineSchedule.weekday(for: .now)
     @Environment(\.scenePhase) private var scenePhase
 
     private var today: GymTodayState { GymLandingState.today(routine: store.activeRoutine, sessions: workouts.sessions, now: now) }
@@ -169,22 +170,20 @@ struct GymView: View {
                 Button { weekOffset += 1 } label: { weekArrow("chevron.right") }
                     .accessibilityLabel("Next week")
             }.buttonStyle(.fitPlain)
-            ScrollViewReader { proxy in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(alignment: .top, spacing: 10) {
-                        ForEach(week) { day in
-                            Button { openDay(day) } label: { GymDayTile(day: day) }
-                                .buttonStyle(.fitPlain)
-                                .id(day.weekday)
-                                .accessibilityLabel("\(day.date.formatted(date: .complete, time: .omitted)), \(day.title), \(day.detail)")
-                                .accessibilityHint(day.session != nil ? "Opens the logged workout." : "Opens this weekday in your repeating plan.")
-                                .accessibilityIdentifier("gymDay-\(day.weekday)")
-                        }
-                    }.padding(.vertical, 2)
-                }
-                .onAppear { proxy.scrollTo(RoutineSchedule.weekday(for: now), anchor: .center) }
-                .onChange(of: weekOffset) { _, offset in proxy.scrollTo(offset == 0 ? RoutineSchedule.weekday(for: now) : 0, anchor: .leading) }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(alignment: .top, spacing: 10) {
+                    ForEach(week) { day in
+                        Button { openDay(day) } label: { GymDayTile(day: day) }
+                            .buttonStyle(.fitPlain)
+                            .id(day.weekday)
+                            .accessibilityLabel("\(day.date.formatted(date: .complete, time: .omitted)), \(day.title), \(day.detail)")
+                            .accessibilityHint(day.session != nil ? "Opens the logged workout." : "Opens this weekday in your repeating plan.")
+                            .accessibilityIdentifier("gymDay-\(day.weekday)")
+                    }
+                }.scrollTargetLayout().padding(.vertical, 2)
             }
+            .scrollPosition(id: $visibleWeekday, anchor: .center)
+            .onChange(of: weekOffset) { _, offset in visibleWeekday = offset == 0 ? RoutineSchedule.weekday(for: now) : 0 }
             Text("Tap a day to view a log or edit its repeating plan.")
                 .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
         }

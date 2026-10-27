@@ -1,6 +1,6 @@
 import Foundation
 
-enum Muscle: String, Codable, CaseIterable, Identifiable {
+enum Muscle: String, Codable, CaseIterable, Identifiable, Sendable {
     case chest, shoulders, biceps, triceps, forearms, abdominals, obliques, quadriceps, calves, upperBack, lowerBack, glutes, hamstrings
     var id: String { rawValue }
     var title: String { switch self { case .upperBack: "Upper back"; case .lowerBack: "Lower back"; default: rawValue.capitalized } }
@@ -19,7 +19,7 @@ struct ExerciseDefinition: Identifiable, Codable, Equatable {
     var isCustom = false
     var isFavorite = false
 }
-struct PlannedExercise: Identifiable, Codable, Equatable {
+struct PlannedExercise: Identifiable, Codable, Equatable, Sendable {
     var id = UUID()
     var exerciseID: String
     var sets = 3
@@ -31,8 +31,8 @@ struct PlannedExercise: Identifiable, Codable, Equatable {
     var warmupSets = 0
     var setTargets: [PlannedSet]?
 }
-enum RoutineDayKind: String, Codable, CaseIterable { case workout = "Workout", rest = "Rest day", flexible = "Flexible day" }
-struct RoutineDay: Identifiable, Codable, Equatable {
+enum RoutineDayKind: String, Codable, CaseIterable, Sendable { case workout = "Workout", rest = "Rest day", flexible = "Flexible day" }
+struct RoutineDay: Identifiable, Codable, Equatable, Sendable {
     var id = UUID()
     var weekday: Int
     var title = ""

@@ -4,7 +4,6 @@ struct RoutineStageBar: View {
     @Binding var selection: RoutineEditorStage
     @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Namespace private var highlight
 
     var body: some View {
         Group {
@@ -23,7 +22,8 @@ struct RoutineStageBar: View {
         ForEach(RoutineEditorStage.allCases) { stage in
             let selected = selection == stage
             Button {
-                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.22)) { selection = stage }
+                guard selection != stage else { return }
+                selection = stage
             } label: {
                 HStack(spacing: 6) {
                     Image(systemName: stage.editorSymbol).font(.system(size: 14, weight: .medium))
@@ -36,10 +36,10 @@ struct RoutineStageBar: View {
                         RoundedRectangle(cornerRadius: 15)
                             .fill(FitTheme.dashboardAccent.opacity(0.16))
                             .overlay { RoundedRectangle(cornerRadius: 15).strokeBorder(FitTheme.dashboardAccent.opacity(0.5), lineWidth: 1) }
-                            .matchedGeometryEffect(id: "stage", in: highlight)
                     }
                 }
                 .contentShape(RoundedRectangle(cornerRadius: 15))
+                .animation(FitMotion.change(reduceMotion: reduceMotion), value: selected)
             }
             .buttonStyle(RoutineEditorPressStyle())
             .accessibilityIdentifier("routineStage-\(stage.rawValue.lowercased())")
@@ -119,7 +119,8 @@ struct RoutineDayKindControl: View {
     private var choices: some View {
         ForEach(RoutineDayKind.allCases, id: \.self) { kind in
             Button {
-                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.2)) { selection = kind }
+                guard selection != kind else { return }
+                selection = kind
             } label: {
                 VStack(spacing: 8) {
                     Image(systemName: kind.editorSymbol).font(.system(size: 19, weight: .regular))
@@ -128,6 +129,7 @@ struct RoutineDayKindControl: View {
                 .frame(maxWidth: .infinity, minHeight: 76)
                 .foregroundStyle(selection == kind ? FitTheme.dashboardAccent : FitTheme.textSecondary)
                 .dashboardGlass(in: RoundedRectangle(cornerRadius: 16), highlighted: selection == kind, interactive: true)
+                .animation(FitMotion.change(reduceMotion: reduceMotion), value: selection == kind)
             }
             .buttonStyle(RoutineEditorPressStyle())
             .accessibilityLabel(kind.rawValue)
@@ -140,15 +142,16 @@ struct RoutineReviewDay: View {
     let day: RoutineDay
     let exercise: ExerciseDefinition?
     @Environment(\.dynamicTypeSize) private var typeSize
+    private var weekdayTitle: String { RoutineSchedule.weekdays.indices.contains(day.weekday) ? RoutineSchedule.weekdays[day.weekday] : "Unscheduled" }
 
     var body: some View {
         cardLayout {
             if typeSize.isAccessibilitySize {
-                Label(RoutineSchedule.weekdays[day.weekday], systemImage: day.kind.editorSymbol)
+                Label(weekdayTitle, systemImage: day.kind.editorSymbol)
                     .font(FitTheme.medium(13)).foregroundStyle(FitTheme.dashboardAccent)
             } else {
                 VStack(spacing: 8) {
-                    Text(String(RoutineSchedule.weekdays[day.weekday].prefix(3))).font(FitTheme.medium(12))
+                    Text(String(weekdayTitle.prefix(3))).font(FitTheme.medium(12))
                     Image(systemName: day.kind.editorSymbol).font(.system(size: 13))
                 }
                 .foregroundStyle(day.kind == .workout ? FitTheme.dashboardAccent : FitTheme.textSecondary)
