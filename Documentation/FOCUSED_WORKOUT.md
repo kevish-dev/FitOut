@@ -49,6 +49,21 @@ keyboard, with scrollable inputs above it. Options retain add exercises/sets,
 set type, timing/history, Live Activity retry, finish early and confirmed discard.
 Minimize never ends the session. The existing summary retains all recorded details.
 
+At exerciseTransition, the app dock shows Slide to next exercise with the next
+exercise/set detail and a 54-point orange arrow handle. Starting requires dragging
+the handle left to right through at least 85% of its track and releasing. A tap
+does not start the timer; short/cancelled drags return to the beginning. This also
+applies after rest expires/is skipped and after switching to another exercise.
+Pause/resume, between-set actions and set completion retain their existing buttons.
+The label grows with Dynamic Type, respects Reduce Motion and provides a direct
+VoiceOver action. The slider is disabled while numeric input is being adjusted.
+
+Slide completion checks the expected exercise, set and transition phase before
+using the existing start command. State identity follows the pending set, duplicate
+activation is guarded, and a failed/stale save releases the latch for retry. No
+timer starts during a partial drag. The iPhone build-for-testing passed; native
+gesture feel and layout remain for the owner to check, without UI automation.
+
 The interface reuses the app's subdued exercise illustrations, theme colors and
 fonts, appearance preference, Reduce Transparency and optional haptics. No new
 photo assets, dependencies or persistence schema changes are needed.

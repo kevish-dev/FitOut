@@ -252,23 +252,33 @@ struct ActiveWorkoutView: View {
             if session.lastRecordedSet != nil {
                 WorkoutLastSetActions(store: store, sessionID: session.id, unit: model.unit)
             }
-            Button { if model.phase == expectedPhase && model.current?.set.id == expectedSet { primaryAction() } } label: {
-                HStack(spacing: 16) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(primaryTitle).font(FitTheme.button(17))
-                        if let detail = WorkoutActionPreview(session: session).detail {
-                            Text(detail).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                    }.frame(maxWidth: .infinity, alignment: .leading)
-                    Image(systemName: model.phase == .activeSet ? "checkmark" : model.phase == .paused ? "play.fill" : "arrow.right")
-                        .font(.system(size: 20, weight: .semibold)).foregroundStyle(.white)
-                        .frame(width: 54, height: 54).background(FitTheme.dashboardAccent, in: Circle())
-                        .accessibilityHidden(true)
-                }.padding(16).frame(maxWidth: .infinity, minHeight: 86)
-                    .foregroundStyle(FitTheme.textPrimary).background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 26))
-                    .contentShape(RoundedRectangle(cornerRadius: 26))
-            }.buttonStyle(RoutineEditorPressStyle()).disabled(!model.editingInputs.isEmpty || model.phase == .activeSet && model.inputError != nil).accessibilityIdentifier(model.phase == .activeSet ? "completeSet" : "focusedWorkoutPrimary")
+            if expectedPhase == .exerciseTransition, let current = model.current {
+                WorkoutNextExerciseSlider(detail: WorkoutActionPreview(session: session).detail ?? current.entry.exercise.name,
+                                          enabled: model.editingInputs.isEmpty) {
+                    guard model.phase == .exerciseTransition, model.current?.entry.id == current.entry.id,
+                          model.current?.set.id == expectedSet, model.editingInputs.isEmpty else { return false }
+                    primaryAction()
+                    return model.phase == .activeSet && model.current?.set.id == expectedSet
+                }.id(current.set.id)
+            } else {
+                Button { if model.phase == expectedPhase && model.current?.set.id == expectedSet { primaryAction() } } label: {
+                    HStack(spacing: 16) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text(primaryTitle).font(FitTheme.button(17))
+                            if let detail = WorkoutActionPreview(session: session).detail {
+                                Text(detail).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }.frame(maxWidth: .infinity, alignment: .leading)
+                        Image(systemName: model.phase == .activeSet ? "checkmark" : model.phase == .paused ? "play.fill" : "arrow.right")
+                            .font(.system(size: 20, weight: .semibold)).foregroundStyle(.white)
+                            .frame(width: 54, height: 54).background(FitTheme.dashboardAccent, in: Circle())
+                            .accessibilityHidden(true)
+                    }.padding(16).frame(maxWidth: .infinity, minHeight: 86)
+                        .foregroundStyle(FitTheme.textPrimary).background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 26))
+                        .contentShape(RoundedRectangle(cornerRadius: 26))
+                }.buttonStyle(RoutineEditorPressStyle()).disabled(!model.editingInputs.isEmpty || model.phase == .activeSet && model.inputError != nil).accessibilityIdentifier(model.phase == .activeSet ? "completeSet" : "focusedWorkoutPrimary")
+            }
         }.frame(maxWidth: 560).padding(.horizontal, FitTheme.pageInset).padding(.vertical, 10).frame(maxWidth: .infinity).background(.bar)
     }
     private var primaryTitle: String {
@@ -325,5 +335,69 @@ struct ActiveWorkoutView: View {
                 .navigationTitle("Technique").navigationBarTitleDisplayMode(.inline)
                 .toolbar { Button("Done") { showTechnique = false } }
         }
+    }
+}
+
+/// Only the exercise-transition action slides; starting/completing a set keeps
+/// its existing control. A successful start removes this view through session state.
+private struct WorkoutNextExerciseSlider: View {
+    let detail: String
+    let enabled: Bool
+    let action: () -> Bool
+    @GestureState private var drag: CGSize?
+    @State private var finished = false
+    @Environment(\.isEnabled) private var isEnabled
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    private var canContinue: Bool { enabled && isEnabled && !finished }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Slide to next exercise").font(FitTheme.button(17))
+                .fixedSize(horizontal: false, vertical: true)
+            Text(detail).font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .opacity(drag == nil ? 1 : 0.35)
+        .padding(.leading, 86).padding(.trailing, 16).padding(.vertical, 16)
+        .frame(maxWidth: .infinity, minHeight: 86, alignment: .leading)
+        .foregroundStyle(FitTheme.textPrimary)
+        .background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 26))
+        .overlay {
+            GeometryReader { geometry in
+                let travel = max(0, geometry.size.width - 86)
+                let offset = finished ? travel : min(travel, max(0, drag?.width ?? 0))
+                Image(systemName: "arrow.right")
+                    .font(.system(size: 20, weight: .semibold)).foregroundStyle(.white)
+                    .frame(width: 54, height: 54).background(FitTheme.dashboardAccent, in: Circle())
+                    .contentShape(Circle())
+                    .offset(x: 16 + offset, y: max(0, (geometry.size.height - 54) / 2))
+                    .gesture(DragGesture(minimumDistance: 3)
+                        .updating($drag) { value, state, _ in
+                            guard canContinue else { return }
+                            state = value.translation
+                        }
+                        .onEnded { value in
+                            guard travel > 0, value.translation.width >= travel * 0.85 else { return }
+                            finish()
+                        })
+                    .animation(reduceMotion || drag != nil ? nil : .spring(response: 0.3, dampingFraction: 0.85), value: offset)
+            }
+        }
+        .environment(\.layoutDirection, .leftToRight)
+        .opacity(enabled && isEnabled ? 1 : 0.45)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Start next exercise")
+        .accessibilityValue(detail)
+        .accessibilityHint(enabled ? "Slide the arrow from left to right to start. With VoiceOver, double tap." : "Finish adjusting the set before continuing.")
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { finish() }
+        .accessibilityIdentifier("nextExerciseSlider")
+    }
+
+    private func finish() {
+        guard canContinue else { return }
+        finished = true
+        // A failed/stale save must let the user retry instead of latching shut.
+        if !action() { finished = false }
     }
 }
