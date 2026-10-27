@@ -50,14 +50,7 @@ struct WorkoutStreakCelebrationView: View {
                 }
             }
             .safeAreaInset(edge: .bottom, spacing: 0) {
-                Button(action: close) {
-                    HStack(spacing: 18) {
-                        Image(systemName: "arrow.right").font(.system(size: 23, weight: .medium))
-                            .foregroundStyle(.white).frame(width: 68, height: 62)
-                            .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 18))
-                        Text("Continue").font(FitTheme.button(19)).frame(maxWidth: .infinity)
-                    }.padding(4).dashboardGlass(in: RoundedRectangle(cornerRadius: 22), interactive: true)
-                }.buttonStyle(.plain).accessibilityIdentifier("continueStreakCelebration")
+                StreakContinueSlider(action: close).id(event.id)
                     .frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity)
             }
             .foregroundStyle(FitTheme.textPrimary).background(FitTheme.dashboardBackground.ignoresSafeArea())
@@ -96,6 +89,59 @@ struct WorkoutStreakCelebrationView: View {
                     .accessibilityLabel(day.date.formatted(.dateTime.weekday(.wide)) + (day.isCompleted ? ", workout completed" : day.isRestDay ? ", planned rest day, streak protected" : ", no completed workout"))
             }
         }.padding(FitTheme.cardInset).dashboardGlass(in: RoundedRectangle(cornerRadius: 24))
+    }
+}
+
+private struct StreakContinueSlider: View {
+    let action: () -> Void
+    @GestureState private var drag: CGSize?
+    @State private var finished = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.fitHaptics) private var haptics
+
+    var body: some View {
+        GeometryReader { geometry in
+            let travel = max(0, geometry.size.width - 76)
+            let offset = finished ? travel : min(travel, max(0, drag?.width ?? 0))
+            ZStack(alignment: .leading) {
+                Text("Continue").font(FitTheme.button(19))
+                    .frame(maxWidth: .infinity).padding(.leading, 86)
+                    .opacity(travel > 0 ? 1 - Double(offset / travel) : 1)
+                    .allowsHitTesting(false)
+                Image(systemName: "arrow.right").font(.system(size: 23, weight: .medium))
+                    .foregroundStyle(.white).frame(width: 68, height: 62)
+                    .background(FitTheme.dashboardAccent, in: RoundedRectangle(cornerRadius: 18))
+                    .contentShape(RoundedRectangle(cornerRadius: 18))
+                    .offset(x: offset)
+                    .gesture(DragGesture(minimumDistance: 3)
+                        .updating($drag) { value, state, _ in
+                            guard !finished else { return }
+                            state = value.translation
+                        }
+                        .onEnded { value in
+                            guard travel > 0, value.translation.width >= travel * 0.85 else { return }
+                            finish()
+                        })
+            }
+            // GestureState resets cancelled/short drags as well as completed ones.
+            .animation(reduceMotion || drag != nil ? nil : .spring(response: 0.3, dampingFraction: 0.85), value: offset)
+            .padding(4).dashboardGlass(in: RoundedRectangle(cornerRadius: 22), interactive: true)
+        }
+        .frame(height: 70)
+        .environment(\.layoutDirection, .leftToRight)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("Continue")
+        .accessibilityHint("Slide the arrow from left to right to continue, or double tap with VoiceOver.")
+        .accessibilityAddTraits(.isButton)
+        .accessibilityAction { finish() }
+        .accessibilityIdentifier("continueStreakCelebration")
+    }
+
+    private func finish() {
+        guard !finished else { return }
+        finished = true
+        haptics?.play(.selection)
+        action()
     }
 }
 

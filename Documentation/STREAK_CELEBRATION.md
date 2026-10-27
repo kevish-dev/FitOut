@@ -51,7 +51,11 @@ weekly consistency metric (at least one completed workout in a calendar week).
 
 The presenter uses the existing app window and presents a native full-screen cover
 above the current workout summary after confirmation transitions settle. Continue
-returns to that summary, preserving Undo. If another alert blocks presentation,
+requires dragging its orange arrow from left to right across at least 85% of the
+track and releasing; tapping does not dismiss. Short or cancelled drags reset,
+with Reduce Motion respected. VoiceOver retains a direct accessibility action.
+Completing the slide returns to the summary and acknowledges the award once,
+preserving the workout's edit/restart controls. If another alert blocks presentation,
 the bounded presentation attempt leaves the award pending for the next foreground
 refresh. No overlay window or continual animation/timer is added. Test/in-memory
 containers disable UIKit presentation while exercising all award logic.
