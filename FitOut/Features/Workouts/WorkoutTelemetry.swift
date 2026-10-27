@@ -3,7 +3,7 @@ import Foundation
 enum WorkoutEventOrigin: String, Codable { case app, liveActivity }
 enum WorkoutEventKind: String, Codable {
     case started, trackingEnabled, paused, resumed, lap, setCreated, setStarted, setTimerStopped, setLogged, setUndone, setEdited, setDeleted
-    case exerciseAdded, exerciseRemoved, exerciseChanged, exerciseSkipped, setSkipped, notesChanged, restChanged, finished
+    case exerciseAdded, exerciseRemoved, exerciseChanged, exerciseSkipped, exercisesReordered, exerciseFocused, setSkipped, notesChanged, restChanged, finished
     var title: String {
         switch self {
         case .started: "Workout started"; case .trackingEnabled: "Detailed tracking enabled"
@@ -14,6 +14,7 @@ enum WorkoutEventKind: String, Codable {
         case .setSkipped: "Set skipped"
         case .exerciseAdded: "Exercise added"; case .exerciseRemoved: "Exercise removed"
         case .exerciseChanged: "Exercise replaced"; case .exerciseSkipped: "Exercise availability changed"
+        case .exercisesReordered: "Exercise order changed"; case .exerciseFocused: "Current exercise changed"
         case .notesChanged: "Notes updated"; case .restChanged: "Rest updated"; case .finished: "Workout ended"
         }
     }
@@ -94,6 +95,11 @@ enum WorkoutTelemetryRecorder {
             }
         }
         let previousEntries = Dictionary((before?.entries ?? []).map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        if let before, Set(before.entries.map(\.id)) == Set(after.entries.map(\.id)), before.entries.map(\.id) != after.entries.map(\.id) {
+            event(.exercisesReordered, from: before.entries.map { $0.exercise.name }.joined(separator: " → "), to: after.entries.map { $0.exercise.name }.joined(separator: " → "))
+        }
+        if let before, before.execution?.entryID != after.execution?.entryID,
+           let current = after.entries.first(where: { $0.id == after.execution?.entryID }) { event(.exerciseFocused, entry: current) }
         for index in after.entries.indices {
             if after.entries[index].skipped || !after.isActive {
                 for setIndex in after.entries[index].sets.indices {

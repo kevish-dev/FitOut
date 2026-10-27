@@ -79,6 +79,7 @@ struct WorkoutExerciseCard: View {
 }
 
 struct WorkoutSetEditor: View {
+    @State private var editingNumbers: Set<String> = []
     @Binding var value: WorkoutSet
     let kind: ExerciseKind
     let unit: WeightUnit
@@ -203,11 +204,15 @@ struct WorkoutSetEditor: View {
             WorkoutLogNumberField(title: "Meters (optional)", value: $value.distanceMeters, step: 50, maximum: 1_000_000)
         } else {
             if kind == .weighted {
-                WorkoutLogNumberField(title: "Load · \(unit.rawValue)", value: Binding(get: { unit.display(value.loadKG) }, set: { value.loadKG = unit.kilograms($0) }), step: unit == .kg ? 2.5 : 5, maximum: unit.display(1000))
+                WorkoutNumberWheel(title: "Load · \(unit.rawValue)", value: Binding(get: { unit.display(value.loadKG) }, set: { value.loadKG = unit.kilograms($0) }), step: unit == .kg ? 0.5 : 1, maximum: unit.display(1000), editingChanged: { active in
+                    if active { editingNumbers.insert("load") } else { editingNumbers.remove("load") }
+                })
             }
-            WorkoutLogNumberField(title: "Reps", value: Binding(get: { Double(value.reps) }, set: { newValue in
+            WorkoutNumberWheel(title: "Reps", value: Binding(get: { Double(value.reps) }, set: { newValue in
                 if newValue.isFinite, (0...1000).contains(newValue) { value.reps = Int(newValue) }
-            }), integer: true)
+            }), integer: true, editingChanged: { active in
+                if active { editingNumbers.insert("reps") } else { editingNumbers.remove("reps") }
+            })
         }
         Button(action: complete) {
             HStack(spacing: 10) {
@@ -220,7 +225,7 @@ struct WorkoutSetEditor: View {
                 .frame(maxWidth: stacked ? .infinity : nil)
                 .background(isLogged ? FitTheme.dashboardAccent.opacity(0.1) : FitTheme.textPrimary.opacity(0.04), in: RoundedRectangle(cornerRadius: 13))
         }
-        .buttonStyle(RoutineEditorPressStyle()).disabled(!canComplete || (!isLogged && !canLog))
+        .buttonStyle(RoutineEditorPressStyle()).disabled(!canComplete || !editingNumbers.isEmpty || (!isLogged && !canLog))
         .accessibilityLabel(isLogged ? "Set completed — undo" : "Complete set")
         .accessibilityHint(canComplete ? (isLogged ? "Undoes this set and resets its optional timer" : "Saves this set and starts its rest timer") : "Resume the workout to log sets")
         .accessibilityIdentifier("completeSet")

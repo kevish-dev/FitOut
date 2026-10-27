@@ -36,6 +36,15 @@ struct ActiveWorkoutView: View {
                         GeometryReader { viewport in
                             ScrollView {
                                 VStack(alignment: .leading, spacing: FitTheme.sectionSpacing) {
+                                    Button { editingPlan = true } label: {
+                                        HStack {
+                                            Label("Session exercises", systemImage: "list.bullet")
+                                            Spacer()
+                                            Text("\(session.entries.count)").monospacedDigit()
+                                            Image(systemName: "arrow.up.arrow.down")
+                                        }.font(FitTheme.button(14)).padding(.horizontal, 16).frame(minHeight: 48)
+                                            .dashboardGlass(in: Capsule(), interactive: true)
+                                    }.buttonStyle(.plain).disabled(!model.editingInputs.isEmpty).accessibilityIdentifier("manageSessionExercises")
                                     if let current = model.current {
                                         progress(session, entry: current.entry, set: current.set)
                                         exercise(current.entry)
@@ -52,7 +61,7 @@ struct ActiveWorkoutView: View {
                                             inputs(current.entry, set: current.set)
                                             HStack {
                                                 Button("Skip set", systemImage: "forward.end") { act(.skipSet, expected: current.set.id) }
-                                                    .disabled(model.phase == .paused).accessibilityIdentifier("skipWorkoutSet")
+                                                    .disabled(model.phase == .paused || !model.editingInputs.isEmpty).accessibilityIdentifier("skipWorkoutSet")
                                                 Spacer()
                                                 Button("Add note", systemImage: "note.text.badge.plus") { openNote(current.entry.id, current.set.id) }
                                             }.font(FitTheme.medium(13)).frame(minHeight: 44)
@@ -134,7 +143,7 @@ struct ActiveWorkoutView: View {
             Menu {
                 if session.isActive {
                     Button(session.status == .paused ? "Resume workout" : "Pause workout", systemImage: session.status == .paused ? "play" : "pause") { model.togglePause() }
-                    Button("Edit workout plan", systemImage: "list.bullet.rectangle") { editingPlan = true }
+                    Button("Manage session exercises", systemImage: "list.bullet.rectangle") { editingPlan = true }
                     Button("Add exercises", systemImage: "plus") { choosingExercises = true }
                     if let entry = model.current?.entry {
                         Button("Edit sets, weight & reps", systemImage: "slider.horizontal.3") { configuringEntry = entry }
@@ -185,7 +194,7 @@ struct ActiveWorkoutView: View {
             if entry.exercise.kind == .weighted {
                 Picker("Weight unit", selection: Binding(get: { model.unit }, set: { model.selectUnit($0) })) {
                     Text("kg").tag(WeightUnit.kg); Text("lb").tag(WeightUnit.lbs)
-                }.pickerStyle(.segmented).frame(maxWidth: 180).accessibilityIdentifier("workoutWeightUnit")
+                }.pickerStyle(.segmented).frame(maxWidth: 180).disabled(!model.editingInputs.isEmpty).accessibilityIdentifier("workoutWeightUnit")
             }
             if let previous = store.reference(entryID: entry.id, setID: set.id) {
                 VStack(alignment: .leading, spacing: 4) {
@@ -224,13 +233,21 @@ struct ActiveWorkoutView: View {
     }
     @ViewBuilder private func fields(_ kind: ExerciseKind, set: WorkoutSet) -> some View {
         if kind == .weighted {
-            WorkoutLogNumberField(title: "Weight · \(model.unit.rawValue)", value: Binding(get: { model.unit.display(model.current?.set.loadKG ?? 0) }, set: { var value = model.current?.set ?? set; value.loadKG = model.unit.kilograms($0); model.editSet(value, field: .load) }), step: model.unit == .kg ? 2.5 : 5, maximum: model.unit.display(1000))
+            WorkoutNumberWheel(title: "Weight · \(model.unit.rawValue)", value: Binding(get: { model.unit.display(model.current?.set.id == set.id ? model.current?.set.loadKG ?? set.loadKG : set.loadKG) }, set: {
+                guard var value = model.current?.set, value.id == set.id else { return }
+                value.loadKG = model.unit.kilograms($0); model.editSet(value, field: .load)
+            }), step: model.unit == .kg ? 0.5 : 1, maximum: model.unit.display(1000), editingChanged: { active in
+                if active { model.editingInputs.insert(.load) } else { model.editingInputs.remove(.load) }
+            }).id("\(set.id)-load-\(model.unit.rawValue)")
         }
         if kind != .duration {
-            WorkoutLogNumberField(title: "Actual reps", value: Binding(get: { Double(model.current?.set.reps ?? 0) }, set: {
+            WorkoutNumberWheel(title: "Actual reps", value: Binding(get: { Double(model.current?.set.id == set.id ? model.current?.set.reps ?? set.reps : set.reps) }, set: {
+                guard var value = model.current?.set, value.id == set.id else { return }
                 guard $0.isFinite, (0...1000).contains($0) else { model.rejectInput(.reps, message: "Enter reps between 0 and 1,000."); return }
-                var value = model.current?.set ?? set; value.reps = Int($0); model.editSet(value, field: .reps)
-            }), integer: true)
+                value.reps = Int($0); model.editSet(value, field: .reps)
+            }), integer: true, editingChanged: { active in
+                if active { model.editingInputs.insert(.reps) } else { model.editingInputs.remove(.reps) }
+            }).id("\(set.id)-reps")
         } else {
             WorkoutLogNumberField(title: "Target seconds", value: Binding(get: { model.current?.set.seconds ?? 0 }, set: { var value = model.current?.set ?? set; value.seconds = $0; model.editSet(value, field: .seconds) }), step: 5, maximum: 86400)
             WorkoutLogNumberField(title: "Meters (optional)", value: Binding(get: { model.current?.set.distanceMeters ?? 0 }, set: { var value = model.current?.set ?? set; value.distanceMeters = $0; model.editSet(value, field: .distance) }), step: 50, maximum: 1_000_000)
@@ -258,7 +275,7 @@ struct ActiveWorkoutView: View {
                 }.padding(16).frame(maxWidth: .infinity, minHeight: 86)
                     .foregroundStyle(FitTheme.textPrimary).background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 26))
                     .contentShape(RoundedRectangle(cornerRadius: 26))
-            }.buttonStyle(RoutineEditorPressStyle()).disabled(model.phase == .activeSet && model.inputError != nil).accessibilityIdentifier(model.phase == .activeSet ? "completeSet" : "focusedWorkoutPrimary")
+            }.buttonStyle(RoutineEditorPressStyle()).disabled(!model.editingInputs.isEmpty || model.phase == .activeSet && model.inputError != nil).accessibilityIdentifier(model.phase == .activeSet ? "completeSet" : "focusedWorkoutPrimary")
         }.frame(maxWidth: 560).padding(.horizontal, FitTheme.pageInset).padding(.vertical, 10).frame(maxWidth: .infinity).background(.bar)
     }
     private var primaryTitle: String {

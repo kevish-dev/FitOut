@@ -42,11 +42,13 @@ struct WorkoutClockAnchor {
     let sessionID: UUID?
     let defaultUnit: WeightUnit
     private(set) var inputErrors: [WorkoutInputField: String] = [:]
+    var editingInputs: Set<WorkoutInputField> = []
     var inputError: String? { inputErrors.values.sorted().first }
     @ObservationIgnored private var anchor = WorkoutClockAnchor()
     @ObservationIgnored private var restTask: Task<Void, Never>?
     @ObservationIgnored private var scheduledDeadline: Date?
     @ObservationIgnored private var visible = false
+    @ObservationIgnored private var inputSetID: UUID?
     init(store: WorkoutStore, unit: WeightUnit) { self.store = store; sessionID = store.active?.id; defaultUnit = unit }
     var session: WorkoutSession? { store.sessions.first { $0.id == sessionID } }
     var phase: WorkoutPhase { session?.execution?.phase ?? .ready }
@@ -62,12 +64,16 @@ struct WorkoutClockAnchor {
     func deactivate() { visible = false; restTask?.cancel(); restTask = nil; scheduledDeadline = nil }
     func refresh() {
         if let sessionID { _ = store.prepareFocusedSession(sessionID, now: now) }
+        if inputSetID != current?.set.id { inputSetID = current?.set.id; inputErrors = [:]; editingInputs = [] }
         scheduleRest()
     }
     func selectUnit(_ value: WeightUnit) { store.update { $0.execution?.preferredUnit = value } }
     func perform(_ command: WorkoutCommand, expectedSet: UUID? = nil) {
         guard let sessionID else { return }
-        if command == .completeSet, let inputError { store.error = inputError; return }
+        if command == .completeSet {
+            guard editingInputs.isEmpty else { store.error = "Let the number picker settle before completing the set."; return }
+            if let inputError { store.error = inputError; return }
+        }
         _ = store.performFocused(command, sessionID: sessionID, expectedSet: expectedSet, now: now)
         if [.skipSet, .undo, .finish].contains(command) { inputErrors = [:] }
         scheduleRest()

@@ -96,8 +96,9 @@ enum WorkoutExecutionEngine {
               session.entries[e].sets[s].status == .pending else { return false }
         if command == .startSet {
             guard [.ready, .exerciseTransition].contains(execution.phase) else { return false }
+            let previousElapsed = session.entries[e].sets[s].timedActiveSeconds ?? 0
             session.entries[e].sets[s].startedAt = now
-            session.entries[e].sets[s].startedActiveSeconds = session.duration(at: now)
+            session.entries[e].sets[s].startedActiveSeconds = max(0, session.duration(at: now) - previousElapsed)
             session.entries[e].sets[s].timedActiveSeconds = nil
             let target = session.entries[e].sets[s]
             session.entries[e].sets[s].inputTarget = WorkoutActual(loadKG: target.loadKG, reps: target.reps, seconds: target.seconds, distanceMeters: target.distanceMeters)

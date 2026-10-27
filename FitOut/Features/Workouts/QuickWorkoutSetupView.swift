@@ -31,12 +31,14 @@ struct QuickWorkoutSetupView: View {
     @State private var selecting = false
     @State private var editing: WorkoutEntry?
     @State private var discarding = false
+    @State private var originalSessionID: UUID?
     @Environment(\.dismiss) private var dismiss
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     init(store: WorkoutStore, gym: GymStore, unit: WeightUnit, defaults: UserDefaults?, addingToSession: Bool = false, onAdded: (() -> Void)? = nil, onStarted: (() -> Void)? = nil) {
         self.store = store; self.gym = gym; self.addingToSession = addingToSession; self.onAdded = onAdded; self.onStarted = onStarted
         _unit = State(initialValue: unit)
         _saved = State(initialValue: QuickWorkoutDraftStore(defaults: addingToSession ? nil : defaults))
+        _originalSessionID = State(initialValue: addingToSession ? store.active?.id : nil)
     }
     var body: some View {
         ScrollView {
@@ -120,6 +122,7 @@ struct QuickWorkoutSetupView: View {
             Button {
                 keyboardDown()
                 if addingToSession {
+                    guard let originalSessionID, store.active?.id == originalSessionID else { store.error = "This workout has ended. Close this setup and open the current session."; return }
                     if store.addConfiguredExercises(saved.draft.entries) { onAdded?(); dismiss() }
                 } else if store.startQuickWorkout(saved.draft, unit: unit) { saved.clear(); onStarted?() }
             } label: {
@@ -180,11 +183,12 @@ struct WorkoutEntryConfigurationView: View {
     var protectedSetID: UUID? = nil
     let save: (WorkoutEntry) -> Void
     @State private var invalid: Set<String> = []
+    @State private var editingNumbers: Set<String> = []
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private var valid: Bool {
-        invalid.isEmpty && !entry.sets.isEmpty && entry.sets.allSatisfy { set in
+        invalid.isEmpty && editingNumbers.isEmpty && !entry.sets.isEmpty && entry.sets.allSatisfy { set in
             set.isValid && (set.status != .pending || (entry.exercise.kind == .duration ? set.seconds > 0 : set.reps > 0))
         }
     }
@@ -288,11 +292,10 @@ struct WorkoutEntryConfigurationView: View {
             number(set, field: .distance, title: "Meters (optional)", value: set.distanceMeters, maximum: 1_000_000, step: 50)
         } else { number(set, field: .reps, title: "Reps", value: Double(set.reps), maximum: 1000, step: 1) }
     }
-    private func number(_ set: WorkoutSet, field: WorkoutInputField, title: String, value: Double, maximum: Double, step: Double) -> some View {
+    @ViewBuilder private func number(_ set: WorkoutSet, field: WorkoutInputField, title: String, value: Double, maximum: Double, step: Double) -> some View {
         let id = set.id.uuidString + field.rawValue
         let number = (entry.sets.firstIndex { $0.id == set.id } ?? 0) + 1
-        return WorkoutConfigurationNumber(title: title, accessibilityTitle: "Set \(number) \(title)", value: value, maximum: maximum, step: step, integer: field == .reps,
-            positive: field == .reps || field == .seconds) { number, isValid in
+        let change: (Double, Bool) -> Void = { number, isValid in
             if !isValid { invalid.insert(id); return }
             invalid.remove(id)
             guard let index = entry.sets.firstIndex(where: { $0.id == set.id }) else { return }
@@ -303,7 +306,17 @@ struct WorkoutEntryConfigurationView: View {
             case .distance: entry.sets[index].distanceMeters = number
             }
             entry.sets[index].editedInputs = (entry.sets[index].editedInputs ?? []).union([field])
-        }.id(id)
+        }
+        if field == .load || field == .reps {
+            WorkoutNumberWheel(title: title, value: Binding(get: { value }, set: { change($0, true) }),
+                integer: field == .reps, step: field == .reps ? 1 : unit == .kg ? 0.5 : 1,
+                minimum: field == .reps ? 1 : 0, maximum: maximum, editingChanged: { active in
+                    if active { editingNumbers.insert(id) } else { editingNumbers.remove(id) }
+                }).id(id).accessibilityLabel("Set \(number) \(title)")
+        } else {
+            WorkoutConfigurationNumber(title: title, accessibilityTitle: "Set \(number) \(title)", value: value, maximum: maximum, step: step, integer: false,
+                positive: field == .seconds, changed: change).id(id)
+        }
     }
 }
 
@@ -342,55 +355,4 @@ private struct WorkoutConfigurationNumber: View {
     }
     private func formatted(_ number: Double) -> String { number.formatted(.number.grouping(.never).precision(.fractionLength(0...2))) }
     private func adjust(_ delta: Double) { text = formatted(min(maximum, max(positive ? 1 : 0, ((value + delta) * 100).rounded() / 100))) }
-}
-
-struct WorkoutSessionConfigurationView: View {
-    let store: WorkoutStore
-    let gym: GymStore
-    let unit: WeightUnit
-    @State private var editing: WorkoutEntry?
-    @State private var adding = false
-    @Environment(\.dismiss) private var dismiss
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("Your workout plan").font(FitTheme.display(23))
-                Text("Edit any exercise's remaining sets. Recorded sets and running timers stay intact.")
-                    .font(FitTheme.body(14)).foregroundStyle(FitTheme.textSecondary)
-                ForEach(store.active?.entries ?? []) { entry in
-                    Button { editing = entry } label: {
-                        HStack(spacing: 14) {
-                            ExerciseArtwork(exercise: entry.exercise, size: 60)
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text(entry.exercise.name).font(FitTheme.section(16))
-                                Text("\(entry.sets.filter { $0.status == .pending }.count) remaining · \(entry.sets.count) sets")
-                                    .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-                            }.frame(maxWidth: .infinity, alignment: .leading)
-                            Image(systemName: "slider.horizontal.3").frame(width: 44, height: 44)
-                        }.padding(FitTheme.cardInset).background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 20))
-                    }.buttonStyle(.plain)
-                }
-                Button { adding = true } label: {
-                    Label("Add exercises", systemImage: "plus").font(FitTheme.button(15)).frame(maxWidth: .infinity, minHeight: 50)
-                }.buttonStyle(.plain).dashboardGlass(in: Capsule(), interactive: true)
-            }.frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity)
-        }.background(FitTheme.dashboardBackground).foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent)
-            .navigationTitle("Workout plan").navigationBarTitleDisplayMode(.inline)
-            .toolbar { ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } } }
-            .sheet(item: $editing) { original in
-                NavigationStack {
-                    WorkoutEntryConfigurationView(entry: original, unit: unit, reference: { entry, set in
-                        WorkoutRecall.reference(for: entry, setID: set.id, current: store.active, history: store.history)
-                    }, protectedSetID: store.active?.execution?.setID) { edited in
-                        if store.configureExercise(edited, original: original) { editing = nil }
-                    }
-                    .safeAreaInset(edge: .bottom) {
-                        if let error = store.error { Text(error).font(FitTheme.body(13)).foregroundStyle(.red).padding() }
-                    }
-                }
-            }
-            .sheet(isPresented: $adding) {
-                NavigationStack { QuickWorkoutSetupView(store: store, gym: gym, unit: unit, defaults: nil, addingToSession: true, onAdded: { adding = false }) }
-            }
-    }
 }
