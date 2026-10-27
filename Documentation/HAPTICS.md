@@ -2,19 +2,34 @@
 
 Settings → Haptics & vibration contains a master switch, overall intensity,
 per-cue controls and previews. Each of 14 cues has an enable switch, intensity
-(0–100%), pulse count (1–5), spacing (0.12–0.60 seconds) and Soft/Balanced/Crisp feel.
+(0–100%), pulse count (1–10), pulse length (0–0.80 seconds), gap between pulses
+(0.12–1.00 seconds) and Soft/Balanced/Crisp feel. Zero length is a transient tap;
+positive length uses sustained Core Haptics events. Gaps follow each event's end,
+so long pulses never overlap. Maximum custom pattern length is 17 seconds.
 Overall intensity multiplies cue intensity; zero is silent. Saving or disabling
 settings stops any current pattern immediately. A confirmed reset restores default
-patterns and turns background rest notifications off.
+patterns and turns background rest alerts off. Use strong workout vibrations
+restores strong workout/streak cues and full overall intensity, leaving unrelated
+custom cues, the master switch and background permission preferences alone.
 
-The app uses Core Haptics transient patterns with no audio. A best-effort UIKit
-fallback handles engine failure; physical sensation depends on hardware and iOS.
+New defaults use full overall intensity. Rest expiry is five full-intensity
+0.45-second bursts separated by 0.25-second gaps (3.25 seconds total). Other
+workout cues use shorter sustained bursts; picker/navigation cues remain brief.
+The app uses Core Haptics transient/continuous patterns without audio. A heavy
+UIKit impact fallback handles engine failure, without promising continuous
+vibration on unsupported hardware. Physical sensation depends on hardware/iOS;
+Core Haptics intensity cannot exceed the platform maximum or promise exact parity
+with an incoming call. Priority suppression includes the final burst's duration,
+so lower-priority UI feedback cannot cut the rest alert's tail short.
 Unsupported hardware/simulators can save settings but cannot preview vibrations.
 The existing SwiftData hapticsEnabled preference remains the master flag. Detailed
 versioned settings live in the app's UserDefaults, preserving appearance and other
 preferences without a schema change. The old haptics.disabled flag is respected
-until an explicit save migrates it. Failed preference saves retain active settings
-and show an error.
+until an explicit save migrates it. V1 settings decode into V2, preserving custom
+intensity, cue settings and existing notification opt-ins. Missing pulse length
+in a saved cue retains its old transient behavior. Existing notification users
+are never silently switched to alarm access. Failed preference saves retain
+active settings and show an error.
 
 ## Covered events
 
@@ -40,21 +55,40 @@ and show an error.
 
 ## Background/locked-screen rest alerts
 
-This option defaults off. Enabling it from Settings requests notification access;
-building, launching or starting a workout never requests it automatically. One
-stable notification identifier is replaced when a rest deadline changes and
-removed on pause, rest skip, finish, deletion, master off, zero overall intensity
-or a disabled/silent rest cue. Replacement operations serialize so an older async
-add cannot win over cancellation. Notification taps open the existing active
-workout route, including cold launch. Foreground notification presentation is
-suppressed in favor of the single custom haptic cue.
+Background rest alerts default off. Settings offers Notification or, on iOS 26+,
+System alarm. The new-install preference is System alarm; older OS versions
+resolve to Notification. Selecting a type while alerts are off never requests
+access. Enabling alerts, or changing an enabled alert type, requests the chosen
+system permission. Denial leaves the previous settings intact. Building,
+launching and ordinary workout actions never request access automatically.
 
-iOS suspends custom Core Haptics in the background. Background/locked-screen
-alerts therefore use the system notification sound and vibration settings;
-FitOut cannot control their vibration strength/count or guarantee delivery under
-Focus, Silent Mode or user notification preferences. A Live Activity countdown
-does not itself guarantee a vibration. No keepalive/background-mode workaround
-or external dependency was added.
+System alarm uses AlarmKit with a single stable UUID and fixed rest deadline.
+The alarm is scheduled when FitOut becomes inactive/backgrounded; foreground
+uses the custom sustained vibration. Opening FitOut cancels its alarm, so there
+are no simultaneous native/custom rest cues. AlarmKit owns locked-screen alerting,
+sound, system vibration and dismissal, with an Open workout action that routes
+to the active session. The permission description is in the app Info.plist.
+There is no second alarm countdown Live Activity; the existing workout countdown
+continues to show rest. AlarmKit can alert through Silent mode/Focus, and can
+make sound; there is no custom or vibration-only alarm-pattern promise.
+
+Notification keeps the existing stable local notification identifier and standard
+system sound. Notification taps open the active workout, including cold launch;
+foreground notification presentation is suppressed. Notification vibration and
+delivery depend on the person's iOS sound, haptic, notification and Focus settings.
+
+Both channels are cancelled/replaced on pause, resume, rest extension/skip,
+finish/deletion, master off, zero intensity or a disabled/silent rest cue. Only
+one channel is scheduled; switching clears the other. Cancellation attempts both
+channels even if one fails. Async replacements serialize so an older schedule
+cannot win over a newer cancellation. Locked-screen Live Activity actions await
+the alert update before returning. A stable alarm UUID allows cleanup after
+relaunch without touching unrelated alarms. Scheduling checks authorization and
+never prompts implicitly. No keepalive/background audio mode or dependency is added.
+
+iOS suspends custom Core Haptics in the background. AlarmKit is the supported
+system alternative on iOS 26+, but does not expose custom vibration strength,
+length or repetition controls. A Live Activity countdown alone does not vibrate.
 
 Settings explain these limits and expose denied authorization without implying
 that an alert is guaranteed. Existing water reminder behavior is retained.
@@ -70,8 +104,14 @@ replacement, permission denial, background recovery and no permission prompt on
 ordinary workout use. Physical-iPhone validation remains necessary for sensation,
 engine interruptions, notification delivery and locked-screen behavior.
 
-Checkpoint: the full 243-test suite passed with zero failures, including 12
-haptic tests. The unsigned iPhone app/widget/test build passed. An unrelated
-coach timeout test initially raced its fixed 50 ms wait under simulator load;
-it now waits for the observable timeout state within a bounded deadline.
-No interactive app/device UI or real haptic sensation was automatically tested.
+Checkpoint: the full 285-test suite passed with zero failures, including 20
+haptic tests. Coverage includes sustained event lengths/gaps/bounds, final-burst
+priority, legacy decoding, persisted custom duration, native alarm mode selection,
+foreground/background switching, unsupported-OS fallback, permission denial,
+one-channel routing and cancellation failures. The unsigned iPhone app/widget/test
+build passed. Physical intensity, actual AlarmKit permission prompts, ringing,
+Lock Screen delivery and engine interruptions require iPhone validation by the
+owner. No interactive app/device UI or physical haptic sensation was tested.
+
+Platform references: [Apple's AlarmKit overview](https://developer.apple.com/videos/play/wwdc2025/230/)
+and [Core Haptics engine lifecycle](https://developer.apple.com/documentation/corehaptics/preparing-your-app-to-play-haptics).

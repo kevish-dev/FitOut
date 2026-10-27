@@ -30,21 +30,65 @@ enum WorkoutHapticPolicy {
 struct WorkoutRestAlert: Equatable, Sendable {
     let sessionID: UUID
     let deadline: Date
+    var mode: WorkoutRestAlertMode = .notification
     static func make(session: WorkoutSession?, settings: FitHapticSettings, now: Date) -> Self? {
         guard settings.shouldAlertForRest, let session, session.status == .inProgress,
               session.execution?.phase == .resting, let deadline = session.restUntil,
               deadline > now, !session.pendingWork.isEmpty else { return nil }
-        return Self(sessionID: session.id, deadline: deadline)
+        return Self(sessionID: session.id, deadline: deadline, mode: settings.restAlertMode)
     }
 }
 
 @MainActor protocol WorkoutRestAlertScheduling {
+    var supportsAlarm: Bool { get }
+    func replace(_ alert: WorkoutRestAlert?) async throws
+    func requestAccess(for mode: WorkoutRestAlertMode) async throws -> Bool
+    func isAuthorized(for mode: WorkoutRestAlertMode) async -> Bool
+}
+
+@MainActor protocol WorkoutRestAlertChannel {
     func replace(_ alert: WorkoutRestAlert?) async throws
     func requestAccess() async throws -> Bool
     func isAuthorized() async -> Bool
 }
 
 @MainActor final class SystemWorkoutRestAlerts: WorkoutRestAlertScheduling {
+    private let notifications: any WorkoutRestAlertChannel
+    private let alarms: (any WorkoutRestAlertChannel)?
+    var supportsAlarm: Bool { alarms != nil }
+    convenience init() {
+        if #available(iOS 26.0, *) {
+            self.init(notifications: NotificationWorkoutRestAlerts(), alarms: AlarmKitWorkoutRestAlerts())
+        } else { self.init(notifications: NotificationWorkoutRestAlerts(), alarms: nil) }
+    }
+    init(notifications: any WorkoutRestAlertChannel, alarms: (any WorkoutRestAlertChannel)?) {
+        self.notifications = notifications; self.alarms = alarms
+    }
+    private func channel(_ mode: WorkoutRestAlertMode) -> any WorkoutRestAlertChannel {
+        mode == .alarm ? alarms ?? notifications : notifications
+    }
+    func requestAccess(for mode: WorkoutRestAlertMode) async throws -> Bool { try await channel(mode).requestAccess() }
+    func isAuthorized(for mode: WorkoutRestAlertMode) async -> Bool { await channel(mode).isAuthorized() }
+    func replace(_ alert: WorkoutRestAlert?) async throws {
+        guard let alert else {
+            // Attempt both cancellations even if one channel fails.
+            var failure: (any Error)?
+            do { try await notifications.replace(nil) } catch { failure = error }
+            do { try await alarms?.replace(nil) } catch { failure = failure ?? error }
+            if let failure { throw failure }
+            return
+        }
+        if alert.mode == .alarm, let alarms {
+            try await notifications.replace(nil)
+            try await alarms.replace(alert)
+        } else {
+            try await alarms?.replace(nil)
+            try await notifications.replace(alert)
+        }
+    }
+}
+
+@MainActor final class NotificationWorkoutRestAlerts: WorkoutRestAlertChannel {
     private let center = UNUserNotificationCenter.current()
     func requestAccess() async throws -> Bool {
         let settings = await center.notificationSettings()
@@ -104,6 +148,8 @@ struct WorkoutRestAlert: Equatable, Sendable {
     private(set) var alertsAuthorized = false
     private(set) var isRequesting = false
     private(set) var error: String?
+    var supportsAlarm: Bool { alerts.supportsAlarm }
+    var alertMode: WorkoutRestAlertMode { haptics.settings.restAlertMode.resolved(supportsAlarm: supportsAlarm) }
 
     init(store: WorkoutStore, haptics: HapticService, alerts: (any WorkoutRestAlertScheduling)? = nil,
          enabled: Bool = true, clock: @escaping () -> Date = { .now }) {
@@ -126,25 +172,54 @@ struct WorkoutRestAlert: Equatable, Sendable {
         synchronize()
     }
     func settingsChanged() { synchronize() }
-    func refreshAuthorization() async { alertsAuthorized = await alerts.isAuthorized() }
+    func refreshAuthorization() async {
+        alertsAuthorized = await alerts.isAuthorized(for: alertMode)
+        hasSynchronizedAlert = false; synchronize()
+    }
+    func setAlertMode(_ mode: WorkoutRestAlertMode) async {
+        guard !isRequesting else { return }
+        isRequesting = true; error = nil
+        defer { isRequesting = false }
+        let resolved = mode.resolved(supportsAlarm: supportsAlarm)
+        do {
+            let authorized: Bool
+            if haptics.settings.backgroundRestAlerts {
+                authorized = try await alerts.requestAccess(for: resolved)
+                guard authorized else { error = permissionMessage(resolved); return }
+            } else { authorized = await alerts.isAuthorized(for: resolved) }
+            var next = haptics.settings; next.restAlertMode = resolved
+            if haptics.update(next) { alertsAuthorized = authorized; hasSynchronizedAlert = false; synchronize() }
+        } catch { self.error = "The rest alert type could not be changed. Your previous choice is still active." }
+    }
     func setBackgroundAlerts(_ value: Bool) async {
         guard !isRequesting else { return }
         isRequesting = true; error = nil
         defer { isRequesting = false }
         do {
             if value {
-                alertsAuthorized = try await alerts.requestAccess()
-                guard alertsAuthorized else { error = "Notifications are disabled for FitOut. Enable them in iPhone Settings for background rest alerts."; return }
+                alertsAuthorized = try await alerts.requestAccess(for: alertMode)
+                guard alertsAuthorized else { error = permissionMessage(alertMode); return }
             }
             var next = haptics.settings; next.backgroundRestAlerts = value
-            _ = haptics.update(next)
+            // Persist the effective type on older iOS versions so an OS upgrade
+            // cannot turn a notification opt-in into an unapproved alarm opt-in.
+            next.restAlertMode = alertMode
+            if haptics.update(next) { hasSynchronizedAlert = false; synchronize() }
         } catch { self.error = "The rest alert preference could not be enabled. Try again." }
     }
     func flushAlerts() async { await alertTask?.value }
+    private func permissionMessage(_ mode: WorkoutRestAlertMode) -> String {
+        mode == .alarm ? "Alarms are disabled for FitOut. Enable alarm access in iPhone Settings, or choose Notification."
+            : "Notifications are disabled for FitOut. Enable them in iPhone Settings for background rest alerts."
+    }
     private func synchronize() {
         guard enabled else { return }
         let now = clock()
-        let requested = WorkoutRestAlert.make(session: store.active, settings: haptics.settings, now: now)
+        var requested = WorkoutRestAlert.make(session: store.active, settings: haptics.settings, now: now)
+        requested?.mode = alertMode
+        // Foreground uses the stronger custom pattern; only background/locked
+        // rest uses the persistent system alarm, avoiding two simultaneous cues.
+        if active && requested?.mode == .alarm { requested = nil }
         if !hasSynchronizedAlert || requested != desiredAlert {
             desiredAlert = requested; hasPendingAlert = true; hasSynchronizedAlert = true
         }

@@ -29,6 +29,8 @@
 	<string>1</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>FitOut reads selected activity, workouts, nutrition and body measurements to show your personal progress.</string>
+	<key>NSAlarmKitUsageDescription</key>
+	<string>FitOut uses alarms to alert you when workout rest finishes, even while your iPhone is locked or FitOut is in the background.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>Inter-Regular.otf</string>

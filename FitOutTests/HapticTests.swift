@@ -32,11 +32,70 @@ final class HapticTests: XCTestCase {
         XCTAssertEqual(pulses[4].time, 1.2, accuracy: 0.0001)
         XCTAssertEqual(pulses[0].intensity, 0.4, accuracy: 0.0001)
         XCTAssertEqual(pulses[0].sharpness, HapticFeel.soft.sharpness)
-        for cue in [HapticCueSettings(intensity: .nan, pulses: 1), HapticCueSettings(intensity: 1, pulses: 6), HapticCueSettings(intensity: 1, pulses: 0), HapticCueSettings(intensity: 1, pulses: 1, spacing: 0.01)] {
+        for cue in [HapticCueSettings(intensity: .nan, pulses: 1), HapticCueSettings(intensity: 1, pulses: 11), HapticCueSettings(intensity: 1, pulses: 0), HapticCueSettings(intensity: 1, pulses: 1, spacing: 0.01)] {
             settings.cues[.restEnded] = cue
             XCTAssertFalse(settings.isValid)
             XCTAssertTrue(HapticPatternPolicy.pulses(for: .restEnded, settings: settings).isEmpty)
         }
+    }
+    func testStrongDefaultsUseSustainedFullIntensityBurstsWithNonOverlappingGaps() {
+        let settings = FitHapticSettings()
+        let pulses = HapticPatternPolicy.pulses(for: .restEnded, settings: settings)
+        XCTAssertEqual(settings.strength, 1)
+        XCTAssertEqual(pulses.count, 5)
+        XCTAssertTrue(pulses.allSatisfy { $0.duration == 0.45 && $0.intensity == 1 })
+        XCTAssertEqual(pulses.last!.endTime, 3.25, accuracy: 0.0001)
+        for index in 1..<pulses.count {
+            XCTAssertEqual(pulses[index].time - pulses[index - 1].endTime, 0.25, accuracy: 0.0001)
+        }
+        XCTAssertEqual(HapticPatternPolicy.pulses(for: .selection, settings: settings).first?.duration, 0)
+    }
+    func testLongPatternBoundsAndPresetKeepMasterOffAndUnrelatedCustomizations() {
+        var settings = FitHapticSettings()
+        settings.cues[.restEnded] = HapticCueSettings(intensity: 1, pulses: 10, spacing: 1, duration: 0.8)
+        XCTAssertTrue(settings.isValid)
+        XCTAssertEqual(HapticPatternPolicy.pulses(for: .restEnded, settings: settings).last!.endTime, 17, accuracy: 0.0001)
+        for duration in [-0.1, 0.81, .infinity, .nan] {
+            settings.cues[.restEnded]?.duration = duration
+            XCTAssertFalse(settings.isValid)
+            XCTAssertTrue(HapticPatternPolicy.pulses(for: .restEnded, settings: settings).isEmpty)
+        }
+        settings.enabled = false; settings.strength = 0.2
+        let selection = HapticCueSettings(enabled: false, intensity: 0.1, pulses: 1)
+        settings.cues[.selection] = selection
+        settings.useStrongWorkoutCues()
+        XCTAssertEqual(settings.strength, 1)
+        XCTAssertEqual(settings.cue(.restEnded), FitHapticEvent.restEnded.defaults)
+        XCTAssertEqual(settings.cue(.selection), selection)
+        XCTAssertFalse(settings.enabled)
+    }
+    func testLegacySettingsDecodeWithoutLosingCustomStrengthOrNotificationOptIn() throws {
+        var original = FitHapticSettings(); original.strength = 0.35; original.backgroundRestAlerts = true
+        original.cues[.restEnded] = HapticCueSettings(intensity: 0.6, pulses: 4, spacing: 0.3, feel: .soft)
+        var json = try XCTUnwrap(JSONSerialization.jsonObject(with: JSONEncoder().encode(original)) as? [String: Any])
+        json["version"] = 1; json.removeValue(forKey: "restAlertMode")
+        let restored = try JSONDecoder().decode(FitHapticSettings.self, from: JSONSerialization.data(withJSONObject: json))
+        XCTAssertTrue(restored.isValid); XCTAssertEqual(restored.version, 2)
+        XCTAssertEqual(restored.strength, 0.35); XCTAssertEqual(restored.restAlertMode, .notification)
+        XCTAssertTrue(restored.backgroundRestAlerts)
+        XCTAssertEqual(restored.cue(.restEnded), original.cue(.restEnded))
+        XCTAssertEqual(HapticPatternPolicy.pulses(for: .restEnded, settings: restored)[3].time, 0.9, accuracy: 0.0001)
+        XCTAssertEqual(HapticPatternPolicy.pulses(for: .restEnded, settings: restored)[0].duration, 0)
+        XCTAssertEqual(try JSONDecoder().decode(FitHapticSettings.self, from: JSONEncoder().encode(restored)), restored)
+    }
+    @MainActor func testLongFinalPulseRemainsProtectedFromLowerPriorityFeedback() {
+        let defaults = UserDefaults(suiteName: "haptics-tail-" + UUID().uuidString)!
+        defer { defaults.removeObject(forKey: HapticService.storageKey) }
+        let output = HapticOutputStub(), service = HapticService(defaults: defaults, repository: HapticPreferencesStub(), output: output)
+        var settings = service.settings
+        settings.cues[.restEnded] = HapticCueSettings(intensity: 1, pulses: 1, duration: 0.8)
+        XCTAssertTrue(service.update(settings)); service.sceneChanged(active: true)
+        service.play(.restEnded, now: time)
+        service.play(.selection, now: time.addingTimeInterval(0.7))
+        service.play(.coachReply, now: time.addingTimeInterval(0.7))
+        XCTAssertEqual(output.patterns.count, 1)
+        service.play(.selection, now: time.addingTimeInterval(0.9))
+        XCTAssertEqual(output.patterns.count, 2)
     }
     @MainActor func testSettingsRelaunchKeepsAllCuesAndHonorsTheExistingMasterPreference() throws {
         let defaults = UserDefaults(suiteName: "haptics-" + UUID().uuidString)!
@@ -45,7 +104,7 @@ final class HapticTests: XCTestCase {
         let service = HapticService(defaults: defaults, repository: repo, output: HapticOutputStub())
         XCTAssertFalse(service.settings.enabled)
         var next = service.settings; next.enabled = true; next.strength = 0.4
-        next.cues[.restEnded] = HapticCueSettings(intensity: 0.5, pulses: 4, spacing: 0.4, feel: .crisp)
+        next.cues[.restEnded] = HapticCueSettings(intensity: 0.5, pulses: 4, spacing: 0.4, feel: .crisp, duration: 0.45)
         XCTAssertTrue(service.update(next))
         let restored = HapticService(defaults: defaults, repository: repo, output: HapticOutputStub())
         XCTAssertEqual(restored.settings, next)
@@ -94,10 +153,10 @@ final class HapticTests: XCTestCase {
         service.play(.selection, now: time.addingTimeInterval(0.2))
         service.play(.coachReply, now: time.addingTimeInterval(0.2))
         XCTAssertEqual(output.patterns.count, 2)
-        service.play(.selection, now: time.addingTimeInterval(2))
+        service.play(.selection, now: time.addingTimeInterval(4))
         XCTAssertEqual(output.patterns.count, 3)
         service.sceneChanged(active: false)
-        service.play(.restEnded, now: time.addingTimeInterval(3))
+        service.play(.restEnded, now: time.addingTimeInterval(5))
         XCTAssertEqual(output.patterns.count, 3)
     }
     func testWorkoutEventsPreferFinalCompletionAndDoNotBuzzForEditsOrEarlyRestSkip() {
@@ -148,7 +207,7 @@ final class HapticTests: XCTestCase {
         try await Task.sleep(for: .milliseconds(1_200))
         XCTAssertEqual(store.active?.execution?.phase, .ready)
         XCTAssertNil(store.active?.restUntil)
-        XCTAssertEqual(output.patterns.last?.count, 3)
+        XCTAssertEqual(output.patterns.last?.count, FitHapticEvent.restEnded.defaults.pulses)
         let played = output.patterns.count
         XCTAssertTrue(store.prepareFocusedSession(id))
         XCTAssertEqual(output.patterns.count, played)
@@ -202,6 +261,94 @@ final class HapticTests: XCTestCase {
         XCTAssertEqual(output.patterns.count, count)
         coordinator.sceneChanged(active: false); await coordinator.flushAlerts()
     }
+    @MainActor func testNativeAlarmIsBackgroundOnlyAndRefreshesOrCancelsAcrossWorkoutActions() async throws {
+        let defaults = UserDefaults(suiteName: "haptics-alarm-" + UUID().uuidString)!
+        defer { defaults.removeObject(forKey: HapticService.storageKey) }
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        let output = HapticOutputStub(), service = HapticService(defaults: defaults, repository: HapticPreferencesStub(), output: output)
+        let alerts = RestAlertStub(); alerts.supportsAlarm = true
+        let coordinator = WorkoutHapticCoordinator(store: store, haptics: service, alerts: alerts)
+        service.onSettingsChange = { [weak coordinator] in coordinator?.settingsChanged() }
+        store.onMutation = { [weak coordinator] before, after, date in coordinator?.saved(before: before, after: after, at: date) }
+        coordinator.sceneChanged(active: true)
+        await coordinator.setAlertMode(.alarm)
+        XCTAssertEqual(alerts.requests, 0)
+        await coordinator.setBackgroundAlerts(true)
+        XCTAssertEqual(alerts.requestedModes, [.alarm])
+        let draft = QuickWorkoutDraft(entries: [WorkoutEntry(exercise: ExerciseCatalogue.all[0], sets: [WorkoutSet(restSeconds: 90), WorkoutSet()])])
+        XCTAssertTrue(store.startQuickWorkout(draft, unit: .kg))
+        let id = try XCTUnwrap(store.active?.id)
+        XCTAssertTrue(store.performFocused(.completeSet, sessionID: id)); await coordinator.flushAlerts()
+        XCTAssertNil(alerts.current)
+        coordinator.sceneChanged(active: false); await coordinator.flushAlerts()
+        let first = try XCTUnwrap(alerts.current)
+        XCTAssertEqual(first.mode, .alarm)
+        XCTAssertEqual(first.deadline, store.active?.restUntil)
+        XCTAssertTrue(store.performFocused(.extendRest, sessionID: id)); await coordinator.flushAlerts()
+        XCTAssertEqual(alerts.current?.deadline, first.deadline.addingTimeInterval(15))
+        store.pause(); await coordinator.flushAlerts(); XCTAssertNil(alerts.current)
+        store.resume(); await coordinator.flushAlerts(); XCTAssertNotNil(alerts.current)
+        coordinator.sceneChanged(active: true); await coordinator.flushAlerts(); XCTAssertNil(alerts.current)
+        coordinator.sceneChanged(active: false); await coordinator.flushAlerts(); XCTAssertNotNil(alerts.current)
+        XCTAssertTrue(store.performFocused(.skipRest, sessionID: id)); await coordinator.flushAlerts(); XCTAssertNil(alerts.current)
+        XCTAssertEqual(alerts.requests, 1)
+    }
+    @MainActor func testAlarmPermissionDenialRetainsPreviousModeAndUnsupportedOSUsesNotifications() async throws {
+        let defaults = UserDefaults(suiteName: "haptics-mode-" + UUID().uuidString)!
+        defer { defaults.removeObject(forKey: HapticService.storageKey) }
+        let store = try WorkoutStore(container: PersistenceFactory.makeContainer(inMemory: true))
+        let service = HapticService(defaults: defaults, repository: HapticPreferencesStub(), output: HapticOutputStub())
+        let alerts = RestAlertStub(), coordinator = WorkoutHapticCoordinator(store: store, haptics: service, alerts: alerts)
+        XCTAssertEqual(coordinator.alertMode, .notification)
+        await coordinator.setBackgroundAlerts(true)
+        XCTAssertEqual(alerts.requestedModes, [.notification])
+        XCTAssertEqual(service.settings.restAlertMode, .notification)
+        alerts.supportsAlarm = true
+        await coordinator.setAlertMode(.notification)
+        let before = service.settings
+        alerts.authorized = false
+        await coordinator.setAlertMode(.alarm)
+        XCTAssertEqual(service.settings, before)
+        XCTAssertNotNil(coordinator.error)
+        XCTAssertEqual(alerts.requestedModes.last, .alarm)
+        alerts.authorized = true
+        await coordinator.setAlertMode(.alarm)
+        XCTAssertEqual(service.settings.restAlertMode, .alarm)
+        XCTAssertTrue(service.settings.backgroundRestAlerts)
+        XCTAssertTrue(coordinator.alertsAuthorized)
+        service.setEnabled(false); coordinator.settingsChanged(); await coordinator.flushAlerts()
+        XCTAssertNil(alerts.current)
+    }
+    @MainActor func testRestAlertDispatcherUsesExactlyOneChannelAndClearsBothOnCancellation() async throws {
+        let notifications = RestChannelStub(), alarms = RestChannelStub()
+        let dispatcher = SystemWorkoutRestAlerts(notifications: notifications, alarms: alarms)
+        XCTAssertTrue(dispatcher.supportsAlarm)
+        var alert = WorkoutRestAlert(sessionID: UUID(), deadline: time.addingTimeInterval(30), mode: .alarm)
+        let granted = try await dispatcher.requestAccess(for: .alarm)
+        XCTAssertTrue(granted)
+        XCTAssertEqual(alarms.requests, 1); XCTAssertEqual(notifications.requests, 0)
+        try await dispatcher.replace(alert)
+        XCTAssertNil(notifications.current); XCTAssertEqual(alarms.current, alert)
+        alert.mode = .notification
+        try await dispatcher.replace(alert)
+        XCTAssertNil(alarms.current); XCTAssertEqual(notifications.current, alert)
+        try await dispatcher.replace(nil)
+        XCTAssertNil(alarms.current); XCTAssertNil(notifications.current)
+        let unsupported = SystemWorkoutRestAlerts(notifications: notifications, alarms: nil)
+        alert.mode = .alarm
+        try await unsupported.replace(alert)
+        XCTAssertEqual(notifications.current, alert)
+    }
+    @MainActor func testRestAlertCancellationAttemptsBothChannelsEvenIfOneFails() async throws {
+        let notifications = RestChannelStub(), alarms = RestChannelStub()
+        let dispatcher = SystemWorkoutRestAlerts(notifications: notifications, alarms: alarms)
+        let alert = WorkoutRestAlert(sessionID: UUID(), deadline: time.addingTimeInterval(30), mode: .alarm)
+        try await dispatcher.replace(alert)
+        notifications.fail = true
+        do { try await dispatcher.replace(nil); XCTFail("Expected the cancellation error") } catch { }
+        XCTAssertNil(alarms.current)
+        XCTAssertEqual(alarms.replacements, 2)
+    }
 }
 
 @MainActor private final class HapticPreferencesStub: PreferencesRepository {
@@ -218,10 +365,25 @@ final class HapticTests: XCTestCase {
     func stop() { stops += 1 }
 }
 @MainActor private final class RestAlertStub: WorkoutRestAlertScheduling {
+    var supportsAlarm = false
     var current: WorkoutRestAlert?
     var requests = 0
+    var requestedModes: [WorkoutRestAlertMode] = []
     var authorized = true
     func replace(_ alert: WorkoutRestAlert?) async throws { current = alert }
-    func requestAccess() async throws -> Bool { requests += 1; return authorized }
-    func isAuthorized() async -> Bool { authorized }
+    func requestAccess(for mode: WorkoutRestAlertMode) async throws -> Bool { requests += 1; requestedModes.append(mode); return authorized }
+    func isAuthorized(for mode: WorkoutRestAlertMode) async -> Bool { authorized }
+}
+@MainActor private final class RestChannelStub: WorkoutRestAlertChannel {
+    var current: WorkoutRestAlert?
+    var requests = 0
+    var replacements = 0
+    var fail = false
+    func replace(_ alert: WorkoutRestAlert?) async throws {
+        replacements += 1
+        if fail { throw CocoaError(.fileWriteUnknown) }
+        current = alert
+    }
+    func requestAccess() async throws -> Bool { requests += 1; return true }
+    func isAuthorized() async -> Bool { true }
 }

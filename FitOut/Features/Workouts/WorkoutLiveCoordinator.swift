@@ -17,6 +17,9 @@ import SwiftUI
         let succeeded = container.workouts.runQuickAction(operation, sessionID: sessionID, commandID: commandID)
         container.workoutPresentation.changed()
         await container.workoutPresentation.flush()
+        // Complete rest alarm cancellation/replacement before a locked-screen
+        // Live Activity action returns control to iOS.
+        await container.workoutHaptics.flushAlerts()
         guard succeeded else { throw WorkoutLiveActionError.unavailable(container.workouts.error ?? "Open FitOut to update this workout.") }
     }
 }

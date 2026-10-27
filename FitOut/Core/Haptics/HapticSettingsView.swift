@@ -3,7 +3,7 @@ import SwiftUI
 struct HapticSettingsView: View {
     @Bindable var haptics: HapticService
     @Bindable var workouts: WorkoutHapticCoordinator
-    @State private var strength = 0.8
+    @State private var strength = 1.0
     @State private var resetting = false
     @Environment(\.scenePhase) private var phase
     var body: some View {
@@ -19,7 +19,11 @@ struct HapticSettingsView: View {
                 }.disabled(!haptics.settings.enabled)
                 Button("Preview current intensity", systemImage: "waveform") { saveStrength(); haptics.play(.restEnded, preview: true) }
                     .disabled(!haptics.settings.enabled || !haptics.supported || strength == 0)
-            } footer: { Text("Overall intensity scales every cue. Zero is silent. Each cue below has its own switch, intensity, 1–5 pulses, spacing and feel.") }
+                Button("Use strong workout vibrations", systemImage: "waveform.path") {
+                    var next = haptics.settings; next.useStrongWorkoutCues()
+                    if haptics.update(next) { strength = next.strength; haptics.play(.restEnded, preview: true) }
+                }.disabled(!haptics.settings.enabled)
+            } footer: { Text("Strong workout cues use sustained vibration bursts. Overall intensity scales every cue; zero is silent. Customize intensity, 1–10 pulses, pulse length, spacing and feel below.") }
             Section("Workout cues") {
                 ForEach(FitHapticEvent.allCases.filter(\.isWorkout)) { cueRow($0) }
             }.disabled(!haptics.settings.enabled)
@@ -27,18 +31,28 @@ struct HapticSettingsView: View {
                 ForEach(FitHapticEvent.allCases.filter { !$0.isWorkout }) { cueRow($0) }
             }.disabled(!haptics.settings.enabled)
             Section {
+                Picker("Rest alert type", selection: Binding(get: { workouts.alertMode }, set: { mode in Task { await workouts.setAlertMode(mode) } })) {
+                    Text("Notification").tag(WorkoutRestAlertMode.notification)
+                    if workouts.supportsAlarm { Text("System alarm").tag(WorkoutRestAlertMode.alarm) }
+                }.disabled(workouts.isRequesting)
                 Toggle("Background rest alerts", isOn: Binding(get: { haptics.settings.backgroundRestAlerts }, set: { value in Task { await workouts.setBackgroundAlerts(value) } }))
                     .disabled(!haptics.settings.enabled || workouts.isRequesting)
-                if workouts.isRequesting { ProgressView("Requesting notification access…") }
+                if workouts.isRequesting { ProgressView("Updating rest alert access…") }
                 if haptics.settings.backgroundRestAlerts && !workouts.alertsAuthorized {
-                    Text("Notifications are not enabled. Review FitOut notifications in iPhone Settings.").foregroundStyle(FitTheme.textSecondary)
+                    Text(workouts.alertMode == .alarm ? "Alarm access is not enabled. Review FitOut alarms in iPhone Settings." : "Notifications are not enabled. Review FitOut notifications in iPhone Settings.").foregroundStyle(FitTheme.textSecondary)
                 }
                 if haptics.settings.backgroundRestAlerts && !haptics.settings.shouldAlertForRest {
                     Text("Rest alerts are off while overall intensity is zero or the rest-finished cue is disabled or silent.").foregroundStyle(FitTheme.textSecondary)
                 }
                 if let error = workouts.error { Text(error).foregroundStyle(FitTheme.textSecondary) }
             } header: { Text("When FitOut is in the background") }
-            footer: { Text("Custom intensity and pulses work while FitOut is active, including a minimized workout. A background or locked-screen alert uses iPhone notification sounds and haptic settings; iOS controls its vibration and delivery. Pausing, extending, skipping rest or ending the workout updates the alert. Turning FitOut haptics off cancels it.") }
+            footer: {
+                Text(workouts.alertMode == .alarm
+                    ? "System alarms (iOS 26+) alert when rest ends while FitOut is in the background or the screen is locked, including Silent mode and Focus. The alarm can make sound. iOS controls its vibration strength and pattern; dismiss it or open your workout to stop it. While FitOut is open, your custom vibration plays instead."
+                    : "Notifications can alert while FitOut is in the background or the screen is locked. iOS notification, sound, vibration and Focus settings control delivery. Custom vibration intensity and pulse length apply while FitOut is open.")
+                Text("Pausing, extending or skipping rest, ending the workout or turning haptics off cancels or updates the alert.")
+                if !workouts.supportsAlarm { Text("Persistent system rest alarms require iOS 26 or later.") }
+            }
             if let error = haptics.error { Section { Text(error).foregroundStyle(FitTheme.textSecondary) } }
             Section {
                 Button("Reset haptic defaults", role: .destructive) { resetting = true }
@@ -82,15 +96,18 @@ private struct HapticCueEditor: View {
             Section {
                 LabeledContent("Cue intensity", value: cue.intensity.formatted(.percent.precision(.fractionLength(0))))
                 Slider(value: $cue.intensity, in: 0...1, step: 0.05).accessibilityLabel("Cue intensity").accessibilityValue(cue.intensity.formatted(.percent))
-                Stepper("\(cue.pulses) \(cue.pulses == 1 ? "pulse" : "pulses")", value: $cue.pulses, in: 1...5)
+                Stepper("\(cue.pulses) \(cue.pulses == 1 ? "pulse" : "pulses")", value: $cue.pulses, in: 1...10)
+                LabeledContent("Pulse length", value: cue.pulseDuration == 0 ? "Tap" : cue.pulseDuration.formatted(.number.precision(.fractionLength(2))) + " sec")
+                Slider(value: Binding(get: { cue.pulseDuration }, set: { cue.duration = $0 }), in: 0...0.8, step: 0.05)
+                    .accessibilityLabel("Vibration pulse length").accessibilityValue(cue.pulseDuration.formatted() + " seconds")
                 LabeledContent("Between pulses", value: cue.spacing.formatted(.number.precision(.fractionLength(2))) + " sec")
-                Slider(value: $cue.spacing, in: 0.12...0.6, step: 0.04).accessibilityLabel("Time between pulses").accessibilityValue(cue.spacing.formatted() + " seconds")
+                Slider(value: $cue.spacing, in: 0.12...1, step: 0.04).accessibilityLabel("Time between pulses").accessibilityValue(cue.spacing.formatted() + " seconds")
                 Picker("Feel", selection: $cue.feel) { ForEach(HapticFeel.allCases) { Text($0.rawValue).tag($0) } }
                 Button("Preview this pattern", systemImage: "waveform") { haptics.preview(event, cue: cue) }
                     .disabled(!haptics.supported || !haptics.settings.enabled || cue.intensity == 0 || haptics.settings.strength == 0)
             }.disabled(!cue.enabled)
             Section {
-                Text("Preview includes your overall intensity. Save applies this cue throughout FitOut. It does not change iOS notification vibrations.")
+                Text("Zero pulse length gives a tap; longer pulses give sustained vibration. Preview includes overall intensity. These patterns apply while FitOut is open; iOS controls system alarm and notification vibrations.")
                 if let error = haptics.error { Text(error).foregroundStyle(FitTheme.textSecondary) }
             }
         }.nutritionForm().navigationTitle(event.title).navigationBarTitleDisplayMode(.inline)

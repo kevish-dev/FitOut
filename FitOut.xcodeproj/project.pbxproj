@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F29000000000000000000001 /* WorkoutRestAlarm.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29000000000000000000002; };
 		F28000000000000000000005 /* WorkoutRecordedSetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28000000000000000000006; };
 		F28000000000000000000001 /* WorkoutRecordedSetEditing.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28000000000000000000002; };
 		F28000000000000000000003 /* WorkoutRecordedSetEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28000000000000000000004; };
@@ -180,6 +181,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F29000000000000000000002 /* WorkoutRestAlarm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRestAlarm.swift; sourceTree = "<group>"; };
 		F28000000000000000000006 /* WorkoutRecordedSetTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecordedSetTests.swift; sourceTree = "<group>"; };
 		F28000000000000000000002 /* WorkoutRecordedSetEditing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecordedSetEditing.swift; sourceTree = "<group>"; };
 		F28000000000000000000004 /* WorkoutRecordedSetEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutRecordedSetEditor.swift; sourceTree = "<group>"; };
@@ -336,6 +338,7 @@
 			F26000000000000000000004 /* HapticService.swift */,
 			F26000000000000000000006 /* WorkoutHaptics.swift */,
 			F26000000000000000000008 /* HapticSettingsView.swift */,
+			F29000000000000000000002 /* WorkoutRestAlarm.swift */,
 		); path = Haptics; sourceTree = "<group>"; };
 		F04000000000000000000005 /* Coach */ = {
 			isa = PBXGroup;
@@ -850,6 +853,7 @@
 				F26000000000000000000003 /* HapticService.swift in Sources */,
 				F26000000000000000000005 /* WorkoutHaptics.swift in Sources */,
 				F26000000000000000000007 /* HapticSettingsView.swift in Sources */,
+				F29000000000000000000001 /* WorkoutRestAlarm.swift in Sources */,
 				F25000000000000000000001 /* CoachContext.swift in Sources */,
 				F25000000000000000000003 /* CoachPersistence.swift in Sources */,
 				F25000000000000000000005 /* OnDeviceCoachResponder.swift in Sources */,

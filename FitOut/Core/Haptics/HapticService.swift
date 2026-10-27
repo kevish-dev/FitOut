@@ -28,10 +28,13 @@ import Observation
                 }
                 guard let engine else { return }
                 try engine.start()
-                let events = pulses.map { CHHapticEvent(eventType: .hapticTransient, parameters: [
-                    CHHapticEventParameter(parameterID: .hapticIntensity, value: $0.intensity),
-                    CHHapticEventParameter(parameterID: .hapticSharpness, value: $0.sharpness)
-                ], relativeTime: $0.time) }
+                let events = pulses.map { pulse in
+                    let parameters = [CHHapticEventParameter(parameterID: .hapticIntensity, value: pulse.intensity),
+                                      CHHapticEventParameter(parameterID: .hapticSharpness, value: pulse.sharpness)]
+                    return pulse.duration > 0
+                        ? CHHapticEvent(eventType: .hapticContinuous, parameters: parameters, relativeTime: pulse.time, duration: pulse.duration)
+                        : CHHapticEvent(eventType: .hapticTransient, parameters: parameters, relativeTime: pulse.time)
+                }
                 player = try engine.makePlayer(with: CHHapticPattern(events: events, parameters: []))
                 try player?.start(atTime: CHHapticTimeImmediate)
                 return
@@ -39,7 +42,7 @@ import Observation
         }
         // UIKit is a best-effort fallback; simulators still cannot physically vibrate.
         fallback = Task {
-            let generator = UIImpactFeedbackGenerator(style: .light)
+            let generator = UIImpactFeedbackGenerator(style: .heavy)
             var previous = 0.0
             for pulse in pulses {
                 do { try await Task.sleep(for: .seconds(max(0, pulse.time - previous))) } catch { return }
@@ -74,7 +77,7 @@ import Observation
         settings = loaded
     }
     @discardableResult func update(_ value: FitHapticSettings) -> Bool {
-        guard value.isValid else { error = "Choose an intensity from 0–100%, 1–5 pulses and 0.12–0.60 seconds between pulses."; return false }
+        guard value.isValid else { error = "Choose 0–100% intensity, 1–10 pulses, 0–0.80 seconds per pulse and 0.12–1.00 seconds between pulses."; return false }
         do {
             let encoded = try JSONEncoder().encode(value)
             var preferences = try repository.loadPreferences(); preferences.hapticsEnabled = value.enabled
@@ -98,7 +101,7 @@ import Observation
         guard !pulses.isEmpty else { return }
         output.play(pulses)
         lastEvent = event; lastPlayed = .now
-        importantUntil = Date().addingTimeInterval((pulses.last?.time ?? 0) + 0.08)
+        importantUntil = Date().addingTimeInterval((pulses.last?.endTime ?? 0) + 0.08)
     }
     func play(_ event: FitHapticEvent, preview: Bool = false, now: Date = .now) {
         guard playbackEnabled, foreground else { return }
@@ -111,7 +114,7 @@ import Observation
             if event == lastEvent && now.timeIntervalSince(lastPlayed) < (interaction ? 0.08 : 0.15) { return }
         }
         output.play(pulses); lastEvent = event; lastPlayed = now
-        if !interaction { importantUntil = now.addingTimeInterval((pulses.last?.time ?? 0) + 0.08) }
+        if !interaction { importantUntil = now.addingTimeInterval((pulses.last?.endTime ?? 0) + 0.08) }
     }
 }
 
