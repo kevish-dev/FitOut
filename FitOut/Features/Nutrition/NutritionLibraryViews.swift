@@ -20,7 +20,7 @@ struct NutritionLibraryView: View {
                 if section == 0 {
                     ForEach(store.foods.filter { $0.source != .recipe && $0.matches(search) }) { food in
                         HStack {
-                            Button { loggingFood = food } label: { NutritionFoodRow(food: food) }.buttonStyle(.plain)
+                            Button { loggingFood = food } label: { NutritionFoodRow(food: food) }.buttonStyle(.fitPlain)
                             Menu {
                                 Button(store.preferences.favoriteIDs.contains(food.id) ? "Unfavorite" : "Favorite") { _ = store.favorite(food.id) }
                                 if food.source == .custom {
@@ -37,7 +37,7 @@ struct NutritionLibraryView: View {
                     ForEach(store.recipes.filter { $0.name.localizedCaseInsensitiveContains(search) || search.isEmpty }) { item in
                         Button { loggingFood = item.food } label: {
                             NutritionFoodRow(food: item.food)
-                        }.buttonStyle(.plain).contextMenu {
+                        }.buttonStyle(.fitPlain).contextMenu {
                             Button("Edit recipe") { recipe = item }
                             Button("Delete recipe", role: .destructive) { _ = store.deleteRecipe(item.id) }
                         }
@@ -51,8 +51,8 @@ struct NutritionLibraryView: View {
                                 Text(item.name).font(FitTheme.section(16))
                                 Text("\(item.items.count) foods · \(NutritionUI.value(NutritionValues.sum(item.items.map(\.values)).calories)) kcal")
                                     .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
-                            }.padding(.vertical, 8)
-                        }.buttonStyle(.plain).contextMenu {
+                            }.frame(maxWidth: .infinity, alignment: .leading).padding(.vertical, 8)
+                        }.buttonStyle(.fitPlain).contextMenu {
                             Button("Edit saved meal") { saved = item }
                             Button("Delete saved meal", role: .destructive) { _ = store.deleteMeal(item.id) }
                         }

@@ -146,7 +146,7 @@ struct ProfileFlow: View {
                         .padding(.horizontal, 12).frame(maxWidth: .infinity)
                         .frame(height: 62 * scale).fitSurface(selected: selected, radius: 15)
                     }
-                    .buttonStyle(.plain).accessibilityLabel(goal.rawValue)
+                    .buttonStyle(.fitPlain).accessibilityLabel(goal.rawValue)
                     .accessibilityAddTraits(selected ? .isSelected : [])
                 }
             }
@@ -204,7 +204,7 @@ private struct HeightScreen: View {
                 .frame(maxWidth: .infinity).frame(height: 42)
                 .fitSurface(selected: unit == value, radius: 12)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.fitPlain)
         .accessibilityLabel(value == .cm ? "Centimeters" : "Inches")
         .accessibilityAddTraits(unit == value ? .isSelected : [])
     }

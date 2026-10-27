@@ -34,13 +34,13 @@ struct WorkoutLastSetActions: View {
         Button { editing = reference } label: {
             Label("Edit last set", systemImage: "pencil").font(FitTheme.button(13)).frame(maxWidth: .infinity, minHeight: 44).padding(.horizontal, 10)
                 .dashboardGlass(in: Capsule(), interactive: true)
-        }.buttonStyle(.plain).accessibilityIdentifier("editLastRecordedSet")
+        }.buttonStyle(.fitPlain).accessibilityIdentifier("editLastRecordedSet")
             .accessibilityHint("Correct recorded values without restarting any timer.")
     }
     private func restart(_ reference: WorkoutRecordedSet) -> some View {
         Button { restarting = reference } label: {
             Label("Restart last set", systemImage: "arrow.counterclockwise").font(FitTheme.medium(13)).frame(maxWidth: .infinity, minHeight: 44).padding(.horizontal, 10)
-        }.buttonStyle(.plain).disabled(store.active != nil && store.active?.id != sessionID)
+        }.buttonStyle(.fitPlain).disabled(store.active != nil && store.active?.id != sessionID)
             .accessibilityIdentifier("restartLastRecordedSet")
     }
 }

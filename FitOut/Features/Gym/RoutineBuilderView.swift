@@ -408,7 +408,7 @@ struct RoutineEditor: View {
         } else if stage != .schedule {
             Button { stage = stage == .review ? .workouts : .schedule } label: {
                 Image(systemName: "arrow.left").frame(width: 54, height: 54).dashboardGlass(in: Circle(), interactive: true)
-            }.buttonStyle(.plain).accessibilityLabel("Previous step")
+            }.buttonStyle(.fitPlain).accessibilityLabel("Previous step")
         }
         Button(action: advance) {
             HStack(spacing: 10) {

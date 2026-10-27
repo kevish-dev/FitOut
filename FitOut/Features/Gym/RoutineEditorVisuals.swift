@@ -203,7 +203,8 @@ struct RoutineDayPauseGraphic: View {
 struct RoutineEditorPressStyle: ButtonStyle {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label.opacity(configuration.isPressed ? 0.9 : 1)
+        configuration.label.contentShape(.interaction, Rectangle())
+            .opacity(configuration.isPressed ? 0.9 : 1)
             .scaleEffect(configuration.isPressed && !reduceMotion ? 0.985 : 1)
             .animation(FitMotion.press(reduceMotion: reduceMotion), value: configuration.isPressed)
     }

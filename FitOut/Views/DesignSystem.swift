@@ -41,6 +41,23 @@ enum FitMotion {
     static func press(reduceMotion: Bool) -> Animation? { reduceMotion ? nil : .easeOut(duration: 0.12) }
 }
 
+/// Plain appearance with the entire laid-out label participating in hit testing.
+/// Keep sizing/padding inside the label so visible controls have matching targets.
+/// Delegating to the native primitive preserves disabled, keyboard, repeat and
+/// accessibility behavior instead of adding a competing tap gesture.
+struct FitPlainButtonStyle: PrimitiveButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Button(role: configuration.role, action: configuration.trigger) {
+            configuration.label.contentShape(.interaction, Rectangle())
+        }
+        .buttonStyle(.plain)
+    }
+}
+
+extension PrimitiveButtonStyle where Self == FitPlainButtonStyle {
+    static var fitPlain: FitPlainButtonStyle { FitPlainButtonStyle() }
+}
+
 struct Surface: ViewModifier {
     var selected = false
     var radius: CGFloat = 16

@@ -130,7 +130,7 @@ struct HomeView: View {
                     .padding(.horizontal, 20).padding(.vertical, 14)
                     .dashboardGlass(in: Capsule(), interactive: true)
             }
-            .buttonStyle(.plain).accessibilityLabel("Open Settings")
+            .buttonStyle(.fitPlain).accessibilityLabel("Open Settings")
             .frame(maxWidth: .infinity)
             .padding(.top, 8)
 
@@ -142,7 +142,7 @@ struct HomeView: View {
                     .padding(.horizontal, 20).padding(.vertical, 14)
                     .dashboardGlass(in: Capsule(), interactive: true)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.fitPlain)
             .accessibilityIdentifier("startOverTesting")
             .frame(maxWidth: .infinity)
             .confirmationDialog("Start over from onboarding?", isPresented: $showingRestartConfirmation, titleVisibility: .visible) {
@@ -386,7 +386,7 @@ struct HomeView: View {
                         .font(.system(size: 14, weight: .semibold))
                         .foregroundStyle(FitTheme.textSecondary)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fitPlain)
                 .accessibilityLabel("View workout analytics")
             }
 
@@ -518,7 +518,7 @@ struct HomeView: View {
                         .frame(width: 36, height: 36)
                         .background(FitTheme.textPrimary.opacity(0.08), in: Circle())
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fitPlain)
                 .accessibilityLabel("View workout volume analytics")
             }
 
@@ -561,7 +561,7 @@ struct HomeView: View {
                     .font(FitTheme.button(12))
                     .foregroundStyle(accent)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fitPlain)
             }
         }
         .padding(FitTheme.cardInset)
@@ -611,7 +611,7 @@ struct HomeView: View {
                 .foregroundStyle(accent)
                 .frame(minHeight: 44, alignment: .leading)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.fitPlain)
         }
         .padding(FitTheme.cardInset)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -639,14 +639,14 @@ struct HomeView: View {
                     .font(FitTheme.medium(12))
                     .foregroundStyle(FitTheme.textSecondary)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fitPlain)
                 .accessibilityLabel("Open Apple Health connection")
             }
 
             LazyVGrid(columns: [GridItem(.flexible(), spacing: FitTheme.sectionSpacing), GridItem(.flexible(), spacing: FitTheme.sectionSpacing)], spacing: FitTheme.sectionSpacing) {
                 Button { showWater = true } label: {
                     HealthOverviewTile(kind: .water, series: healthOverview.waterMilliliters, isLoading: isLoadingHealth, waterUnit: container.hydration.state.waterDisplayUnit)
-                }.buttonStyle(.plain).accessibilityHint("Opens water logging")
+                }.buttonStyle(.fitPlain).accessibilityHint("Opens water logging")
                 HealthOverviewTile(kind: .steps, series: healthOverview.steps, isLoading: isLoadingHealth)
                 HealthOverviewTile(kind: .calories, series: healthOverview.activeCalories, isLoading: isLoadingHealth)
                 TimelineView(.periodic(from: .now, by: 60)) { context in
@@ -662,7 +662,7 @@ struct HomeView: View {
                         .foregroundStyle(FitTheme.textPrimary.opacity(0.8))
                         .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fitPlain)
             } else if !isLoadingHealth && displayedHealthErrors.isEmpty && (healthOverview.steps.total == nil || healthOverview.activeCalories.total == nil) {
                 Text("Missing activity readings? Review FitOut’s Steps and Active Energy access in Apple Health. Calories here means active energy burned, not food intake.")
                     .font(FitTheme.body(12))

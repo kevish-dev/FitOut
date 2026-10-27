@@ -76,7 +76,7 @@ struct ProfilePresentationSection: View {
                         Image(systemName: preferences.navigationStyle == style ? "checkmark.circle.fill" : "circle")
                             .foregroundStyle(preferences.navigationStyle == style ? FitTheme.dashboardAccent : FitTheme.textSecondary)
                     }.frame(minHeight: 72).contentShape(Rectangle())
-                }.buttonStyle(.plain)
+                }.buttonStyle(.fitPlain)
                     .accessibilityLabel(style.title).accessibilityAddTraits(preferences.navigationStyle == style ? .isSelected : [])
                     .accessibilityIdentifier("navigationStyle-\(style.rawValue)")
             }

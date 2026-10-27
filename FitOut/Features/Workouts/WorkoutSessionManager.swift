@@ -87,7 +87,7 @@ struct WorkoutSessionConfigurationView: View {
                         .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)
                     if current { Label("Current", systemImage: "arrow.right.circle.fill").font(FitTheme.medium(11)).foregroundStyle(FitTheme.dashboardAccent) }
                 }.frame(maxWidth: .infinity, alignment: .leading).frame(minHeight: 54)
-            }.buttonStyle(.plain).accessibilityLabel("Edit \(entry.exercise.name) sets")
+            }.buttonStyle(.fitPlain).accessibilityLabel("Edit \(entry.exercise.name) sets")
             Menu {
                 Button("Do this next", systemImage: "play.fill") { confirmation = .focus(entry) }.disabled(remaining == 0 || current && session.execution?.phase == .activeSet)
                 Button("Edit sets, weight & reps", systemImage: "slider.horizontal.3") { destination = .edit(entry) }

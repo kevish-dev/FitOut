@@ -30,7 +30,7 @@ struct AppShell: View {
                             .foregroundStyle(FitTheme.dashboardAccent)
                             .dashboardGlass(in: Circle(), highlighted: true, interactive: true)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.fitPlain)
                     .accessibilityLabel(menuOpen ? "Close navigation menu" : "Open navigation menu")
                     .accessibilityValue(menuOpen ? "Expanded" : "Collapsed")
                     .accessibilityHint(menuOpen ? "Hides the navigation destinations." : "Shows Home, Gym, Nutrition, Health and AI Coach.")
@@ -170,7 +170,7 @@ struct AppShell: View {
             .frame(width: 52, height: 52)
             .dashboardGlass(in: Circle(), highlighted: navigation.selected == destination, interactive: true)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.fitPlain)
         .accessibilityLabel(title)
         .accessibilityAddTraits(navigation.selected == destination ? .isSelected : [])
         .accessibilityIdentifier("navigate-\(destination)")

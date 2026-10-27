@@ -110,7 +110,7 @@ struct GymView: View {
                         .font(FitTheme.medium(13))
                         .frame(maxWidth: .infinity, minHeight: 44)
                         .dashboardGlass(in: RoundedRectangle(cornerRadius: 14), interactive: true)
-                }.buttonStyle(.plain)
+                }.buttonStyle(.fitPlain)
             }
         }
         .accessibilityIdentifier("gymTodayCard")
@@ -139,7 +139,7 @@ struct GymView: View {
                 } label: { GymShortcut(title: "Workout history", detail: "Revisit your sessions", symbol: "clock.arrow.circlepath") }
                 .accessibilityIdentifier("gymHistory")
             }
-            .buttonStyle(.plain)
+            .buttonStyle(.fitPlain)
         }
     }
 
@@ -154,7 +154,7 @@ struct GymView: View {
                         .frame(minHeight: 44)
                         .padding(.horizontal, 12)
                         .dashboardGlass(in: Capsule(), highlighted: weekOffset == 0, interactive: true)
-                }.buttonStyle(.plain)
+                }.buttonStyle(.fitPlain)
                 .accessibilityLabel("Show current week")
             }
             HStack(spacing: 8) {
@@ -168,13 +168,13 @@ struct GymView: View {
                 Spacer()
                 Button { weekOffset += 1 } label: { weekArrow("chevron.right") }
                     .accessibilityLabel("Next week")
-            }.buttonStyle(.plain)
+            }.buttonStyle(.fitPlain)
             ScrollViewReader { proxy in
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(alignment: .top, spacing: 10) {
                         ForEach(week) { day in
                             Button { openDay(day) } label: { GymDayTile(day: day) }
-                                .buttonStyle(.plain)
+                                .buttonStyle(.fitPlain)
                                 .id(day.weekday)
                                 .accessibilityLabel("\(day.date.formatted(date: .complete, time: .omitted)), \(day.title), \(day.detail)")
                                 .accessibilityHint(day.session != nil ? "Opens the logged workout." : "Opens this weekday in your repeating plan.")
@@ -207,7 +207,7 @@ struct GymView: View {
                     Image(systemName: "arrow.up.right").frame(width: 44, height: 44)
                         .dashboardGlass(in: Circle(), interactive: true)
                 }
-                .buttonStyle(.plain).foregroundStyle(accent)
+                .buttonStyle(.fitPlain).foregroundStyle(accent)
                 .accessibilityLabel("Analytics and calendar")
             }
             if hasHistory {

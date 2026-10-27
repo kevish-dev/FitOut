@@ -66,7 +66,7 @@ struct RoutineCreationSheet: View {
                     Image(systemName: "xmark").font(.system(size: 14, weight: .semibold))
                         .frame(width: 44, height: 44)
                         .dashboardGlass(in: Circle(), interactive: true)
-                }.buttonStyle(.plain).accessibilityLabel("Cancel routine creation")
+                }.buttonStyle(.fitPlain).accessibilityLabel("Cancel routine creation")
                     .accessibilityIdentifier("cancelRoutineCreation")
             }
             Text("Choose a starting point for your week.")
@@ -183,6 +183,7 @@ private struct RoutineChoicePressStyle: ButtonStyle {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
+            .contentShape(.interaction, Rectangle())
             .opacity(configuration.isPressed ? 0.8 : 1)
             .scaleEffect(configuration.isPressed && !reduceMotion ? 0.985 : 1)
             .animation(reduceMotion ? nil : .easeOut(duration: 0.15), value: configuration.isPressed)

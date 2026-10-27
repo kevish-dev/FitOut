@@ -94,7 +94,7 @@ struct QuickWorkoutSetupView: View {
                         Button { editing = entry } label: {
                             Label("Edit sets, weight & reps", systemImage: "slider.horizontal.3")
                                 .font(FitTheme.button(13)).frame(maxWidth: .infinity, minHeight: 44)
-                        }.buttonStyle(.plain).dashboardGlass(in: Capsule(), interactive: true)
+                        }.buttonStyle(.fitPlain).dashboardGlass(in: Capsule(), interactive: true)
                             .accessibilityIdentifier("configureQuickExercise-\(entry.exercise.id)")
                     }.padding(FitTheme.cardInset).background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 20))
                         .transition(.opacity)
@@ -103,7 +103,7 @@ struct QuickWorkoutSetupView: View {
                 Button { selecting = true } label: {
                     Label(saved.draft.entries.isEmpty ? "Choose exercises" : "Add exercises", systemImage: "plus")
                         .font(FitTheme.button(16)).frame(maxWidth: .infinity, minHeight: 54)
-                }.buttonStyle(.plain).dashboardGlass(in: Capsule(), interactive: true).accessibilityIdentifier("configureQuickExercises")
+                }.buttonStyle(.fitPlain).dashboardGlass(in: Capsule(), interactive: true).accessibilityIdentifier("configureQuickExercises")
                 if let error = saved.error ?? store.error { Text(error).font(FitTheme.body(13)).foregroundStyle(.red) }
                 if !addingToSession { Text("Setup is saved on this iPhone. Previous recorded weights and reps are filled in when available.").font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary) }
             }.frame(maxWidth: 560).padding(FitTheme.pageInset).frame(maxWidth: .infinity)
@@ -214,7 +214,7 @@ struct WorkoutEntryConfigurationView: View {
                         .contentTransition(.numericText()).animation(FitMotion.change(reduceMotion: reduceMotion), value: entry.sets.count)
                     Button(action: addSet) { Image(systemName: "plus").frame(width: 44, height: 44) }
                         .disabled(entry.sets.count >= 100).accessibilityLabel("Add set").accessibilityIdentifier("addConfiguredSet")
-                }.buttonStyle(.plain)
+                }.buttonStyle(.fitPlain)
                 Stepper("Rest · \(entry.restSeconds) sec", value: $entry.restSeconds, in: 0...3600, step: 15).font(FitTheme.medium(14))
                     .onChange(of: entry.restSeconds) { _, seconds in
                         for index in entry.sets.indices where entry.sets[index].status == .pending { entry.sets[index].restSeconds = seconds }
@@ -347,7 +347,7 @@ private struct WorkoutConfigurationNumber: View {
                 Button { adjust(-step) } label: { Image(systemName: "minus").frame(width: 44, height: 44) }.accessibilityLabel("Decrease \(title)")
                 Spacer()
                 Button { adjust(step) } label: { Image(systemName: "plus").frame(width: 44, height: 44) }.accessibilityLabel("Increase \(title)")
-            }.buttonStyle(.plain)
+            }.buttonStyle(.fitPlain)
             if !valid { Text("Enter \(positive ? "a positive" : "a valid") number up to \(maximum.formatted()).").font(FitTheme.body(11)).foregroundStyle(.red) }
         }.frame(minWidth: 108, maxWidth: .infinity)
         .onAppear { text = formatted(value) }

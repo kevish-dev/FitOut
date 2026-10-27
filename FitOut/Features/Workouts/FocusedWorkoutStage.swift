@@ -66,7 +66,7 @@ struct FocusedWorkoutStage: View {
                             Label(phase == .paused ? "Resume" : "Pause", systemImage: phase == .paused ? "play.fill" : "pause.fill")
                                 .font(FitTheme.button(15)).padding(.horizontal, 22).frame(minHeight: 46)
                         }
-                        .buttonStyle(.plain).dashboardGlass(in: Capsule(), interactive: true)
+                        .buttonStyle(.fitPlain).dashboardGlass(in: Capsule(), interactive: true)
                         .accessibilityLabel(phase == .paused ? "Resume workout" : "Pause workout")
                         .accessibilityIdentifier("pauseResumeWorkout")
                         .offset(y: 20)

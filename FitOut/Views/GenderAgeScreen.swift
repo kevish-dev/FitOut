@@ -28,7 +28,7 @@ struct GenderAgeScreen: View {
                         .frame(width: 192 * scale, height: 136 * scale)
                         .fitSurface(selected: selected, radius: 16)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.fitPlain)
                     .accessibilityLabel(gender.rawValue)
                     .accessibilityAddTraits(selected ? .isSelected : [])
                 }

@@ -82,7 +82,7 @@ struct WorkoutNumberWheel: View {
             }
             Button { exact = true; editingChanged(true) } label: {
                 Label("Enter exact", systemImage: "number").font(FitTheme.medium(12)).frame(maxWidth: .infinity, minHeight: 44)
-            }.buttonStyle(.plain).disabled(scrolling).accessibilityLabel("Enter exact \(title)")
+            }.buttonStyle(.fitPlain).disabled(scrolling).accessibilityLabel("Enter exact \(title)")
         }
         .frame(minWidth: 108, maxWidth: .infinity)
         .onDisappear { if scrolling { commit(); scrolling = false; editingChanged(false) } }

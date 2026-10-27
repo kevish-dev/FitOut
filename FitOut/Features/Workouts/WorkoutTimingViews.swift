@@ -36,8 +36,10 @@ struct WorkoutTimingDetails: View {
                             }.padding(.vertical, 6)
                         }
                     }.font(FitTheme.body(13)).routinePanel()
-                    Button("Prepare full session export", systemImage: "square.and.arrow.up") { export() }
-                        .font(FitTheme.button(14)).frame(minHeight: 44)
+                    Button { export() } label: {
+                        Label("Prepare full session export", systemImage: "square.and.arrow.up")
+                            .font(FitTheme.button(14)).frame(minHeight: 44).contentShape(Rectangle())
+                    }
                     if let exportURL { ShareLink("Share session JSON", item: exportURL).frame(minHeight: 44) }
                     if let exportError { Text(exportError).font(FitTheme.body(12)).foregroundStyle(.orange) }
                 }

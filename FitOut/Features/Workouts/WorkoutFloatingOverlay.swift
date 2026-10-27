@@ -193,10 +193,10 @@ private struct FloatingWorkoutPill: View {
                             }
                         }
                     }.frame(maxWidth: .infinity, minHeight: 56)
-                }.buttonStyle(.plain).accessibilityLabel("Open current workout").accessibilityHint("Drag the handle to move this control")
+                }.buttonStyle(.fitPlain).accessibilityLabel("Open current workout").accessibilityHint("Drag the handle to move this control")
                 Button { if session.status == .paused { store.resume() } else { store.pause() } } label: {
                     Image(systemName: session.status == .paused ? "play.fill" : "pause.fill").font(.system(size: 15, weight: .medium)).frame(width: 44, height: 52)
-                }.buttonStyle(.plain).accessibilityLabel(session.status == .paused ? "Resume workout" : "Pause workout")
+                }.buttonStyle(.fitPlain).accessibilityLabel(session.status == .paused ? "Resume workout" : "Pause workout")
             }
             .padding(.leading, 10).padding(.trailing, 4).padding(.vertical, 2).foregroundStyle(FitTheme.textPrimary)
             .dashboardGlass(in: Capsule(), interactive: true)

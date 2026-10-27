@@ -44,7 +44,7 @@ struct ActiveWorkoutView: View {
                                             Image(systemName: "arrow.up.arrow.down")
                                         }.font(FitTheme.button(14)).padding(.horizontal, 16).frame(minHeight: 48)
                                             .dashboardGlass(in: Capsule(), interactive: true)
-                                    }.buttonStyle(.plain).disabled(!model.editingInputs.isEmpty).accessibilityIdentifier("manageSessionExercises")
+                                    }.buttonStyle(.fitPlain).disabled(!model.editingInputs.isEmpty).accessibilityIdentifier("manageSessionExercises")
                                     if let current = model.current {
                                         progress(session, entry: current.entry, set: current.set)
                                         exercise(current.entry)
@@ -55,15 +55,16 @@ struct ActiveWorkoutView: View {
                                         Button { configuringEntry = current.entry } label: {
                                             Label("Manage \(current.entry.sets.count) sets", systemImage: "slider.horizontal.3")
                                                 .font(FitTheme.button(14)).frame(maxWidth: .infinity, minHeight: 48)
-                                        }.buttonStyle(.plain).dashboardGlass(in: Capsule(), interactive: true)
+                                                .dashboardGlass(in: Capsule(), interactive: true)
+                                        }.buttonStyle(.fitPlain)
                                             .accessibilityIdentifier("manageWorkoutSets")
                                         if [.ready, .activeSet, .exerciseTransition, .paused].contains(model.phase), current.set.status == .pending {
                                             inputs(current.entry, set: current.set)
                                             HStack {
-                                                Button("Skip set", systemImage: "forward.end") { act(.skipSet, expected: current.set.id) }
+                                                Button { act(.skipSet, expected: current.set.id) } label: { Label("Skip set", systemImage: "forward.end").frame(minHeight: 44).contentShape(Rectangle()) }
                                                     .disabled(model.phase == .paused || !model.editingInputs.isEmpty).accessibilityIdentifier("skipWorkoutSet")
                                                 Spacer()
-                                                Button("Add note", systemImage: "note.text.badge.plus") { openNote(current.entry.id, current.set.id) }
+                                                Button { openNote(current.entry.id, current.set.id) } label: { Label("Add note", systemImage: "note.text.badge.plus").frame(minHeight: 44).contentShape(Rectangle()) }
                                             }.font(FitTheme.medium(13)).frame(minHeight: 44)
                                         }
                                     } else {
@@ -78,7 +79,7 @@ struct ActiveWorkoutView: View {
                 }.safeAreaInset(edge: .bottom, spacing: 0) { footer(session) }
             } else {
                 ContentUnavailableView("No active workout", systemImage: "dumbbell", description: Text("Close this screen to start or resume a workout."))
-                    .safeAreaInset(edge: .bottom) { Button("Close", action: minimize).frame(minHeight: 54) }
+                    .safeAreaInset(edge: .bottom) { Button(action: minimize) { Text("Close").frame(minHeight: 54).contentShape(Rectangle()) } }
             }
         }
         .foregroundStyle(FitTheme.textPrimary).tint(FitTheme.dashboardAccent).background(FitTheme.dashboardBackground)
@@ -127,7 +128,7 @@ struct ActiveWorkoutView: View {
         HStack(alignment: .center, spacing: 12) {
             Button(action: minimize) {
                 Image(systemName: "chevron.down").frame(width: 44, height: 44).dashboardGlass(in: Circle(), interactive: true)
-            }.buttonStyle(.plain).accessibilityLabel("Minimize workout").accessibilityIdentifier("minimizeWorkout")
+            }.buttonStyle(.fitPlain).accessibilityLabel("Minimize workout").accessibilityIdentifier("minimizeWorkout")
             VStack(alignment: .leading, spacing: 4) {
                 Text(session.routineID == nil ? "QUICK WORKOUT" : "PLANNED ROUTINE").font(FitTheme.medium(9)).tracking(1.1).foregroundStyle(FitTheme.dashboardAccent)
                 Text(session.title).font(FitTheme.section(14)).lineLimit(2)
@@ -179,7 +180,7 @@ struct ActiveWorkoutView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                 Button { showTechnique = true } label: {
                     Image(systemName: "info.circle").font(.system(size: 19)).frame(width: 44, height: 44)
-                }.buttonStyle(.plain).accessibilityLabel("Exercise details and technique")
+                }.buttonStyle(.fitPlain).accessibilityLabel("Exercise details and technique")
             }
         }
     }
@@ -196,7 +197,7 @@ struct ActiveWorkoutView: View {
                     Text(previous.isCurrentWorkout ? "Previous set" : "Last time · " + previous.date.formatted(date: .abbreviated, time: .omitted)).font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary)
                     Text(entry.exercise.kind == .duration ? "\(previous.set.seconds.formatted()) sec" : "\(previous.set.reps) reps" + (entry.exercise.kind == .weighted ? " · \(model.unit.display(previous.set.loadKG).formatted()) \(model.unit.rawValue)" : ""))
                         .font(FitTheme.medium(13))
-                    if set.startedAt == nil { Button("Use previous") { store.reusePrevious(entryID: entry.id, setID: set.id) }.font(FitTheme.medium(12)).frame(minHeight: 44) }
+                    if set.startedAt == nil { Button { store.reusePrevious(entryID: entry.id, setID: set.id) } label: { Text("Use previous").font(FitTheme.medium(12)).frame(minHeight: 44).contentShape(Rectangle()) } }
                 }
             }
             ViewThatFits(in: .horizontal) {
@@ -252,7 +253,7 @@ struct ActiveWorkoutView: View {
         let expectedPhase = model.phase
         let expectedSet = model.current?.set.id
         return VStack(spacing: 8) {
-            if model.phase == .resting { Button("+15 seconds rest", systemImage: "plus") { act(.extendRest) }.font(FitTheme.medium(13)).frame(minHeight: 44) }
+            if model.phase == .resting { Button { act(.extendRest) } label: { Label("+15 seconds rest", systemImage: "plus").font(FitTheme.medium(13)).frame(minHeight: 44).contentShape(Rectangle()) } }
             if session.lastRecordedSet != nil {
                 WorkoutLastSetActions(store: store, sessionID: session.id, unit: model.unit)
             }

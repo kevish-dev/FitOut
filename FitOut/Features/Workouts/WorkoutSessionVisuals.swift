@@ -122,7 +122,7 @@ struct WorkoutRestCard: View {
                 Text(session.status == .paused ? "Rest paused" : "Rest between sets").font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
                 Text(WorkoutDisplay.clock(ceil(remaining))).font(FitTheme.metric(23)).monospacedDigit()
             }.frame(maxWidth: .infinity, alignment: .leading)
-            Button("End rest", action: end).font(FitTheme.button(13)).frame(minWidth: 70, minHeight: 44)
+            Button(action: end) { Text("End rest").font(FitTheme.button(13)).frame(minWidth: 70, minHeight: 44).contentShape(Rectangle()) }
                 .accessibilityIdentifier("endWorkoutRest")
         }
         .padding(FitTheme.cardInset).dashboardGlass(in: RoundedRectangle(cornerRadius: 22))

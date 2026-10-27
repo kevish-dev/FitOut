@@ -26,7 +26,7 @@ struct CoachView: View {
                             VStack(alignment: .leading, spacing: 8) {
                                 Label("Chat storage needs attention", systemImage: "externaldrive.badge.exclamationmark").font(FitTheme.section(15))
                                 Text(error).font(FitTheme.body(13))
-                                Button("Retry storage") { store.retryStorage() }.frame(minHeight: 44)
+                                Button { store.retryStorage() } label: { Text("Retry storage").frame(minHeight: 44).contentShape(Rectangle()) }
                             }.padding(FitTheme.cardInset).fitSurface(radius: 16)
                         }
                         if store.messages.isEmpty { welcome }
@@ -108,7 +108,7 @@ struct CoachView: View {
                 Button { sheet = .chats } label: { Image(systemName: "clock.arrow.circlepath").frame(width: 44, height: 44) }
                     .accessibilityLabel("Saved conversations")
                 Button { store.newChat() } label: { Image(systemName: "square.and.pencil").frame(width: 44, height: 44) }
-                .buttonStyle(.plain).disabled(!store.archiveLoaded || store.messages.isEmpty)
+                .buttonStyle(.fitPlain).disabled(!store.archiveLoaded || store.messages.isEmpty)
                 .accessibilityLabel("New conversation")
                 .accessibilityIdentifier("coachNewChat")
             }
@@ -165,7 +165,7 @@ struct CoachView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .fitSurface(radius: 16)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.fitPlain)
         .disabled(store.isResponding || !store.availability.isAvailable || !store.archiveLoaded)
     }
 
@@ -186,7 +186,7 @@ struct CoachView: View {
     private func refinement(_ label: String, question: String) -> some View {
         Button { store.draft = question; send() } label: {
             Text(label).font(FitTheme.medium(12)).padding(.horizontal, 14).frame(minHeight: 44).dashboardGlass(in: Capsule(), interactive: true)
-        }.buttonStyle(.plain).disabled(!store.availability.isAvailable || !store.archiveLoaded || store.isResponding)
+        }.buttonStyle(.fitPlain).disabled(!store.availability.isAvailable || !store.archiveLoaded || store.isResponding)
     }
 
     private var unavailableNotice: some View {
@@ -257,7 +257,7 @@ struct CoachView: View {
                         .background(FitTheme.dashboardAccent.opacity(store.isResponding || store.canSend ? 1 : 0.3), in: Circle())
                         .foregroundStyle(.white)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fitPlain)
                 .disabled(!store.isResponding && !store.canSend)
                 .accessibilityLabel(store.isResponding ? "Stop reply" : "Send message")
                 .accessibilityIdentifier("coachSendOrStop")

@@ -44,7 +44,7 @@ struct GoalsScreen: View {
             .frame(height: 51 * scale)
             .fitSurface(selected: selected, radius: 15)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.fitPlain)
         .accessibilityLabel(goal.title)
         .accessibilityAddTraits(selected ? .isSelected : [])
         .accessibilityIdentifier("goal-\(goal.rawValue)")

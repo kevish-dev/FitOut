@@ -45,7 +45,7 @@ struct WorkoutStreakCelebrationView: View {
                 .background(FitTheme.dashboardBackground)
                 .overlay(alignment: .topTrailing) {
                     Button(action: close) { Image(systemName: "xmark").frame(width: 44, height: 44).dashboardGlass(in: Circle(), interactive: true) }
-                        .buttonStyle(.plain).padding(.trailing, FitTheme.pageInset).padding(.top, 8)
+                        .buttonStyle(.fitPlain).padding(.trailing, FitTheme.pageInset).padding(.top, 8)
                         .accessibilityLabel("Close streak celebration")
                 }
             }

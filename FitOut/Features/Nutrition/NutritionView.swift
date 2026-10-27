@@ -91,7 +91,7 @@ struct NutritionView: View {
                 DatePicker("Nutrition date", selection: $date, in: ...Date(), displayedComponents: .date).labelsHidden().datePickerStyle(.compact).frame(maxWidth: .infinity)
                 Button { moveDate(1) } label: { Image(systemName: "chevron.right").frame(width: 44, height: 44) }.disabled(today).accessibilityLabel("Next day")
             }
-            if !today { Button("Back to today") { date = .now }.font(FitTheme.button(12)).frame(maxWidth: .infinity, minHeight: 36) }
+            if !today { Button { date = .now } label: { Text("Back to today").font(FitTheme.button(12)).frame(maxWidth: .infinity, minHeight: 44).contentShape(Rectangle()) } }
         }
         .font(FitTheme.body(14)).padding(.horizontal, 4)
         .dashboardGlass(in: RoundedRectangle(cornerRadius: 14))
@@ -108,7 +108,7 @@ struct NutritionView: View {
                             Text("\(NutritionUI.value(abs(goal - consumed))) kcal \(consumed > goal ? "above target" : "remaining")")
                                 .font(FitTheme.medium(12)).foregroundStyle(FitTheme.dashboardAccent)
                         }
-                    } else { Button("Set your targets", systemImage: "slider.horizontal.3") { sheet = .targets }.font(FitTheme.button(12)).frame(minHeight: 32) }
+                    } else { Button { sheet = .targets } label: { Label("Set your targets", systemImage: "slider.horizontal.3").font(FitTheme.button(12)).frame(minHeight: 44).contentShape(Rectangle()) } }
                     if summary.entries.isEmpty { Text("No food logged for this day").font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary) }
                     else if !summary.isComplete(.calories) { Text("Partial total · some energy values missing").font(FitTheme.body(11)).foregroundStyle(.secondary) }
                 }.frame(maxWidth: .infinity, alignment: .leading)
@@ -125,7 +125,7 @@ struct NutritionView: View {
                 HStack(alignment: .top, spacing: 16) {
                     macro(.protein, title: "Protein"); macro(.carbohydrates, title: "Carbs"); macro(.fat, title: "Fat")
                 }
-            }.buttonStyle(.plain).accessibilityLabel("Open daily nutrient breakdown")
+            }.buttonStyle(.fitPlain).accessibilityLabel("Open daily nutrient breakdown")
             HStack {
                 if summary.estimateCount > 0 { Text("\(summary.estimateCount) estimated \(summary.estimateCount == 1 ? "entry" : "entries")").font(FitTheme.body(11)).foregroundStyle(FitTheme.textSecondary) }
                 Spacer()
@@ -201,7 +201,7 @@ struct NutritionView: View {
                 Text(NutritionUI.value(entry.portion.values.calories)).font(FitTheme.section(15)).foregroundStyle(FitTheme.textPrimary)
                 Image(systemName: "chevron.right").font(.system(size: 10)).foregroundStyle(FitTheme.textSecondary).padding(.top, 3)
             }.padding(.vertical, 4).contentShape(Rectangle())
-        }.buttonStyle(.plain).contextMenu {
+        }.buttonStyle(.fitPlain).contextMenu {
             Button("Edit") { sheet = .entry(entry) }
             Button("Duplicate") { _ = store.repeatEntry(entry, on: date) }
             Menu("Move to meal") { ForEach(NutritionMeal.allCases) { meal in Button(meal.rawValue) { var value = entry; value.meal = meal; _ = store.saveEntry(value) } } }
@@ -225,7 +225,7 @@ struct NutritionView: View {
                     Button { container.hydration.log(amount, at: NutritionDates.timestamp(on: date)) } label: {
                         Text("+\(amount) ml").font(FitTheme.button(13)).frame(maxWidth: .infinity, minHeight: 44)
                             .dashboardGlass(in: Capsule(), interactive: true)
-                    }.buttonStyle(.plain)
+                    }.buttonStyle(.fitPlain)
                 }
             }
             if let latest = container.hydration.state.water.filter({ Calendar.current.isDate($0.date, inSameDayAs: date) }).max(by: { $0.date < $1.date }) {

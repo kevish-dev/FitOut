@@ -25,7 +25,7 @@ struct ExerciseFilterSheet: View {
                         headingLayout {
                             Label("Muscles", systemImage: "figure.arms.open").font(FitTheme.section(17))
                             if !typeSize.isAccessibilitySize { Spacer() }
-                            Button("Use muscle map") { showMap = true }.font(FitTheme.medium(12)).frame(minHeight: 44)
+                            Button { showMap = true } label: { Text("Use muscle map").font(FitTheme.medium(12)).frame(minHeight: 44).contentShape(Rectangle()) }
                         }
                         Text("Choose any. Primary and secondary muscles are included.")
                             .font(FitTheme.body(12)).foregroundStyle(FitTheme.textSecondary)

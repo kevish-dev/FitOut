@@ -89,14 +89,14 @@ struct ExerciseBrowser: View {
                         .accessibilityIdentifier("exerciseSearch")
                     if !query.search.isEmpty {
                         Button { query.search = "" } label: { Image(systemName: "xmark.circle.fill").frame(width: 44, height: 44) }
-                            .buttonStyle(.plain).foregroundStyle(FitTheme.textSecondary).accessibilityLabel("Clear search")
+                            .buttonStyle(.fitPlain).foregroundStyle(FitTheme.textSecondary).accessibilityLabel("Clear search")
                     }
                 }
                 .padding(.leading, 14).padding(.trailing, query.search.isEmpty ? 14 : 0).frame(minHeight: 50)
                 .background(FitTheme.surface, in: RoundedRectangle(cornerRadius: 15))
                 .overlay { RoundedRectangle(cornerRadius: 15).strokeBorder(searchFocused ? FitTheme.dashboardAccent : FitTheme.subtleBorder, lineWidth: 1) }
                 if searchFocused {
-                    Button("Done") { searchFocused = false }.font(FitTheme.button(14)).frame(minWidth: 44, minHeight: 44)
+                    Button { searchFocused = false } label: { Text("Done").font(FitTheme.button(14)).frame(minWidth: 44, minHeight: 44).contentShape(Rectangle()) }
                 }
             }
             if !searchFocused {
@@ -157,7 +157,7 @@ struct ExerciseBrowser: View {
                     ExerciseChoiceChip(title: category.rawValue, symbol: "xmark", selected: true) { query.filters.category = nil }
                         .accessibilityLabel("Remove type filter")
                 }
-                Button("Clear filters") { query.filters = ExerciseBrowseFilters() }.font(FitTheme.medium(12)).frame(minHeight: 44)
+                Button { query.filters = ExerciseBrowseFilters() } label: { Text("Clear filters").font(FitTheme.medium(12)).frame(minHeight: 44).contentShape(Rectangle()) }
             }
         }
     }
@@ -224,7 +224,7 @@ struct ExerciseBrowser: View {
                             .contentTransition(.numericText()).animation(FitMotion.change(reduceMotion: reduceMotion), value: chosen.count)
                     }.disabled(chosen.isEmpty)
                     Spacer()
-                    if !chosen.isEmpty { Button("Clear") { selection.clear(); reviewSelection = false }.font(FitTheme.medium(12)).frame(minHeight: 44) }
+                    if !chosen.isEmpty { Button { selection.clear(); reviewSelection = false } label: { Text("Clear").font(FitTheme.medium(12)).frame(minHeight: 44).contentShape(Rectangle()) } }
                 }
                 if reviewSelection && !chosen.isEmpty { selectionTray.transition(.opacity) }
             }
@@ -268,8 +268,8 @@ struct ExerciseBrowser: View {
             Text(query.scope == .favorites ? "No matching favorites" : "No matching exercises").font(FitTheme.section(19))
             Text("Try another search or clear the filters. You can also create your own exercise.")
                 .font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary).multilineTextAlignment(.center)
-            Button("Clear search & filters") { query.search = ""; query.filters = ExerciseBrowseFilters(); query.scope = .all }.font(FitTheme.button(14)).frame(minHeight: 44)
-            Button("Create an exercise") { createExercise() }.font(FitTheme.medium(13)).frame(minHeight: 44)
+            Button { query.search = ""; query.filters = ExerciseBrowseFilters(); query.scope = .all } label: { Text("Clear search & filters").font(FitTheme.button(14)).frame(minHeight: 44).contentShape(Rectangle()) }
+            Button { createExercise() } label: { Text("Create an exercise").font(FitTheme.medium(13)).frame(minHeight: 44).contentShape(Rectangle()) }
         }.frame(maxWidth: .infinity).padding(.vertical, 28)
     }
 

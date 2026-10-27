@@ -15,10 +15,10 @@ struct MuscleSelection: View {
                             .frame(maxWidth: .infinity, minHeight: 44)
                             .foregroundStyle(selection.contains(muscle) ? FitTheme.dashboardAccent : FitTheme.textPrimary)
                             .dashboardGlass(in: RoundedRectangle(cornerRadius: 12), highlighted: selection.contains(muscle), interactive: true)
-                    }.buttonStyle(.plain).accessibilityValue(selection.contains(muscle) ? "Selected" : "Not selected")
+                    }.buttonStyle(.fitPlain).accessibilityValue(selection.contains(muscle) ? "Selected" : "Not selected")
                 }
             }
-            Button("Use muscle map") { showMap = true }.font(FitTheme.button(13)).frame(minHeight: 44)
+            Button { showMap = true } label: { Text("Use muscle map").font(FitTheme.button(13)).frame(minHeight: 44).contentShape(Rectangle()) }
         }
         .sheet(isPresented: $showMap) { NavigationStack { MuscleMapView(selection: $selection).toolbar { Button("Done") { showMap = false } } } }
     }

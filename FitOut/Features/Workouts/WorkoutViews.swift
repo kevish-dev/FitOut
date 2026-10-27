@@ -51,8 +51,10 @@ struct WorkoutSummary: View {
                 }
                 Label(session.startedAt.formatted(date: .abbreviated, time: .shortened), systemImage: "calendar")
                     .font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
-                Button("Timing & session timeline", systemImage: "stopwatch") { showTiming = true }
-                    .font(FitTheme.button(14)).frame(minHeight: 44)
+                Button { showTiming = true } label: {
+                    Label("Timing & session timeline", systemImage: "stopwatch")
+                        .font(FitTheme.button(14)).frame(minHeight: 44).contentShape(Rectangle())
+                }
                 if !records.isEmpty {
                     VStack(alignment: .leading, spacing: 10) {
                         Label("New personal records", systemImage: "trophy").font(FitTheme.section(17)).foregroundStyle(FitTheme.dashboardAccent)
@@ -82,8 +84,8 @@ struct WorkoutSummary: View {
                                 HStack {
                                     Text("Set \(reference.number)").font(FitTheme.medium(12)).foregroundStyle(FitTheme.textSecondary)
                                     Spacer()
-                                    Button { editing = reference } label: { Label("Edit", systemImage: "pencil").font(FitTheme.medium(12)).frame(minHeight: 44) }
-                                        .buttonStyle(.plain).accessibilityLabel("Edit \(entry.exercise.name), set \(reference.number)")
+                                    Button { editing = reference } label: { Label("Edit", systemImage: "pencil").font(FitTheme.medium(12)).frame(minWidth: 44, minHeight: 44) }
+                                        .buttonStyle(.fitPlain).accessibilityLabel("Edit \(entry.exercise.name), set \(reference.number)")
                                 }
                             }
                             if set.status == .skipped {

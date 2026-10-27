@@ -88,7 +88,7 @@ struct MyRoutinesView: View {
                     Text("\(routine.trainingDays.count) training days · \(routine.isActive ? "Active" : routine.archivedAt == nil ? "Saved" : "Archived")")
                         .font(FitTheme.body(12)).foregroundStyle(.secondary)
                 }.frame(maxWidth: .infinity, minHeight: 52, alignment: .leading).contentShape(Rectangle())
-            }.buttonStyle(.plain)
+            }.buttonStyle(.fitPlain)
             Menu {
                 Button("Edit") { if destination == nil { destination = .edit(routine, stage: .schedule) } }
                 if routine.archivedAt != nil {

@@ -29,9 +29,9 @@ struct FoodSelectionSheet: View {
                 Section("\(foods.count) foods") {
                     ForEach(foods) { food in
                         HStack(spacing: 8) {
-                            Button { chosen = food } label: { NutritionFoodRow(food: food) }.buttonStyle(.plain)
+                            Button { chosen = food } label: { NutritionFoodRow(food: food) }.buttonStyle(.fitPlain)
                                 .accessibilityIdentifier("selectFood-\(food.id)")
-                            Button { _ = store.favorite(food.id) } label: { Image(systemName: store.preferences.favoriteIDs.contains(food.id) ? "star.fill" : "star").frame(width: 36, height: 44) }
+                            Button { _ = store.favorite(food.id) } label: { Image(systemName: store.preferences.favoriteIDs.contains(food.id) ? "star.fill" : "star").frame(width: 44, height: 44).contentShape(Rectangle()) }
                                 .buttonStyle(.borderless).accessibilityLabel("Favorite \(food.name)")
                         }
                     }

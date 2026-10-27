@@ -52,27 +52,29 @@ struct ExerciseImageButton: View {
     var body: some View {
         if let exercise, let image = exercise.imageAssetName.flatMap({ UIImage(named: $0) }) {
             Button { showingImage = true } label: {
-                switch style {
-                case .reference:
-                    Label("View exercise image", systemImage: "arrow.up.left.and.arrow.down.right")
-                        .font(FitTheme.medium(13)).frame(minHeight: 44)
-                case .detail:
-                    VStack(spacing: 10) {
-                        ExerciseArtwork(exercise: exercise, expanded: true)
-                        Label("Tap to explore the image", systemImage: "arrow.up.left.and.arrow.down.right")
-                            .font(FitTheme.medium(12)).padding(.bottom, 4)
-                    }
-                case .workoutStage(let height):
-                    Image(uiImage: image).resizable().scaledToFit()
-                        .frame(maxWidth: .infinity).frame(height: height).padding(.horizontal, 12)
-                        .overlay(alignment: .topTrailing) {
-                            Image(systemName: "arrow.up.left.and.arrow.down.right")
-                                .font(.system(size: 12)).frame(width: 44, height: 44)
-                                .dashboardGlass(in: Circle()).padding(10)
+                Group {
+                    switch style {
+                    case .reference:
+                        Label("View exercise image", systemImage: "arrow.up.left.and.arrow.down.right")
+                            .font(FitTheme.medium(13)).frame(minHeight: 44)
+                    case .detail:
+                        VStack(spacing: 10) {
+                            ExerciseArtwork(exercise: exercise, expanded: true)
+                            Label("Tap to explore the image", systemImage: "arrow.up.left.and.arrow.down.right")
+                                .font(FitTheme.medium(12)).padding(.bottom, 4)
                         }
-                case .thumbnail(let size):
-                    ExerciseArtwork(exercise: exercise, size: size)
-                }
+                    case .workoutStage(let height):
+                        Image(uiImage: image).resizable().scaledToFit()
+                            .frame(maxWidth: .infinity).frame(height: height).padding(.horizontal, 12)
+                            .overlay(alignment: .topTrailing) {
+                                Image(systemName: "arrow.up.left.and.arrow.down.right")
+                                    .font(.system(size: 12)).frame(width: 44, height: 44)
+                                    .dashboardGlass(in: Circle()).padding(10)
+                            }
+                    case .thumbnail(let size):
+                        ExerciseArtwork(exercise: exercise, size: size)
+                    }
+                }.contentShape(.interaction, Rectangle())
             }
             .buttonStyle(.borderless).tint(FitTheme.dashboardAccent)
             .accessibilityLabel("View image for \(exercise.name)")

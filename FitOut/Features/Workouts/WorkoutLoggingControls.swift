@@ -52,7 +52,7 @@ struct WorkoutExerciseCard: View {
                 Divider().overlay(FitTheme.textPrimary.opacity(0.05))
                 if entry.skipped {
                     Text("Previously logged sets are kept.").font(FitTheme.body(13)).foregroundStyle(FitTheme.textSecondary)
-                    Button("Restore exercise", action: toggleSkip).font(FitTheme.button(14)).frame(minHeight: 44)
+                    Button(action: toggleSkip) { Text("Restore exercise").font(FitTheme.button(14)).frame(minHeight: 44).contentShape(Rectangle()) }
                 } else {
                     ExerciseImageButton(exercise: entry.exercise)
                     ForEach(Array(entry.sets.enumerated()), id: \.element.id) { index, set in
@@ -144,8 +144,7 @@ struct WorkoutSetEditor: View {
                 }
             }
             else if !isLogged {
-                Button("Start set timer", systemImage: "stopwatch", action: start)
-                    .font(FitTheme.medium(12)).frame(minHeight: 44).disabled(!canComplete)
+                Button(action: start) { Label("Start set timer", systemImage: "stopwatch").font(FitTheme.medium(12)).frame(minHeight: 44).contentShape(Rectangle()) }.disabled(!canComplete)
             }
             DisclosureGroup("Effort (optional)") {
                 Toggle("Record RPE", isOn: Binding(get: { value.rpe != nil }, set: { value.rpe = $0 ? 7 : nil }))
@@ -168,8 +167,7 @@ struct WorkoutSetEditor: View {
     }
     @ViewBuilder private var reuseAction: some View {
         if !isLogged && value.startedAt == nil {
-            Button("Use previous", systemImage: "arrow.uturn.down", action: reuse)
-                .font(FitTheme.medium(12)).frame(minHeight: 44)
+            Button(action: reuse) { Label("Use previous", systemImage: "arrow.uturn.down").font(FitTheme.medium(12)).frame(minHeight: 44).contentShape(Rectangle()) }
                 .accessibilityHint("Copies previous inputs into this set. Logging is still required.")
         }
     }
@@ -183,9 +181,9 @@ struct WorkoutSetEditor: View {
     @ViewBuilder private var timerAction: some View {
         if !isLogged {
             if value.timedActiveSeconds == nil {
-                Button("Stop timer", systemImage: "stop.fill", action: stopTimer).font(FitTheme.medium(12)).frame(minHeight: 44)
+                Button(action: stopTimer) { Label("Stop timer", systemImage: "stop.fill").font(FitTheme.medium(12)).frame(minHeight: 44).contentShape(Rectangle()) }
             } else {
-                Button("Restart", systemImage: "arrow.clockwise", action: start).font(FitTheme.medium(12)).frame(minHeight: 44).disabled(!canComplete)
+                Button(action: start) { Label("Restart", systemImage: "arrow.clockwise").font(FitTheme.medium(12)).frame(minHeight: 44).contentShape(Rectangle()) }.disabled(!canComplete)
             }
         }
     }
@@ -269,7 +267,7 @@ struct WorkoutLogNumberField: View {
             value = min(maximum, max(0, ((value + delta) * 100).rounded() / 100))
         } label: {
             Image(systemName: symbol).font(.system(size: 12, weight: .semibold)).frame(width: 44, height: 44)
-        }.buttonStyle(.plain).buttonRepeatBehavior(.enabled)
+        }.buttonStyle(.fitPlain).buttonRepeatBehavior(.enabled)
             .foregroundStyle(FitTheme.textSecondary)
             .disabled(!value.isFinite || (delta < 0 ? value <= 0 : value >= maximum))
             .accessibilityLabel("\(delta < 0 ? "Decrease" : "Increase") \(title) by \(step.formatted())")

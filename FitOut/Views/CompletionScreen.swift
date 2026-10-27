@@ -39,7 +39,7 @@ struct CompletionScreen: View {
                         .font(FitTheme.button(16))
                         .frame(maxWidth: .infinity).frame(height: 54)
                         .foregroundStyle(FitTheme.orange).fitSurface(selected: true)
-                }.buttonStyle(.plain).accessibilityIdentifier("editProfileButton")
+                }.buttonStyle(.fitPlain).accessibilityIdentifier("editProfileButton")
                 ShareLink(item: exportText) {
                     Label("Share my goals", systemImage: "square.and.arrow.up")
                         .font(FitTheme.medium(14)).foregroundStyle(FitTheme.textPrimary.opacity(0.65))

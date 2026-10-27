@@ -56,7 +56,7 @@ struct WeightScreen: View {
                             .frame(maxWidth: .infinity).frame(height: 42)
                             .fitSurface(selected: unit == profile.unit, radius: 12)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.fitPlain)
                     .accessibilityLabel(unit == .kg ? "Kilograms" : "Pounds")
                     .accessibilityAddTraits(unit == profile.unit ? .isSelected : [])
                 }
@@ -79,7 +79,7 @@ struct WeightScreen: View {
                 .frame(maxWidth: .infinity).frame(height: 38)
                 .fitSurface(selected: isTarget == target, radius: 12)
         }
-        .buttonStyle(.plain)
+        .buttonStyle(.fitPlain)
         .accessibilityLabel(target ? "Target weight" : "Current weight")
         .accessibilityAddTraits(isTarget == target ? .isSelected : [])
     }

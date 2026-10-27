@@ -64,7 +64,7 @@ struct ProfileScreen: View {
                             .frame(maxWidth: .infinity).frame(height: 38)
                             .foregroundStyle(!profile.usesPhoto ? FitTheme.orange : FitTheme.textPrimary)
                             .fitSurface(selected: !profile.usesPhoto, radius: 13)
-                    }.buttonStyle(.plain)
+                    }.buttonStyle(.fitPlain)
                     Button {
                         isNameFocused = false
                         photoError = nil
@@ -77,7 +77,7 @@ struct ProfileScreen: View {
                             .foregroundStyle(profile.usesPhoto ? FitTheme.orange : FitTheme.textPrimary)
                             .fitSurface(selected: profile.usesPhoto, radius: 13)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.fitPlain)
                     .accessibilityIdentifier("uploadAvatarButton")
                 }.fitSurface(radius: 13)
             }
@@ -101,7 +101,7 @@ struct ProfileScreen: View {
                             .frame(width: 24, height: 4)
                             .frame(height: 32)
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(.fitPlain)
                     .accessibilityLabel("Avatar page \(page + 1)")
                     .accessibilityAddTraits(emojiPage == page ? .isSelected : [])
                 }
@@ -131,7 +131,7 @@ struct ProfileScreen: View {
                         .fitSurface(selected: selected, radius: 25)
                         .frame(maxWidth: .infinity)
                 }
-                .buttonStyle(.plain)
+                .buttonStyle(.fitPlain)
                 .accessibilityLabel("\(emoji) avatar")
                 .accessibilityAddTraits(selected ? .isSelected : [])
             }
